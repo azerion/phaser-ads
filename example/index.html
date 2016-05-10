@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
+
+    <title>Phaser Advertisement example</title>
+
+    <!-- Include Phaser Crisp Text JS -->
+    <script type="text/javascript" src="../node_modules/phaser/build/phaser.js"></script>
+    <script type="text/javascript" src="../build/phaser-ads.js"></script>
+
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        canvas {
+            box-shadow: 0px 0px 5px black;
+            margin: 20px auto;
+        }
+    </style>
+
+    <!-- Game we want to track -->
+    <script type="text/javascript">
+        var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { create: create, preload: preload, resize: resize}, true);
+        Phaser.Device.whenReady(function () {
+            game.plugins.add(Fabrique.Plugins.AdManager);
+        });
+
+        function preload() {
+            if (!game.device.desktop) {
+                game.scale.setGameSize(window.innerWidth, window.innerHeight);
+                game.scale.setUserScale(window.innerWidth / 800, window.innerHeight / 600);
+            } else {
+                game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+            }
+        }
+
+        function create(){
+            //let's add a nice background
+            var crispText = game.add.crispText(400, 300, 'This text is soo crisp!', {
+                font: '50px Arial',
+                fill: '#000000'
+            });
+            crispText.anchor.set(0.5);
+            crispText.scale.set(1 / game.scale.grid.multiplier);
+        }
+
+        function resize() {
+            console.log('reszied');
+        }
+    </script>
+</head>
+<body>
+</body>
+</html>

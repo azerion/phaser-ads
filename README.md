@@ -1,2 +1,2 @@
 # phaser-ads
-A Phaser plugin for providing nice ads integrate in your phaser.io game
+A Phaser plugin for providing nice ads integration in your phaser.io game
