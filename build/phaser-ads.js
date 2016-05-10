@@ -26,8 +26,9 @@ var Fabrique;
                 this.onContentResumed = new Phaser.Signal();
                 this.onAdClicked = new Phaser.Signal();
                 this.onAdError = new Phaser.Signal();
+                this.onAdReady = new Phaser.Signal();
                 this.provider = null;
-                Object.defineProperty(game.ads, 'game', {
+                Object.defineProperty(game, 'ads', {
                     value: this
                 });
             }
@@ -39,6 +40,7 @@ var Fabrique;
                 if (null === this.provider) {
                     return;
                 }
+                this.provider.playAd();
             };
             AdManager.prototype.hideAd = function () {
                 if (null === this.provider) {
@@ -56,7 +58,6 @@ var Fabrique;
     (function (AdProvider) {
         var AdSense = (function () {
             function AdSense(game, gameContentId, adContentId, adTagUrl) {
-                var _this = this;
                 this.googleEnabled = false;
                 this.canPlayAds = false;
                 this.adTagUrl = '';
@@ -70,31 +71,12 @@ var Fabrique;
                 this.gameContent = document.getElementById(gameContentId);
                 this.gameContent.currentTime = 100;
                 this.adTagUrl = adTagUrl;
+                this.game = game;
                 // Create the ad display container.
                 this.createAdDisplayContainer();
-                // Create ads loader.
-                this.adLoader = new google.ima.AdsLoader(this.adDisplay);
-                // Listen and respond to ads loaded and error events.
-                this.adLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, function (adsManagerLoadedEvent) { return _this.onAdManagerLoader(adsManagerLoadedEvent); }, false);
-                this.adLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, this.onAdError, false);
                 google.ima.settings.setVpaidMode(google.ima.ImaSdkSettings.VpaidMode.ENABLED);
                 //set language
                 google.ima.settings.setLocale('nl');
-                // Request video ads.
-                var adsRequest = new google.ima.AdsRequest();
-                adsRequest.adTagUrl = this.adTagUrl;
-                // Specify the linear and nonlinear slot sizes. This helps the SDK to
-                // select the correct creative if multiple are returned.
-                adsRequest.linearAdSlotWidth = this.game.width;
-                adsRequest.linearAdSlotHeight = this.game.height;
-                adsRequest.nonLinearAdSlotWidth = this.game.width;
-                adsRequest.nonLinearAdSlotHeight = this.game.height;
-                adsRequest.forceNonLinearFullSlot = true; //required to comply with google rules
-                try {
-                    this.adLoader.requestAds(adsRequest);
-                }
-                catch (e) {
-                }
             }
             AdSense.prototype.playAd = function () {
                 if (!this.googleEnabled || !this.canPlayAds) {
@@ -115,10 +97,37 @@ var Fabrique;
                     this.adContent.style.display = 'none';
                     // An error may be thrown if there was a problem with the VAST response.
                     console.log('ad error!!!!', adError);
+                    this.adManager.onAdError.dispatch(adError);
                 }
             };
             AdSense.prototype.setManager = function (manager) {
+                var _this = this;
                 this.adManager = manager;
+                // Create ads loader.
+                this.adLoader = new google.ima.AdsLoader(this.adDisplay);
+                // Listen and respond to ads loaded and error events.
+                this.adLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, function (adsManagerLoadedEvent) { return _this.onAdManagerLoader(adsManagerLoadedEvent); }, false);
+                this.adLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, function (e) {
+                    console.log('No ad available', e);
+                    //We silently ignore adLoader errors, it just means there is no ad available
+                    _this.adManager.onAdReady.dispatch();
+                }, false);
+                // Request video ads.
+                var adsRequest = new google.ima.AdsRequest();
+                adsRequest.adTagUrl = this.adTagUrl;
+                // Specify the linear and nonlinear slot sizes. This helps the SDK to
+                // select the correct creative if multiple are returned.
+                adsRequest.linearAdSlotWidth = this.game.width;
+                adsRequest.linearAdSlotHeight = this.game.height;
+                adsRequest.nonLinearAdSlotWidth = this.game.width;
+                adsRequest.nonLinearAdSlotHeight = this.game.height;
+                adsRequest.forceNonLinearFullSlot = true; //required to comply with google rules
+                try {
+                    this.adLoader.requestAds(adsRequest);
+                }
+                catch (e) {
+                    this.adManager.onAdReady.dispatch();
+                }
             };
             AdSense.prototype.createAdDisplayContainer = function () {
                 this.adDisplay = new google.ima.AdDisplayContainer(this.adContent, this.gameContent);
@@ -130,7 +139,6 @@ var Fabrique;
                 adsRenderingSettings.restoreCustomPlaybackStateOnAdBreakComplete = true;
                 this.canPlayAds = true;
                 // videoContent should be set to the content video element.
-                console.log(this.gameContent);
                 this.adsManager = adsManagerLoadedEvent.getAdsManager(this.gameContent, adsRenderingSettings);
                 // Add listeners to the required events.
                 this.adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, function (error) { return _this.onAdError.call(_this, error); });
@@ -141,6 +149,7 @@ var Fabrique;
                 this.adsManager.addEventListener(google.ima.AdEvent.Type.LOADED, this.onAdEvent.bind(this));
                 this.adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, this.onAdEvent.bind(this));
                 this.adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, this.onAdEvent.bind(this));
+                this.adManager.onAdReady.dispatch();
             };
             AdSense.prototype.onAdEvent = function () {
                 console.log('onAdEvent', arguments);

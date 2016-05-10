@@ -35,43 +35,15 @@ module Fabrique {
                 this.gameContent.currentTime = 100;
 
                 this.adTagUrl = adTagUrl;
+                this.game = game;
 
                 // Create the ad display container.
                 this.createAdDisplayContainer();
-                // Create ads loader.
-                this.adLoader = new google.ima.AdsLoader(this.adDisplay);
-                // Listen and respond to ads loaded and error events.
-                this.adLoader.addEventListener(
-                    google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
-                    (adsManagerLoadedEvent: GoogleAds.ima.AdsManagerLoadedEvent) => this.onAdManagerLoader(adsManagerLoadedEvent),
-                    false);
-                this.adLoader.addEventListener(
-                    google.ima.AdErrorEvent.Type.AD_ERROR,
-                    this.onAdError,
-                    false);
 
                 (<any>google.ima.settings).setVpaidMode((<any>google.ima).ImaSdkSettings.VpaidMode.ENABLED);
 
                 //set language
                 (<any>google.ima.settings).setLocale('nl');
-
-                // Request video ads.
-                var adsRequest = new google.ima.AdsRequest();
-                adsRequest.adTagUrl = this.adTagUrl;
-                // Specify the linear and nonlinear slot sizes. This helps the SDK to
-                // select the correct creative if multiple are returned.
-                adsRequest.linearAdSlotWidth = this.game.width;
-                adsRequest.linearAdSlotHeight = this.game.height;
-
-                adsRequest.nonLinearAdSlotWidth = this.game.width;
-                adsRequest.nonLinearAdSlotHeight = this.game.height;
-                adsRequest.forceNonLinearFullSlot = true; //required to comply with google rules
-
-                try {
-                    this.adLoader.requestAds(adsRequest);
-                } catch (e) {
-                    //somehow this get's thrown on iOS
-                }
             }
 
             public playAd(): void {
@@ -94,11 +66,46 @@ module Fabrique {
                     this.adContent.style.display = 'none';
                     // An error may be thrown if there was a problem with the VAST response.
                     console.log('ad error!!!!', adError);
+                    this.adManager.onAdError.dispatch(adError);
                 }
             }
 
             public setManager(manager: AdManager): void {
                 this.adManager = manager;
+
+                // Create ads loader.
+                this.adLoader = new google.ima.AdsLoader(this.adDisplay);
+                // Listen and respond to ads loaded and error events.
+                this.adLoader.addEventListener(
+                    google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
+                    (adsManagerLoadedEvent: GoogleAds.ima.AdsManagerLoadedEvent) => this.onAdManagerLoader(adsManagerLoadedEvent),
+                    false);
+                this.adLoader.addEventListener(
+                    google.ima.AdErrorEvent.Type.AD_ERROR,
+                    (e) => {
+                        console.log('No ad available', e);
+                        //We silently ignore adLoader errors, it just means there is no ad available
+                        this.adManager.onAdReady.dispatch()
+                    },
+                    false);
+
+                // Request video ads.
+                var adsRequest = new google.ima.AdsRequest();
+                adsRequest.adTagUrl = this.adTagUrl;
+                // Specify the linear and nonlinear slot sizes. This helps the SDK to
+                // select the correct creative if multiple are returned.
+                adsRequest.linearAdSlotWidth = this.game.width;
+                adsRequest.linearAdSlotHeight = this.game.height;
+
+                adsRequest.nonLinearAdSlotWidth = this.game.width;
+                adsRequest.nonLinearAdSlotHeight = this.game.height;
+                adsRequest.forceNonLinearFullSlot = true; //required to comply with google rules
+
+                try {
+                    this.adLoader.requestAds(adsRequest);
+                } catch (e) {
+                    this.adManager.onAdReady.dispatch();
+                }
             }
 
             private createAdDisplayContainer(): void {
@@ -113,7 +120,6 @@ module Fabrique {
                 this.canPlayAds = true;
 
                 // videoContent should be set to the content video element.
-                console.log(this.gameContent)
                 this.adsManager = adsManagerLoadedEvent.getAdsManager(this.gameContent, adsRenderingSettings);
 
                 // Add listeners to the required events.
@@ -140,6 +146,8 @@ module Fabrique {
                 this.adsManager.addEventListener(
                     google.ima.AdEvent.Type.COMPLETE,
                     this.onAdEvent.bind(this));
+
+                this.adManager.onAdReady.dispatch();
             }
 
             private onAdEvent() {

@@ -16,13 +16,15 @@ module Fabrique {
             public onAdClicked: Phaser.Signal = new Phaser.Signal();
 
             public onAdError: Phaser.Signal = new Phaser.Signal();
+            
+            public onAdReady: Phaser.Signal = new Phaser.Signal();
 
             private provider: AdProvider.IProvider = null;
 
             constructor(game: AdGame, parent:PIXI.DisplayObject) {
                 super(game, parent);
 
-                Object.defineProperty(game.ads, 'game', {
+                Object.defineProperty(game, 'ads', {
                     value: this
                 });
             }
@@ -36,6 +38,8 @@ module Fabrique {
                 if (null === this.provider) {
                     return;
                 }
+
+                this.provider.playAd();
             }
 
             hideAd(): void {
