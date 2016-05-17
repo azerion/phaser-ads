@@ -1,5 +1,5 @@
 /*!
- * phaser-ads - version 0.1.0-alpha2 
+ * phaser-ads - version 0.1.0-alpha3 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
@@ -115,7 +115,7 @@ var Fabrique;
             AdSense.prototype.setManager = function (manager) {
                 var _this = this;
                 this.adManager = manager;
-                if (!this.googleEnabled || !this.canPlayAds) {
+                if (!this.googleEnabled) {
                     this.adManager.onAdReady.dispatch();
                     return;
                 }

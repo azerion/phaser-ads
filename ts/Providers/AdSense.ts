@@ -90,7 +90,7 @@ module Fabrique {
             public setManager(manager: AdManager): void {
                 this.adManager = manager;
 
-                if (!this.googleEnabled || !this.canPlayAds) {
+                if (!this.googleEnabled) {
                     this.adManager.onAdReady.dispatch();
                     return;
                 }
