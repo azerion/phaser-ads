@@ -1,5 +1,9 @@
 module Fabrique {
     export module AdProvider {
+        export interface ICustomParams {
+            [name: string]: string | number| any[];
+        }
+
         export class AdSense implements IProvider {
             private gameContent: any;
 
@@ -21,7 +25,7 @@ module Fabrique {
 
             public adManager: AdManager = null;
 
-            constructor(game: Phaser.Game, gameContentId: string, adContentId: string, adTagUrl: string) {
+            constructor(game: Phaser.Game, gameContentId: string, adContentId: string, adTagUrl: string, customParams?: ICustomParams) {
                 if (typeof google === "undefined") {
                     return;
                 }
@@ -36,6 +40,19 @@ module Fabrique {
 
                 this.adTagUrl = adTagUrl;
                 this.game = game;
+
+                if (undefined !== customParams) {
+                    let customDataString: string = '';
+                    for (let key in customParams) {
+                        if (customDataString.length > 0) {
+                            customDataString += '' +
+                                '&';
+                        }
+                        var param = (Array.isArray(customParams[key])) ? (<any[]>customParams[key]).join(',') : customParams[key];
+                        customDataString += key + '=' + param;
+                    }
+                    this.adTagUrl += '&cust_params=' + encodeURIComponent(customDataString);
+                }
 
                 // Create the ad display container.
                 this.createAdDisplayContainer();

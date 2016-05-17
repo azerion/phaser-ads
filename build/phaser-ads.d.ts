@@ -21,6 +21,9 @@ declare module Fabrique {
 }
 declare module Fabrique {
     module AdProvider {
+        interface ICustomParams {
+            [name: string]: string | number | any[];
+        }
         class AdSense implements IProvider {
             private gameContent;
             private adContent;
@@ -32,7 +35,7 @@ declare module Fabrique {
             private adTagUrl;
             private game;
             adManager: AdManager;
-            constructor(game: Phaser.Game, gameContentId: string, adContentId: string, adTagUrl: string);
+            constructor(game: Phaser.Game, gameContentId: string, adContentId: string, adTagUrl: string, customParams?: ICustomParams);
             playAd(): void;
             setManager(manager: AdManager): void;
             private createAdDisplayContainer();

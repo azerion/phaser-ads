@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 0.0.1 
+ * phaser-ads - version 0.1.0-alpha1 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 10-05-2016
+ * Build at 17-05-2016
  * Released under MIT License 
  */
 
@@ -57,7 +57,7 @@ var Fabrique;
     var AdProvider;
     (function (AdProvider) {
         var AdSense = (function () {
-            function AdSense(game, gameContentId, adContentId, adTagUrl) {
+            function AdSense(game, gameContentId, adContentId, adTagUrl, customParams) {
                 this.googleEnabled = false;
                 this.canPlayAds = false;
                 this.adTagUrl = '';
@@ -72,6 +72,18 @@ var Fabrique;
                 this.gameContent.currentTime = 100;
                 this.adTagUrl = adTagUrl;
                 this.game = game;
+                if (undefined !== customParams) {
+                    var customDataString = '';
+                    for (var key in customParams) {
+                        if (customDataString.length > 0) {
+                            customDataString += '' +
+                                '&';
+                        }
+                        var param = (Array.isArray(customParams[key])) ? customParams[key].join(',') : customParams[key];
+                        customDataString += key + '=' + param;
+                    }
+                    this.adTagUrl += '&cust_params=' + encodeURIComponent(customDataString);
+                }
                 // Create the ad display container.
                 this.createAdDisplayContainer();
                 google.ima.settings.setVpaidMode(google.ima.ImaSdkSettings.VpaidMode.ENABLED);
