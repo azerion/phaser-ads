@@ -4,18 +4,14 @@ declare module Fabrique {
             ads: Fabrique.Plugins.AdManager;
         }
         class AdManager extends Phaser.Plugin {
-            onAdStarted: Phaser.Signal;
-            onAdFinished: Phaser.Signal;
             onContentPaused: Phaser.Signal;
             onContentResumed: Phaser.Signal;
             onAdClicked: Phaser.Signal;
-            onAdError: Phaser.Signal;
-            onAdReady: Phaser.Signal;
             private provider;
             constructor(game: AdGame, parent: PIXI.DisplayObject);
             setAdProvider(provider: AdProvider.IProvider): void;
-            showAd(): void;
-            hideAd(): void;
+            requestAd(): void;
+            enableMobileAds(): void;
         }
     }
 }
@@ -34,13 +30,15 @@ declare module Fabrique {
             private canPlayAds;
             private adTagUrl;
             private game;
+            private adRequested;
             adManager: AdManager;
             constructor(game: Phaser.Game, gameContentId: string, adContentId: string, adTagUrl: string, customParams?: ICustomParams);
-            playAd(): void;
             setManager(manager: AdManager): void;
-            private createAdDisplayContainer();
+            requestAd(): void;
+            initializeAd(): void;
             private onAdManagerLoader(adsManagerLoadedEvent);
-            private onAdEvent();
+            private onAdEvent(adEvent);
+            private onAdError();
             /**
              * When the ad starts playing, and the game should be paused
              */
@@ -49,7 +47,6 @@ declare module Fabrique {
              * When the ad is finished and the game should be resumed
              */
             private onContentResumeRequested();
-            private onAdError(error);
         }
     }
 }
@@ -59,7 +56,8 @@ declare module Fabrique {
         interface IProvider {
             adManager: AdManager;
             setManager(manager: AdManager): void;
-            playAd(): void;
+            requestAd(): void;
+            initializeAd(): void;
         }
     }
 }

@@ -13,7 +13,7 @@ module Fabrique {
 
             private adLoader: GoogleAds.ima.AdsLoader;
 
-            private adsManager: GoogleAds.ima.AdsManager;
+            private adsManager: GoogleAds.ima.AdsManager = null;
 
             private googleEnabled: boolean = false;
 
@@ -22,6 +22,8 @@ module Fabrique {
             private adTagUrl: string = '';
 
             private game: Phaser.Game;
+
+            private adRequested: boolean = false;
 
             public adManager: AdManager = null;
 
@@ -55,83 +57,52 @@ module Fabrique {
                 }
 
                 // Create the ad display container.
-                this.createAdDisplayContainer();
+                this.adDisplay = new google.ima.AdDisplayContainer(this.adContent, this.gameContent);
 
+                //Set vpaid enabled, and update locale
                 (<any>google.ima.settings).setVpaidMode((<any>google.ima).ImaSdkSettings.VpaidMode.ENABLED);
-
-                //set language
                 (<any>google.ima.settings).setLocale('nl');
-            }
 
-            public playAd(): void {
-                if (!this.googleEnabled || !this.canPlayAds) {
-                    this.adManager.onAdFinished.dispatch();
-                    return;
-                }
-
-                // Initialize the container. Must be done via a user action on mobile devices.
-                this.adDisplay.initialize();
-
-                try {
-                    this.adContent.style.display = 'block';
-                    // Initialize the ads manager. Ad rules playlist will start at this time.
-                    this.adsManager.init(this.game.width, this.game.height, google.ima.ViewMode.NORMAL);
-                    // Call play to start showing the ad. Single video and overlay ads will
-                    // start at this time; the call will be ignored for ad rules.
-                    this.adsManager.start();
-                } catch (adError) {
-                    this.adContent.style.display = 'none';
-                    // An error may be thrown if there was a problem with the VAST response.
-                    console.log('ad error!!!!', adError);
-                    this.adManager.onAdError.dispatch(adError);
-                }
+                // Create ads loader, and register events
+                this.adLoader = new google.ima.AdsLoader(this.adDisplay);
+                this.adLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, this.onAdManagerLoader, false, this);
+                this.adLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, (e) => {
+                    console.log('No ad available', e);
+                }, false);
             }
 
             public setManager(manager: AdManager): void {
                 this.adManager = manager;
+            }
 
+            public requestAd(): void {
                 if (!this.googleEnabled) {
-                    this.adManager.onAdReady.dispatch();
+                    this.adManager.onContentResumed.dispatch();
                     return;
                 }
-
-                // Create ads loader.
-                this.adLoader = new google.ima.AdsLoader(this.adDisplay);
-                // Listen and respond to ads loaded and error events.
-                this.adLoader.addEventListener(
-                    google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
-                    (adsManagerLoadedEvent: GoogleAds.ima.AdsManagerLoadedEvent) => this.onAdManagerLoader(adsManagerLoadedEvent),
-                    false);
-                this.adLoader.addEventListener(
-                    google.ima.AdErrorEvent.Type.AD_ERROR,
-                    (e) => {
-                        console.log('No ad available', e);
-                        //We silently ignore adLoader errors, it just means there is no ad available
-                        this.adManager.onAdReady.dispatch()
-                    },
-                    false);
 
                 // Request video ads.
                 var adsRequest = new google.ima.AdsRequest();
                 adsRequest.adTagUrl = this.adTagUrl;
                 // Specify the linear and nonlinear slot sizes. This helps the SDK to
                 // select the correct creative if multiple are returned.
-                adsRequest.linearAdSlotWidth = this.game.width;
-                adsRequest.linearAdSlotHeight = this.game.height;
+                adsRequest.linearAdSlotWidth = parseInt(this.game.canvas.style.width, 10);
+                adsRequest.linearAdSlotHeight = parseInt(this.game.canvas.style.height, 10);
 
-                adsRequest.nonLinearAdSlotWidth = this.game.width;
-                adsRequest.nonLinearAdSlotHeight = this.game.height;
+                adsRequest.nonLinearAdSlotWidth = parseInt(this.game.canvas.style.width, 10);
+                adsRequest.nonLinearAdSlotHeight = parseInt(this.game.canvas.style.height, 10);
                 adsRequest.forceNonLinearFullSlot = true; //required to comply with google rules
 
                 try {
                     this.adLoader.requestAds(adsRequest);
                 } catch (e) {
-                    this.adManager.onAdReady.dispatch();
+                    this.adManager.onContentResumed.dispatch();
                 }
             }
 
-            private createAdDisplayContainer(): void {
-                this.adDisplay = new google.ima.AdDisplayContainer(this.adContent, this.gameContent);
+            public initializeAd(): void {
+                // Initialize the container. Must be done via a user action on mobile devices.
+                this.adDisplay.initialize();
             }
 
             private onAdManagerLoader(adsManagerLoadedEvent: GoogleAds.ima.AdsManagerLoadedEvent): void {
@@ -139,7 +110,6 @@ module Fabrique {
                 var adsRenderingSettings = new google.ima.AdsRenderingSettings();
                 adsRenderingSettings.restoreCustomPlaybackStateOnAdBreakComplete = true;
 
-                this.canPlayAds = true;
 
                 // videoContent should be set to the content video element.
                 this.adsManager = adsManagerLoadedEvent.getAdsManager(this.gameContent, adsRenderingSettings);
@@ -169,12 +139,44 @@ module Fabrique {
                     google.ima.AdEvent.Type.COMPLETE,
                     this.onAdEvent.bind(this));
 
-                this.adManager.onAdReady.dispatch();
+                try {
+                    this.adContent.style.display = 'block';
+                    // Initialize the ads manager. Ad rules playlist will start at this time.
+                    this.adsManager.init(
+                        parseInt(this.game.canvas.style.width, 10),
+                        parseInt(this.game.canvas.style.height, 10),
+                        google.ima.ViewMode.NORMAL
+                    );
+                    // Call play to start showing the ad. Single video and overlay ads will
+                    // start at this time; the call will be ignored for ad rules.
+                    this.adsManager.start();
+                } catch (adError) {
+                    this.onAdError();
+                }
             }
 
-            private onAdEvent() {
+            private onAdEvent(adEvent: any) {
                 console.log('onAdEvent', arguments);
-                this.adManager.onContentResumed.dispatch();
+
+                if (adEvent.type == google.ima.AdEvent.Type.CLICK) {
+                    this.adManager.onAdClicked.dispatch();
+                } else if (adEvent.type == google.ima.AdEvent.Type.LOADED) {
+                    var ad = adEvent.getAd();
+                    if (!ad.isLinear())
+                    {
+                        this.onContentResumeRequested();
+                    }
+                }
+            }
+
+            private onAdError() {
+                if (null !== this.adsManager) {
+                    this.adsManager.destroy();
+                    this.adsManager = null;
+                }
+
+                //We silently ignore adLoader errors, it just means there is no ad available
+                this.onContentResumeRequested()
             }
 
             /**
@@ -191,12 +193,7 @@ module Fabrique {
             private onContentResumeRequested() {
                 console.log('onContentResumeRequested', arguments);
                 this.adContent.style.display = 'none';
-                this.adManager.onAdFinished.dispatch();
-            }
-
-            private onAdError(error: GoogleAds.ima.AdErrorEvent): void {
-                console.log('error', error.getError());
-                this.adManager.onAdError.dispatch(error.getError());
+                this.adManager.onContentResumed.dispatch();
             }
         }
     }

@@ -5,19 +5,11 @@ module Fabrique {
         }
 
         export class AdManager extends Phaser.Plugin {
-            public onAdStarted: Phaser.Signal = new Phaser.Signal();
-
-            public onAdFinished: Phaser.Signal = new Phaser.Signal();
-
             public onContentPaused: Phaser.Signal = new Phaser.Signal();
 
             public onContentResumed: Phaser.Signal = new Phaser.Signal();
 
             public onAdClicked: Phaser.Signal = new Phaser.Signal();
-
-            public onAdError: Phaser.Signal = new Phaser.Signal();
-            
-            public onAdReady: Phaser.Signal = new Phaser.Signal();
 
             private provider: AdProvider.IProvider = null;
 
@@ -29,24 +21,25 @@ module Fabrique {
                 });
             }
 
-            setAdProvider(provider: AdProvider.IProvider): void {
+            public setAdProvider(provider: AdProvider.IProvider): void {
                 this.provider = provider;
                 this.provider.setManager(this);
             }
 
-            showAd(): void {
+            public requestAd(): void {
                 if (null === this.provider) {
                     return;
                 }
 
-                this.provider.playAd();
+                this.provider.requestAd();
             }
-
-            hideAd(): void {
+            
+            public enableMobileAds(): void {
                 if (null === this.provider) {
                     return;
                 }
 
+                this.provider.initializeAd();
             }
         }
     }

@@ -6,7 +6,8 @@ module Fabrique {
             adManager: AdManager;
 
             setManager(manager: AdManager): void;
-            playAd(): void;
+            requestAd(): void;
+            initializeAd(): void;
         }
     }
 }

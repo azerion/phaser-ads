@@ -19,6 +19,7 @@ declare module GoogleAds.ima {
             LOADED: string;
             STARTED: string;
             COMPLETE: string;
+            CLICK: string;
         };
     }
 
@@ -50,7 +51,7 @@ declare module GoogleAds.ima {
 
     class AdsLoader {
         constructor(displayontainer: AdDisplayContainer);
-        addEventListener(type: string, callback: (thingy: any) => void, something: boolean): void;
+        addEventListener(type: string, callback: (thingy: any) => void, something: boolean, context?: any): void;
         requestAds(request: AdsRequest): void;
     }
 
@@ -58,6 +59,7 @@ declare module GoogleAds.ima {
         addEventListener(type: string, callback: (thingy: any) => void, something?: boolean): void;
         init(width: number, height: number, viewMode: string): void;
         start(): void;
+        destroy(): void;
     }
 
     class AdDisplayContainer {
