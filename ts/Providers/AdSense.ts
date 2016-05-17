@@ -90,6 +90,11 @@ module Fabrique {
             public setManager(manager: AdManager): void {
                 this.adManager = manager;
 
+                if (!this.googleEnabled || !this.canPlayAds) {
+                    this.adManager.onAdReady.dispatch();
+                    return;
+                }
+
                 // Create ads loader.
                 this.adLoader = new google.ima.AdsLoader(this.adDisplay);
                 // Listen and respond to ads loaded and error events.
