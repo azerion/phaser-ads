@@ -33,12 +33,6 @@
         var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game-container', { create: create, preload: preload, resize: resize});
         Phaser.Device.whenReady(function () {
             game.plugins.add(Fabrique.Plugins.AdManager);
-            game.ads.setAdProvider(new Fabrique.AdProvider.AdSense(
-                game,
-                'game-container',
-                'ad-container',
-                'yourevasttaghere'
-            ));
         });
 
         function preload() {
@@ -46,22 +40,28 @@
         }
 
         function create(){
-            game.ads.onAdError.add(function (error) {
-               console.log('Something went wrong', error);
-            });
+            //Set the ad provider, we use google AdSense (ima 3 sdk)
+            game.ads.setAdProvider(new Fabrique.AdProvider.AdSense(
+                    game,
+                    'game-container',
+                    'ad-container',
+                    'https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator='
+            ));
 
-            game.ads.onAdStarted.add(function () {
+            //Content paused event is fired when the content (game) should be paused, and the ad will be played
+            game.ads.onContentPaused.add(function () {
                 console.log('Started playing add');
             });
 
-            game.ads.onAdReady.add(function () {
-                game.ads.showAd();
-            });
-
-            game.ads.onAdFinished.add(function () {
+            //This is fired when the ad is finished playing and the content (game) should be resumed
+            game.ads.onContentResumed.add(function () {
                 console.log('Finished playing add');
             });
 
+            //This is how we request an add
+            game.ads.requestAd();
+
+            //the actual game content, behind the ad
             var text = game.add.text(game.width / 2, game.height / 2, 'If you see this, there is no Ad beeing displayed', {
                 font: '30px Arial',
                 fill: '#ffffff'
