@@ -14,6 +14,7 @@ Tested on:
   * Chrome 50+
  - Mobile
   * Chrome 50+
+  * iOS 9+
 
 Credits
 -------

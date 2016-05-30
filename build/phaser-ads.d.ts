@@ -41,6 +41,7 @@ declare module Fabrique {
             private game;
             private adRequested;
             adManager: AdManager;
+            private fauxVideoElement;
             constructor(game: Phaser.Game, gameContentId: string, adTagUrl: string, customParams?: ICustomParams);
             setManager(manager: AdManager): void;
             /**

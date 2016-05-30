@@ -27,6 +27,8 @@ module Fabrique {
 
             public adManager: AdManager = null;
 
+            private fauxVideoElement: HTMLMediaElement;
+
             constructor(game: Phaser.Game, gameContentId: string, adTagUrl: string, customParams?: ICustomParams) {
                 if (typeof google === "undefined") {
                     return;
@@ -35,7 +37,7 @@ module Fabrique {
                 this.googleEnabled = true;
 
                 this.gameContent = document.getElementById(gameContentId);
-                this.gameContent.currentTime = 100;
+                // this.gameContent.currentTime = 100;
                 this.gameContent.style.position = 'absolute';
 
                 this.adContent = this.gameContent.parentNode.appendChild(document.createElement('div'));
@@ -48,13 +50,19 @@ module Fabrique {
                 //This is a work around for some ios failing issues
                 //iOS ima3 requires this information, but canvas doesn't provide it. so we create a a custom method
                 if (game.device.iOS) {
-                    var fauxVideoElement: HTMLMediaElement = document.createElement('video');
+                    this.fauxVideoElement = this.gameContent.parentNode.appendChild(document.createElement('video'));
+                    this.fauxVideoElement.id = 'phaser-ad-faux-video';
+                    this.fauxVideoElement.style.position = 'absolute';
+                    this.fauxVideoElement.style.zIndex = '999';
+                    this.fauxVideoElement.style.display = 'none';
+
 
                     (<any>this.gameContent).canPlayType = (): string => {
-                        return fauxVideoElement.canPlayType('video/mp4');
+                        return this.fauxVideoElement.canPlayType('video/mp4');
                     };
-                    (<any>this.gameContent).load = (): void => {};
-                    (<any>this.gameContent).pause = (): void => {};
+                    (<any>this.gameContent).load = (): void => {console.log('loading video')};
+                    (<any>this.gameContent).pause = (): void => {console.log('pausing video')};
+                    (<any>this.gameContent).play = (): void => {console.log('playing video')};
                 }
 
                 this.adTagUrl = adTagUrl;
@@ -74,7 +82,7 @@ module Fabrique {
                 }
 
                 // Create the ad display container.
-                this.adDisplay = new google.ima.AdDisplayContainer(this.adContent, this.gameContent);
+                this.adDisplay = new google.ima.AdDisplayContainer(this.adContent, (game.device.iOS) ? this.fauxVideoElement : this.gameContent);
 
                 //Set vpaid enabled, and update locale
                 (<any>google.ima.settings).setVpaidMode((<any>google.ima).ImaSdkSettings.VpaidMode.ENABLED);
@@ -117,7 +125,13 @@ module Fabrique {
                 adsRequest.linearAdSlotWidth = width;
                 adsRequest.linearAdSlotHeight = height;
                 adsRequest.nonLinearAdSlotWidth = width;
-                adsRequest.nonLinearAdSlotHeight = height;
+                adsRequest.nonLinearAdSlotHeight = height / 3;
+
+                if (this.game.device.iOS) {
+                    this.fauxVideoElement.style.width = width + 'px';
+                    this.fauxVideoElement.style.height = height + 'px';
+                }
+
 
                 //Required for games, see:
                 //http://googleadsdeveloper.blogspot.nl/2015/10/important-changes-for-gaming-publishers.html
@@ -173,6 +187,9 @@ module Fabrique {
 
                 try {
                     this.adContent.style.display = 'block';
+                    if (this.game.device.iOS) {
+                        this.fauxVideoElement.style.display = 'block';
+                    }
                     // Initialize the ads manager. Ad rules playlist will start at this time.
 
                     let width: number = parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
@@ -203,6 +220,8 @@ module Fabrique {
                     {
                         this.onContentResumeRequested();
                     }
+                } else if (adEvent.type === google.ima.AdEvent.Type.ALL_ADS_COMPLETED) {
+                    this.onContentResumeRequested();
                 }
             }
 
@@ -230,6 +249,9 @@ module Fabrique {
             private onContentResumeRequested() {
                 console.log('onContentResumeRequested', arguments);
                 this.adContent.style.display = 'none';
+                if (this.game.device.iOS) {
+                    this.fauxVideoElement.style.display = 'none';
+                }
                 this.adManager.onContentResumed.dispatch();
             }
         }
