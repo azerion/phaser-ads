@@ -11,7 +11,16 @@ declare module Fabrique {
             constructor(game: AdGame, parent: PIXI.DisplayObject);
             setAdProvider(provider: AdProvider.IProvider): void;
             requestAd(): void;
-            enableMobileAds(): void;
+        }
+    }
+}
+import AdManager = Fabrique.Plugins.AdManager;
+declare module Fabrique {
+    module AdProvider {
+        interface IProvider {
+            adManager: AdManager;
+            setManager(manager: AdManager): void;
+            requestAd(): void;
         }
     }
 }
@@ -20,7 +29,7 @@ declare module Fabrique {
         interface ICustomParams {
             [name: string]: string | number | any[];
         }
-        class AdSense implements IProvider {
+        class Ima3 implements IProvider {
             private gameContent;
             private adContent;
             private adDisplay;
@@ -32,11 +41,24 @@ declare module Fabrique {
             private game;
             private adRequested;
             adManager: AdManager;
-            constructor(game: Phaser.Game, gameContentId: string, adContentId: string, adTagUrl: string, customParams?: ICustomParams);
+            constructor(game: Phaser.Game, gameContentId: string, adTagUrl: string, customParams?: ICustomParams);
             setManager(manager: AdManager): void;
+            /**
+             * Doing an ad request, if anything is wrong with the lib (missing ima3, failed request) we just dispatch the contentResumed event
+             * Otherwise we display an ad
+             */
             requestAd(): void;
-            initializeAd(): void;
+            /**
+             * Called when the ads manager was loaded.
+             * We register all ad related events here, and initialize the manager with the game width/height
+             *
+             * @param adsManagerLoadedEvent
+             */
             private onAdManagerLoader(adsManagerLoadedEvent);
+            /**
+             * Generic ad events are handled here
+             * @param adEvent
+             */
             private onAdEvent(adEvent);
             private onAdError();
             /**
@@ -47,17 +69,6 @@ declare module Fabrique {
              * When the ad is finished and the game should be resumed
              */
             private onContentResumeRequested();
-        }
-    }
-}
-import AdManager = Fabrique.Plugins.AdManager;
-declare module Fabrique {
-    module AdProvider {
-        interface IProvider {
-            adManager: AdManager;
-            setManager(manager: AdManager): void;
-            requestAd(): void;
-            initializeAd(): void;
         }
     }
 }

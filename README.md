@@ -12,10 +12,12 @@ Usage
 Tested on:
  - Desktop
   * Chrome 50+
+ - Mobile
+  * Chrome 50+
 
 Credits
 -------
-The AdSense provider is based on the code provided by Google for their [IMA3 SDK](https://github.com/googleads/googleads-ima-html5/releases)
+The IMA3 provider is based on the code provided by Google for their [IMA3 SDK](https://github.com/googleads/googleads-ima-html5/releases)
 
 Disclaimer
 ----------

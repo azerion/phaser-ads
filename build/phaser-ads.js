@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 0.1.0-alpha3 
+ * phaser-ads - version 0.3.0 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 17-05-2016
+ * Build at 30-05-2016
  * Released under MIT License 
  */
 
@@ -38,23 +38,18 @@ var Fabrique;
                 }
                 this.provider.requestAd();
             };
-            AdManager.prototype.enableMobileAds = function () {
-                if (null === this.provider) {
-                    return;
-                }
-                this.provider.initializeAd();
-            };
             return AdManager;
         })(Phaser.Plugin);
         Plugins.AdManager = AdManager;
     })(Plugins = Fabrique.Plugins || (Fabrique.Plugins = {}));
 })(Fabrique || (Fabrique = {}));
+var AdManager = Fabrique.Plugins.AdManager;
 var Fabrique;
 (function (Fabrique) {
     var AdProvider;
     (function (AdProvider) {
-        var AdSense = (function () {
-            function AdSense(game, gameContentId, adContentId, adTagUrl, customParams) {
+        var Ima3 = (function () {
+            function Ima3(game, gameContentId, adTagUrl, customParams) {
                 this.adsManager = null;
                 this.googleEnabled = false;
                 this.canPlayAds = false;
@@ -65,10 +60,24 @@ var Fabrique;
                     return;
                 }
                 this.googleEnabled = true;
-                this.adContent = document.getElementById(adContentId);
-                this.adContent.style.display = 'none';
                 this.gameContent = document.getElementById(gameContentId);
                 this.gameContent.currentTime = 100;
+                this.gameContent.style.position = 'absolute';
+                this.adContent = this.gameContent.parentNode.appendChild(document.createElement('div'));
+                this.adContent.id = 'phaser-ad-container';
+                this.adContent.style.position = 'absolute';
+                this.adContent.style.zIndex = '9999';
+                this.adContent.style.display = 'none';
+                //This is a work around for some ios failing issues
+                //iOS ima3 requires this information, but canvas doesn't provide it. so we create a a custom method
+                if (game.device.iOS) {
+                    var fauxVideoElement = document.createElement('video');
+                    this.gameContent.canPlayType = function () {
+                        return fauxVideoElement.canPlayType('video/mp4');
+                    };
+                    this.gameContent.load = function () { };
+                    this.gameContent.pause = function () { };
+                }
                 this.adTagUrl = adTagUrl;
                 this.game = game;
                 if (undefined !== customParams) {
@@ -95,36 +104,49 @@ var Fabrique;
                     console.log('No ad available', e);
                 }, false);
             }
-            AdSense.prototype.setManager = function (manager) {
+            Ima3.prototype.setManager = function (manager) {
                 this.adManager = manager;
             };
-            AdSense.prototype.requestAd = function () {
+            /**
+             * Doing an ad request, if anything is wrong with the lib (missing ima3, failed request) we just dispatch the contentResumed event
+             * Otherwise we display an ad
+             */
+            Ima3.prototype.requestAd = function () {
                 if (!this.googleEnabled) {
                     this.adManager.onContentResumed.dispatch();
                     return;
                 }
+                //For mobile this ad request needs to be handled post user click
+                this.adDisplay.initialize();
                 // Request video ads.
                 var adsRequest = new google.ima.AdsRequest();
                 adsRequest.adTagUrl = this.adTagUrl;
+                var width = parseInt((!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
+                var height = parseInt((!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
                 // Specify the linear and nonlinear slot sizes. This helps the SDK to
                 // select the correct creative if multiple are returned.
-                adsRequest.linearAdSlotWidth = parseInt(this.game.canvas.style.width, 10);
-                adsRequest.linearAdSlotHeight = parseInt(this.game.canvas.style.height, 10);
-                adsRequest.nonLinearAdSlotWidth = parseInt(this.game.canvas.style.width, 10);
-                adsRequest.nonLinearAdSlotHeight = parseInt(this.game.canvas.style.height, 10);
-                adsRequest.forceNonLinearFullSlot = true; //required to comply with google rules
+                adsRequest.linearAdSlotWidth = width;
+                adsRequest.linearAdSlotHeight = height;
+                adsRequest.nonLinearAdSlotWidth = width;
+                adsRequest.nonLinearAdSlotHeight = height;
+                //Required for games, see:
+                //http://googleadsdeveloper.blogspot.nl/2015/10/important-changes-for-gaming-publishers.html
+                adsRequest.forceNonLinearFullSlot = true;
                 try {
                     this.adLoader.requestAds(adsRequest);
                 }
                 catch (e) {
+                    console.log(e);
                     this.adManager.onContentResumed.dispatch();
                 }
             };
-            AdSense.prototype.initializeAd = function () {
-                // Initialize the container. Must be done via a user action on mobile devices.
-                this.adDisplay.initialize();
-            };
-            AdSense.prototype.onAdManagerLoader = function (adsManagerLoadedEvent) {
+            /**
+             * Called when the ads manager was loaded.
+             * We register all ad related events here, and initialize the manager with the game width/height
+             *
+             * @param adsManagerLoadedEvent
+             */
+            Ima3.prototype.onAdManagerLoader = function (adsManagerLoadedEvent) {
                 var _this = this;
                 // Get the ads manager.
                 var adsRenderingSettings = new google.ima.AdsRenderingSettings();
@@ -143,7 +165,9 @@ var Fabrique;
                 try {
                     this.adContent.style.display = 'block';
                     // Initialize the ads manager. Ad rules playlist will start at this time.
-                    this.adsManager.init(parseInt(this.game.canvas.style.width, 10), parseInt(this.game.canvas.style.height, 10), google.ima.ViewMode.NORMAL);
+                    var width = parseInt((!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
+                    var height = parseInt((!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
+                    this.adsManager.init(width, height, google.ima.ViewMode.NORMAL);
                     // Call play to start showing the ad. Single video and overlay ads will
                     // start at this time; the call will be ignored for ad rules.
                     this.adsManager.start();
@@ -152,19 +176,24 @@ var Fabrique;
                     this.onAdError();
                 }
             };
-            AdSense.prototype.onAdEvent = function (adEvent) {
+            /**
+             * Generic ad events are handled here
+             * @param adEvent
+             */
+            Ima3.prototype.onAdEvent = function (adEvent) {
                 console.log('onAdEvent', arguments);
                 if (adEvent.type == google.ima.AdEvent.Type.CLICK) {
                     this.adManager.onAdClicked.dispatch();
                 }
                 else if (adEvent.type == google.ima.AdEvent.Type.LOADED) {
                     var ad = adEvent.getAd();
+                    console.log(ad);
                     if (!ad.isLinear()) {
                         this.onContentResumeRequested();
                     }
                 }
             };
-            AdSense.prototype.onAdError = function () {
+            Ima3.prototype.onAdError = function () {
                 if (null !== this.adsManager) {
                     this.adsManager.destroy();
                     this.adsManager = null;
@@ -175,22 +204,21 @@ var Fabrique;
             /**
              * When the ad starts playing, and the game should be paused
              */
-            AdSense.prototype.onContentPauseRequested = function () {
+            Ima3.prototype.onContentPauseRequested = function () {
                 console.log('onContentPauseRequested', arguments);
                 this.adManager.onContentPaused.dispatch();
             };
             /**
              * When the ad is finished and the game should be resumed
              */
-            AdSense.prototype.onContentResumeRequested = function () {
+            Ima3.prototype.onContentResumeRequested = function () {
                 console.log('onContentResumeRequested', arguments);
                 this.adContent.style.display = 'none';
                 this.adManager.onContentResumed.dispatch();
             };
-            return AdSense;
+            return Ima3;
         })();
-        AdProvider.AdSense = AdSense;
+        AdProvider.Ima3 = Ima3;
     })(AdProvider = Fabrique.AdProvider || (Fabrique.AdProvider = {}));
 })(Fabrique || (Fabrique = {}));
-var AdManager = Fabrique.Plugins.AdManager;
 //# sourceMappingURL=phaser-ads.js.map

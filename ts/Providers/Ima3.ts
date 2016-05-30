@@ -4,7 +4,7 @@ module Fabrique {
             [name: string]: string | number| any[];
         }
 
-        export class AdSense implements IProvider {
+        export class Ima3 implements IProvider {
             private gameContent: any;
 
             private adContent: HTMLElement;
@@ -27,18 +27,35 @@ module Fabrique {
 
             public adManager: AdManager = null;
 
-            constructor(game: Phaser.Game, gameContentId: string, adContentId: string, adTagUrl: string, customParams?: ICustomParams) {
+            constructor(game: Phaser.Game, gameContentId: string, adTagUrl: string, customParams?: ICustomParams) {
                 if (typeof google === "undefined") {
                     return;
                 }
 
                 this.googleEnabled = true;
 
-                this.adContent = document.getElementById(adContentId);
-                this.adContent.style.display = 'none';
-
                 this.gameContent = document.getElementById(gameContentId);
                 this.gameContent.currentTime = 100;
+                this.gameContent.style.position = 'absolute';
+
+                this.adContent = this.gameContent.parentNode.appendChild(document.createElement('div'));
+                this.adContent.id = 'phaser-ad-container';
+                this.adContent.style.position = 'absolute';
+                this.adContent.style.zIndex = '9999';
+                this.adContent.style.display = 'none';
+
+
+                //This is a work around for some ios failing issues
+                //iOS ima3 requires this information, but canvas doesn't provide it. so we create a a custom method
+                if (game.device.iOS) {
+                    var fauxVideoElement: HTMLMediaElement = document.createElement('video');
+
+                    (<any>this.gameContent).canPlayType = (): string => {
+                        return fauxVideoElement.canPlayType('video/mp4');
+                    };
+                    (<any>this.gameContent).load = (): void => {};
+                    (<any>this.gameContent).pause = (): void => {};
+                }
 
                 this.adTagUrl = adTagUrl;
                 this.game = game;
@@ -75,36 +92,51 @@ module Fabrique {
                 this.adManager = manager;
             }
 
+            /**
+             * Doing an ad request, if anything is wrong with the lib (missing ima3, failed request) we just dispatch the contentResumed event
+             * Otherwise we display an ad
+             */
             public requestAd(): void {
                 if (!this.googleEnabled) {
                     this.adManager.onContentResumed.dispatch();
                     return;
                 }
 
+                //For mobile this ad request needs to be handled post user click
+                this.adDisplay.initialize();
+
                 // Request video ads.
                 var adsRequest = new google.ima.AdsRequest();
                 adsRequest.adTagUrl = this.adTagUrl;
+
+                let width: number = parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
+                let height: number = parseInt(<string>(!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
+
                 // Specify the linear and nonlinear slot sizes. This helps the SDK to
                 // select the correct creative if multiple are returned.
-                adsRequest.linearAdSlotWidth = parseInt(this.game.canvas.style.width, 10);
-                adsRequest.linearAdSlotHeight = parseInt(this.game.canvas.style.height, 10);
+                adsRequest.linearAdSlotWidth = width;
+                adsRequest.linearAdSlotHeight = height;
+                adsRequest.nonLinearAdSlotWidth = width;
+                adsRequest.nonLinearAdSlotHeight = height;
 
-                adsRequest.nonLinearAdSlotWidth = parseInt(this.game.canvas.style.width, 10);
-                adsRequest.nonLinearAdSlotHeight = parseInt(this.game.canvas.style.height, 10);
-                adsRequest.forceNonLinearFullSlot = true; //required to comply with google rules
+                //Required for games, see:
+                //http://googleadsdeveloper.blogspot.nl/2015/10/important-changes-for-gaming-publishers.html
+                adsRequest.forceNonLinearFullSlot = true;
 
                 try {
                     this.adLoader.requestAds(adsRequest);
                 } catch (e) {
+                    console.log(e);
                     this.adManager.onContentResumed.dispatch();
                 }
             }
 
-            public initializeAd(): void {
-                // Initialize the container. Must be done via a user action on mobile devices.
-                this.adDisplay.initialize();
-            }
-
+            /**
+             * Called when the ads manager was loaded.
+             * We register all ad related events here, and initialize the manager with the game width/height
+             *
+             * @param adsManagerLoadedEvent
+             */
             private onAdManagerLoader(adsManagerLoadedEvent: GoogleAds.ima.AdsManagerLoadedEvent): void {
                 // Get the ads manager.
                 var adsRenderingSettings = new google.ima.AdsRenderingSettings();
@@ -142,11 +174,11 @@ module Fabrique {
                 try {
                     this.adContent.style.display = 'block';
                     // Initialize the ads manager. Ad rules playlist will start at this time.
-                    this.adsManager.init(
-                        parseInt(this.game.canvas.style.width, 10),
-                        parseInt(this.game.canvas.style.height, 10),
-                        google.ima.ViewMode.NORMAL
-                    );
+
+                    let width: number = parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
+                    let height: number = parseInt(<string>(!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
+
+                    this.adsManager.init(width, height, google.ima.ViewMode.NORMAL);
                     // Call play to start showing the ad. Single video and overlay ads will
                     // start at this time; the call will be ignored for ad rules.
                     this.adsManager.start();
@@ -155,6 +187,10 @@ module Fabrique {
                 }
             }
 
+            /**
+             * Generic ad events are handled here
+             * @param adEvent
+             */
             private onAdEvent(adEvent: any) {
                 console.log('onAdEvent', arguments);
 
@@ -162,6 +198,7 @@ module Fabrique {
                     this.adManager.onAdClicked.dispatch();
                 } else if (adEvent.type == google.ima.AdEvent.Type.LOADED) {
                     var ad = adEvent.getAd();
+                    console.log(ad);
                     if (!ad.isLinear())
                     {
                         this.onContentResumeRequested();

@@ -33,14 +33,6 @@ module Fabrique {
 
                 this.provider.requestAd();
             }
-            
-            public enableMobileAds(): void {
-                if (null === this.provider) {
-                    return;
-                }
-
-                this.provider.initializeAd();
-            }
         }
     }
 }
