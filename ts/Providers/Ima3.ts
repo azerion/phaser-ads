@@ -29,6 +29,8 @@ module Fabrique {
 
             private fauxVideoElement: HTMLMediaElement;
 
+            private gameOverlay: HTMLElement;
+
             constructor(game: Phaser.Game, gameContentId: string, adTagUrl: string, customParams?: ICustomParams) {
                 if (typeof google === "undefined") {
                     return;
@@ -55,6 +57,13 @@ module Fabrique {
                     this.fauxVideoElement.style.position = 'absolute';
                     this.fauxVideoElement.style.zIndex = '999';
                     this.fauxVideoElement.style.display = 'none';
+
+                    this.gameOverlay = this.gameContent.parentNode.appendChild(document.createElement('div'));
+                    this.gameOverlay.id = 'phaser-ad-game-overlay';
+                    this.gameOverlay.style.backgroundColor = '#000000';
+                    this.gameOverlay.style.position = 'absolute';
+                    this.gameOverlay.style.zIndex = '99';
+                    this.gameOverlay.style.display = 'none';
 
 
                     (<any>this.gameContent).canPlayType = (): string => {
@@ -91,9 +100,7 @@ module Fabrique {
                 // Create ads loader, and register events
                 this.adLoader = new google.ima.AdsLoader(this.adDisplay);
                 this.adLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, this.onAdManagerLoader, false, this);
-                this.adLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, (e) => {
-                    console.log('No ad available', e);
-                }, false);
+                this.adLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, this.onAdError.bind(this), false);
             }
 
             public setManager(manager: AdManager): void {
@@ -130,6 +137,8 @@ module Fabrique {
                 if (this.game.device.iOS) {
                     this.fauxVideoElement.style.width = width + 'px';
                     this.fauxVideoElement.style.height = height + 'px';
+                    this.gameOverlay.style.width = width + 'px';
+                    this.gameOverlay.style.height = height + 'px';
                 }
 
 
@@ -161,34 +170,21 @@ module Fabrique {
                 this.adsManager = adsManagerLoadedEvent.getAdsManager(this.gameContent, adsRenderingSettings);
 
                 // Add listeners to the required events.
-                this.adsManager.addEventListener(
-                    google.ima.AdErrorEvent.Type.AD_ERROR,
-                    (error: GoogleAds.ima.AdErrorEvent) => this.onAdError.call(this, error));
-                this.adsManager.addEventListener(
-                    google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED,
-                    this.onContentPauseRequested.bind(this));
-                this.adsManager.addEventListener(
-                    google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED,
-                    this.onContentResumeRequested.bind(this));
-                this.adsManager.addEventListener(
-                    google.ima.AdEvent.Type.ALL_ADS_COMPLETED,
-                    this.onAdEvent.bind(this));
+                this.adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, this.onAdError.bind(this));
+                this.adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED, this.onContentPauseRequested.bind(this));
+                this.adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED, this.onContentResumeRequested.bind(this));
+                this.adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, this.onAdEvent.bind(this));
 
                 // Listen to any additional events, if necessary.
-                this.adsManager.addEventListener(
-                    google.ima.AdEvent.Type.LOADED,
-                    this.onAdEvent.bind(this));
-                this.adsManager.addEventListener(
-                    google.ima.AdEvent.Type.STARTED,
-                    this.onAdEvent.bind(this));
-                this.adsManager.addEventListener(
-                    google.ima.AdEvent.Type.COMPLETE,
-                    this.onAdEvent.bind(this));
+                this.adsManager.addEventListener(google.ima.AdEvent.Type.LOADED, this.onAdEvent.bind(this));
+                this.adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, this.onAdEvent.bind(this));
+                this.adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, this.onAdEvent.bind(this));
 
                 try {
                     this.adContent.style.display = 'block';
                     if (this.game.device.iOS) {
                         this.fauxVideoElement.style.display = 'block';
+                        this.gameOverlay.style.display = 'block';
                     }
                     // Initialize the ads manager. Ad rules playlist will start at this time.
 
@@ -226,6 +222,7 @@ module Fabrique {
             }
 
             private onAdError() {
+                console.log('gneric ad error');
                 if (null !== this.adsManager) {
                     this.adsManager.destroy();
                     this.adsManager = null;
@@ -251,6 +248,7 @@ module Fabrique {
                 this.adContent.style.display = 'none';
                 if (this.game.device.iOS) {
                     this.fauxVideoElement.style.display = 'none';
+                    this.gameOverlay.style.display = 'none';
                 }
                 this.adManager.onContentResumed.dispatch();
             }

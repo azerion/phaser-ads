@@ -1,5 +1,5 @@
 /*!
- * phaser-ads - version 0.4.0 
+ * phaser-ads - version 0.4.1 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
@@ -77,6 +77,12 @@ var Fabrique;
                     this.fauxVideoElement.style.position = 'absolute';
                     this.fauxVideoElement.style.zIndex = '999';
                     this.fauxVideoElement.style.display = 'none';
+                    this.gameOverlay = this.gameContent.parentNode.appendChild(document.createElement('div'));
+                    this.gameOverlay.id = 'phaser-ad-game-overlay';
+                    this.gameOverlay.style.backgroundColor = '#000000';
+                    this.gameOverlay.style.position = 'absolute';
+                    this.gameOverlay.style.zIndex = '99';
+                    this.gameOverlay.style.display = 'none';
                     this.gameContent.canPlayType = function () {
                         return _this.fauxVideoElement.canPlayType('video/mp4');
                     };
@@ -106,9 +112,7 @@ var Fabrique;
                 // Create ads loader, and register events
                 this.adLoader = new google.ima.AdsLoader(this.adDisplay);
                 this.adLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, this.onAdManagerLoader, false, this);
-                this.adLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, function (e) {
-                    console.log('No ad available', e);
-                }, false);
+                this.adLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, this.onAdError.bind(this), false);
             }
             Ima3.prototype.setManager = function (manager) {
                 this.adManager = manager;
@@ -138,6 +142,8 @@ var Fabrique;
                 if (this.game.device.iOS) {
                     this.fauxVideoElement.style.width = width + 'px';
                     this.fauxVideoElement.style.height = height + 'px';
+                    this.gameOverlay.style.width = width + 'px';
+                    this.gameOverlay.style.height = height + 'px';
                 }
                 //Required for games, see:
                 //http://googleadsdeveloper.blogspot.nl/2015/10/important-changes-for-gaming-publishers.html
@@ -157,14 +163,13 @@ var Fabrique;
              * @param adsManagerLoadedEvent
              */
             Ima3.prototype.onAdManagerLoader = function (adsManagerLoadedEvent) {
-                var _this = this;
                 // Get the ads manager.
                 var adsRenderingSettings = new google.ima.AdsRenderingSettings();
                 adsRenderingSettings.restoreCustomPlaybackStateOnAdBreakComplete = true;
                 // videoContent should be set to the content video element.
                 this.adsManager = adsManagerLoadedEvent.getAdsManager(this.gameContent, adsRenderingSettings);
                 // Add listeners to the required events.
-                this.adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, function (error) { return _this.onAdError.call(_this, error); });
+                this.adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, this.onAdError.bind(this));
                 this.adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED, this.onContentPauseRequested.bind(this));
                 this.adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED, this.onContentResumeRequested.bind(this));
                 this.adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, this.onAdEvent.bind(this));
@@ -176,6 +181,7 @@ var Fabrique;
                     this.adContent.style.display = 'block';
                     if (this.game.device.iOS) {
                         this.fauxVideoElement.style.display = 'block';
+                        this.gameOverlay.style.display = 'block';
                     }
                     // Initialize the ads manager. Ad rules playlist will start at this time.
                     var width = parseInt((!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
@@ -210,6 +216,7 @@ var Fabrique;
                 }
             };
             Ima3.prototype.onAdError = function () {
+                console.log('gneric ad error');
                 if (null !== this.adsManager) {
                     this.adsManager.destroy();
                     this.adsManager = null;
@@ -232,6 +239,7 @@ var Fabrique;
                 this.adContent.style.display = 'none';
                 if (this.game.device.iOS) {
                     this.fauxVideoElement.style.display = 'none';
+                    this.gameOverlay.style.display = 'none';
                 }
                 this.adManager.onContentResumed.dispatch();
             };
