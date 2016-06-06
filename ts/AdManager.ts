@@ -26,12 +26,12 @@ module Fabrique {
                 this.provider.setManager(this);
             }
 
-            public requestAd(): void {
+            public requestAd(...args: any[]): void {
                 if (null === this.provider) {
                     return;
                 }
 
-                this.provider.requestAd();
+                this.provider.requestAd.apply(this.provider, args);
             }
         }
     }

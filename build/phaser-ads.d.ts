@@ -10,7 +10,7 @@ declare module Fabrique {
             private provider;
             constructor(game: AdGame, parent: PIXI.DisplayObject);
             setAdProvider(provider: AdProvider.IProvider): void;
-            requestAd(): void;
+            requestAd(...args: any[]): void;
         }
     }
 }
@@ -20,7 +20,7 @@ declare module Fabrique {
         interface IProvider {
             adManager: AdManager;
             setManager(manager: AdManager): void;
-            requestAd(): void;
+            requestAd(...args: any[]): void;
         }
     }
 }
@@ -43,13 +43,13 @@ declare module Fabrique {
             adManager: AdManager;
             private fauxVideoElement;
             private gameOverlay;
-            constructor(game: Phaser.Game, gameContentId: string, adTagUrl: string, customParams?: ICustomParams);
+            constructor(game: Phaser.Game, adTagUrl: string);
             setManager(manager: AdManager): void;
             /**
              * Doing an ad request, if anything is wrong with the lib (missing ima3, failed request) we just dispatch the contentResumed event
              * Otherwise we display an ad
              */
-            requestAd(): void;
+            requestAd(customParams?: ICustomParams): void;
             /**
              * Called when the ads manager was loaded.
              * We register all ad related events here, and initialize the manager with the game width/height
@@ -71,6 +71,7 @@ declare module Fabrique {
              * When the ad is finished and the game should be resumed
              */
             private onContentResumeRequested();
+            private parseCustomParams(customParams);
         }
     }
 }

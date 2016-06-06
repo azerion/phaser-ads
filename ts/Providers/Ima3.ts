@@ -31,14 +31,14 @@ module Fabrique {
 
             private gameOverlay: HTMLElement;
 
-            constructor(game: Phaser.Game, gameContentId: string, adTagUrl: string, customParams?: ICustomParams) {
+            constructor(game: Phaser.Game, adTagUrl: string) {
                 if (typeof google === "undefined") {
                     return;
                 }
 
                 this.googleEnabled = true;
 
-                this.gameContent = document.getElementById(gameContentId);
+                this.gameContent = (typeof game.parent === 'string') ? document.getElementById(<string>(<any>game).parent) : game.parent;
                 // this.gameContent.currentTime = 100;
                 this.gameContent.style.position = 'absolute';
 
@@ -77,19 +77,6 @@ module Fabrique {
                 this.adTagUrl = adTagUrl;
                 this.game = game;
 
-                if (undefined !== customParams) {
-                    let customDataString: string = '';
-                    for (let key in customParams) {
-                        if (customDataString.length > 0) {
-                            customDataString += '' +
-                                '&';
-                        }
-                        var param = (Array.isArray(customParams[key])) ? (<any[]>customParams[key]).join(',') : customParams[key];
-                        customDataString += key + '=' + param;
-                    }
-                    this.adTagUrl += '&cust_params=' + encodeURIComponent(customDataString);
-                }
-
                 // Create the ad display container.
                 this.adDisplay = new google.ima.AdDisplayContainer(this.adContent, (game.device.iOS) ? this.fauxVideoElement : this.gameContent);
 
@@ -111,7 +98,7 @@ module Fabrique {
              * Doing an ad request, if anything is wrong with the lib (missing ima3, failed request) we just dispatch the contentResumed event
              * Otherwise we display an ad
              */
-            public requestAd(): void {
+            public requestAd(customParams?: ICustomParams): void {
                 if (!this.googleEnabled) {
                     this.adManager.onContentResumed.dispatch();
                     return;
@@ -122,7 +109,7 @@ module Fabrique {
 
                 // Request video ads.
                 var adsRequest = new google.ima.AdsRequest();
-                adsRequest.adTagUrl = this.adTagUrl;
+                adsRequest.adTagUrl = this.adTagUrl + this.parseCustomParams(customParams);
 
                 let width: number = parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
                 let height: number = parseInt(<string>(!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
@@ -251,6 +238,23 @@ module Fabrique {
                     this.gameOverlay.style.display = 'none';
                 }
                 this.adManager.onContentResumed.dispatch();
+            }
+
+            private parseCustomParams(customParams: ICustomParams): string {
+                if (undefined !== customParams) {
+                    let customDataString: string = '';
+                    for (let key in customParams) {
+                        if (customDataString.length > 0) {
+                            customDataString += '' +
+                                '&';
+                        }
+                        var param = (Array.isArray(customParams[key])) ? (<any[]>customParams[key]).join(',') : customParams[key];
+                        customDataString += key + '=' + param;
+                    }
+                    return '&cust_params=' + encodeURIComponent(customDataString);
+                }
+
+                return '';
             }
         }
     }

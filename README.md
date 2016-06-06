@@ -1,6 +1,9 @@
 Phaser Ads
 ==========
-A Phaser plugin for providing nice ads integration in your phaser.io game
+A Phaser plugin for providing nice ads integration in your phaser.io game trough the IMA3 sdk.
+
+Key features:
+ -
 
 Getting Started
 ---------------
@@ -8,13 +11,14 @@ Getting Started
 Usage
 -----
 
+
+
 ### Browser Support
 Tested on:
  - Desktop
   * Chrome 50+
  - Mobile
   * Chrome 50+
-  * iOS 9+
 
 Credits
 -------

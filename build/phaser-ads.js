@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 0.4.1 
+ * phaser-ads - version 0.5.0 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 30-05-2016
+ * Build at 06-06-2016
  * Released under MIT License 
  */
 
@@ -33,10 +33,14 @@ var Fabrique;
                 this.provider.setManager(this);
             };
             AdManager.prototype.requestAd = function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i - 0] = arguments[_i];
+                }
                 if (null === this.provider) {
                     return;
                 }
-                this.provider.requestAd();
+                this.provider.requestAd.apply(this.provider, args);
             };
             return AdManager;
         })(Phaser.Plugin);
@@ -49,7 +53,7 @@ var Fabrique;
     var AdProvider;
     (function (AdProvider) {
         var Ima3 = (function () {
-            function Ima3(game, gameContentId, adTagUrl, customParams) {
+            function Ima3(game, adTagUrl) {
                 var _this = this;
                 this.adsManager = null;
                 this.googleEnabled = false;
@@ -61,7 +65,7 @@ var Fabrique;
                     return;
                 }
                 this.googleEnabled = true;
-                this.gameContent = document.getElementById(gameContentId);
+                this.gameContent = (typeof game.parent === 'string') ? document.getElementById(game.parent) : game.parent;
                 // this.gameContent.currentTime = 100;
                 this.gameContent.style.position = 'absolute';
                 this.adContent = this.gameContent.parentNode.appendChild(document.createElement('div'));
@@ -92,18 +96,6 @@ var Fabrique;
                 }
                 this.adTagUrl = adTagUrl;
                 this.game = game;
-                if (undefined !== customParams) {
-                    var customDataString = '';
-                    for (var key in customParams) {
-                        if (customDataString.length > 0) {
-                            customDataString += '' +
-                                '&';
-                        }
-                        var param = (Array.isArray(customParams[key])) ? customParams[key].join(',') : customParams[key];
-                        customDataString += key + '=' + param;
-                    }
-                    this.adTagUrl += '&cust_params=' + encodeURIComponent(customDataString);
-                }
                 // Create the ad display container.
                 this.adDisplay = new google.ima.AdDisplayContainer(this.adContent, (game.device.iOS) ? this.fauxVideoElement : this.gameContent);
                 //Set vpaid enabled, and update locale
@@ -121,7 +113,7 @@ var Fabrique;
              * Doing an ad request, if anything is wrong with the lib (missing ima3, failed request) we just dispatch the contentResumed event
              * Otherwise we display an ad
              */
-            Ima3.prototype.requestAd = function () {
+            Ima3.prototype.requestAd = function (customParams) {
                 if (!this.googleEnabled) {
                     this.adManager.onContentResumed.dispatch();
                     return;
@@ -130,7 +122,7 @@ var Fabrique;
                 this.adDisplay.initialize();
                 // Request video ads.
                 var adsRequest = new google.ima.AdsRequest();
-                adsRequest.adTagUrl = this.adTagUrl;
+                adsRequest.adTagUrl = this.adTagUrl + this.parseCustomParams(customParams);
                 var width = parseInt((!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
                 var height = parseInt((!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
                 // Specify the linear and nonlinear slot sizes. This helps the SDK to
@@ -242,6 +234,21 @@ var Fabrique;
                     this.gameOverlay.style.display = 'none';
                 }
                 this.adManager.onContentResumed.dispatch();
+            };
+            Ima3.prototype.parseCustomParams = function (customParams) {
+                if (undefined !== customParams) {
+                    var customDataString = '';
+                    for (var key in customParams) {
+                        if (customDataString.length > 0) {
+                            customDataString += '' +
+                                '&';
+                        }
+                        var param = (Array.isArray(customParams[key])) ? customParams[key].join(',') : customParams[key];
+                        customDataString += key + '=' + param;
+                    }
+                    return '&cust_params=' + encodeURIComponent(customDataString);
+                }
+                return '';
             };
             return Ima3;
         })();
