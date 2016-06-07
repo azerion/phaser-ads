@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 0.5.0 
+ * phaser-ads - version 0.5.1 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 06-06-2016
+ * Build at 07-06-2016
  * Released under MIT License 
  */
 
@@ -68,6 +68,8 @@ var Fabrique;
                 this.gameContent = (typeof game.parent === 'string') ? document.getElementById(game.parent) : game.parent;
                 // this.gameContent.currentTime = 100;
                 this.gameContent.style.position = 'absolute';
+                this.gameContent.style.width = '100%';
+                this.gameContent.style.height = '100%';
                 this.adContent = this.gameContent.parentNode.appendChild(document.createElement('div'));
                 this.adContent.id = 'phaser-ad-container';
                 this.adContent.style.position = 'absolute';
