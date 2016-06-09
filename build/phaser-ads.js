@@ -300,8 +300,8 @@ var Fabrique;
                 // Request video ads.
                 var adsRequest = new google.ima.AdsRequest();
                 adsRequest.adTagUrl = this.adTagUrl + this.parseCustomParams(customParams);
-                var width = parseInt((!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
-                var height = parseInt((!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
+                var width = window.innerWidth; //parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
+                var height = window.innerHeight; //parseInt(<string>(!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
                 // Specify the linear and nonlinear slot sizes. This helps the SDK to
                 // select the correct creative if multiple are returned.
                 adsRequest.linearAdSlotWidth = width;
@@ -365,8 +365,8 @@ var Fabrique;
                         this.gameOverlay.style.display = 'block';
                     }
                     // Initialize the ads manager. Ad rules playlist will start at this time.
-                    var width = parseInt((!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
-                    var height = parseInt((!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
+                    var width = window.innerWidth; //parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
+                    var height = window.innerHeight; //parseInt(<string>(!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
                     this.adsManager.init(width, height, google.ima.ViewMode.NORMAL);
                     // Call play to start showing the ad. Single video and overlay ads will
                     // start at this time; the call will be ignored for ad rules.
