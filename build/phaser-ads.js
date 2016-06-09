@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 0.5.1 
+ * phaser-ads - version 0.6.0 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 07-06-2016
+ * Build at 09-06-2016
  * Released under MIT License 
  */
 
@@ -42,10 +42,185 @@ var Fabrique;
                 }
                 this.provider.requestAd.apply(this.provider, args);
             };
+            AdManager.prototype.preloadAd = function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i - 0] = arguments[_i];
+                }
+                if (null === this.provider) {
+                    return;
+                }
+                this.provider.preloadAd.apply(this.provider, args);
+            };
+            AdManager.prototype.destroyAd = function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i - 0] = arguments[_i];
+                }
+                if (null === this.provider) {
+                    return;
+                }
+                this.provider.destroyAd.apply(this.provider, args);
+            };
+            AdManager.prototype.hideAd = function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i - 0] = arguments[_i];
+                }
+                if (null === this.provider) {
+                    return;
+                }
+                this.provider.hideAd.apply(this.provider, args);
+            };
             return AdManager;
         })(Phaser.Plugin);
         Plugins.AdManager = AdManager;
     })(Plugins = Fabrique.Plugins || (Fabrique.Plugins = {}));
+})(Fabrique || (Fabrique = {}));
+var Fabrique;
+(function (Fabrique) {
+    var AdProvider;
+    (function (AdProvider) {
+        (function (HeyzapAdTypes) {
+            HeyzapAdTypes[HeyzapAdTypes["Interstitial"] = 0] = "Interstitial";
+            HeyzapAdTypes[HeyzapAdTypes["Video"] = 1] = "Video";
+            HeyzapAdTypes[HeyzapAdTypes["Rewarded"] = 2] = "Rewarded";
+            HeyzapAdTypes[HeyzapAdTypes["Banner"] = 3] = "Banner";
+        })(AdProvider.HeyzapAdTypes || (AdProvider.HeyzapAdTypes = {}));
+        var HeyzapAdTypes = AdProvider.HeyzapAdTypes;
+        var CordovaHeyzap = (function () {
+            function CordovaHeyzap(game, publisherId) {
+                var _this = this;
+                this.adsEnabled = false;
+                if (game.device.cordova || game.device.crosswalk) {
+                    this.adsEnabled = true;
+                }
+                else {
+                    return;
+                }
+                HeyzapAds.start(publisherId).then(function () {
+                    // Native call successful.
+                }, function (error) {
+                    //Failed to start heyzap, disabling ads
+                    _this.adsEnabled = false;
+                });
+                //Register event listeners
+                HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.SHOW, function () {
+                    _this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.SHOW);
+                });
+                HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.SHOW_FAILED, function () {
+                    _this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.SHOW_FAILED);
+                });
+                HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.CLICKED, function () {
+                    _this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.CLICKED);
+                });
+                HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.SHOW, function () {
+                    _this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.SHOW);
+                });
+                HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.SHOW_FAILED, function () {
+                    _this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.SHOW_FAILED);
+                });
+                HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.CLICKED, function () {
+                    _this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.CLICKED);
+                });
+                HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.SHOW, function () {
+                    _this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.SHOW);
+                });
+                HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.SHOW_FAILED, function () {
+                    _this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.SHOW_FAILED);
+                });
+                HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.CLICKED, function () {
+                    _this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.CLICKED);
+                });
+            }
+            CordovaHeyzap.prototype.setManager = function (manager) {
+                this.adManager = manager;
+            };
+            CordovaHeyzap.prototype.requestAd = function (adType, bannerAdPositions) {
+                var _this = this;
+                if (!this.adsEnabled) {
+                    this.adManager.onContentResumed.dispatch();
+                }
+                switch (adType) {
+                    case HeyzapAdTypes.Interstitial:
+                        HeyzapAds.InterstitialAd.show().then(function () {
+                            // Native call successful.
+                            _this.adManager.onContentPaused.dispatch();
+                        }, function (error) {
+                            //Failed to show insentive ad, continue operations
+                            _this.adManager.onContentResumed.dispatch();
+                        });
+                        break;
+                    case HeyzapAdTypes.Video:
+                        HeyzapAds.VideoAd.show().then(function () {
+                            // Native call successful.
+                            _this.adManager.onContentPaused.dispatch();
+                        }, function (error) {
+                            //Failed to show insentive ad, continue operations
+                            _this.adManager.onContentResumed.dispatch();
+                        });
+                        break;
+                    case HeyzapAdTypes.Rewarded:
+                        HeyzapAds.IncentivizedAd.show().then(function () {
+                            // Native call successful.
+                            _this.adManager.onContentPaused.dispatch();
+                        }, function (error) {
+                            //Failed to show insentive ad, continue operations
+                            _this.adManager.onContentResumed.dispatch();
+                        });
+                        break;
+                    case HeyzapAdTypes.Banner:
+                        HeyzapAds.BannerAd.show(bannerAdPositions).then(function () {
+                            // Native call successful.
+                        }, function (error) {
+                            // Handle Error
+                        });
+                        break;
+                }
+            };
+            CordovaHeyzap.prototype.preloadAd = function (adType) {
+                if (!this.adsEnabled) {
+                    return;
+                }
+                if (adType === HeyzapAdTypes.Rewarded) {
+                    HeyzapAds.IncentivizedAd.fetch().then(function () {
+                        // Native call successful.
+                    }, function (error) {
+                        // Handle Error
+                    });
+                }
+                return;
+            };
+            CordovaHeyzap.prototype.destroyAd = function (adType) {
+                if (!this.adsEnabled) {
+                    return;
+                }
+                if (adType === HeyzapAdTypes.Banner) {
+                    HeyzapAds.BannerAd.destroy().then(function () {
+                        // Native call successful.
+                    }, function (error) {
+                        // Handle Error
+                    });
+                }
+                return;
+            };
+            CordovaHeyzap.prototype.hideAd = function (adType) {
+                if (!this.adsEnabled) {
+                    return;
+                }
+                if (adType === HeyzapAdTypes.Banner) {
+                    HeyzapAds.BannerAd.hide().then(function () {
+                        // Native call successful.
+                    }, function (error) {
+                        // Handle Error
+                    });
+                }
+                return;
+            };
+            return CordovaHeyzap;
+        })();
+        AdProvider.CordovaHeyzap = CordovaHeyzap;
+    })(AdProvider = Fabrique.AdProvider || (Fabrique.AdProvider = {}));
 })(Fabrique || (Fabrique = {}));
 var AdManager = Fabrique.Plugins.AdManager;
 var Fabrique;
@@ -147,8 +322,20 @@ var Fabrique;
                 }
                 catch (e) {
                     console.log(e);
-                    this.adManager.onContentResumed.dispatch();
+                    this.adManager.onContentResumed.dispatch(e);
                 }
+            };
+            //Does nothing, but needed for Provider interface
+            Ima3.prototype.preloadAd = function () {
+                return;
+            };
+            //Does nothing, but needed for Provider interface
+            Ima3.prototype.destroyAd = function () {
+                return;
+            };
+            //Does nothing, but needed for Provider interface
+            Ima3.prototype.hideAd = function () {
+                return;
             };
             /**
              * Called when the ads manager was loaded.

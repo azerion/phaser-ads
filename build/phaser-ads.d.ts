@@ -11,6 +11,29 @@ declare module Fabrique {
             constructor(game: AdGame, parent: PIXI.DisplayObject);
             setAdProvider(provider: AdProvider.IProvider): void;
             requestAd(...args: any[]): void;
+            preloadAd(...args: any[]): void;
+            destroyAd(...args: any[]): void;
+            hideAd(...args: any[]): void;
+        }
+    }
+}
+declare module Fabrique {
+    module AdProvider {
+        enum HeyzapAdTypes {
+            Interstitial = 0,
+            Video = 1,
+            Rewarded = 2,
+            Banner = 3,
+        }
+        class CordovaHeyzap implements IProvider {
+            adManager: AdManager;
+            private adsEnabled;
+            constructor(game: Phaser.Game, publisherId: string);
+            setManager(manager: AdManager): void;
+            requestAd(adType: HeyzapAdTypes, bannerAdPositions?: string): void;
+            preloadAd(adType: HeyzapAdTypes): void;
+            destroyAd(adType: HeyzapAdTypes): void;
+            hideAd(adType: HeyzapAdTypes): void;
         }
     }
 }
@@ -21,6 +44,9 @@ declare module Fabrique {
             adManager: AdManager;
             setManager(manager: AdManager): void;
             requestAd(...args: any[]): void;
+            preloadAd(...args: any[]): void;
+            destroyAd(...args: any[]): void;
+            hideAd(...args: any[]): void;
         }
     }
 }
@@ -50,6 +76,9 @@ declare module Fabrique {
              * Otherwise we display an ad
              */
             requestAd(customParams?: ICustomParams): void;
+            preloadAd(): void;
+            destroyAd(): void;
+            hideAd(): void;
             /**
              * Called when the ads manager was loaded.
              * We register all ad related events here, and initialize the manager with the game width/height

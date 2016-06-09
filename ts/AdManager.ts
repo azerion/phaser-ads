@@ -33,6 +33,30 @@ module Fabrique {
 
                 this.provider.requestAd.apply(this.provider, args);
             }
+
+            public preloadAd(...args: any[]): void {
+                if (null === this.provider) {
+                    return;
+                }
+
+                this.provider.preloadAd.apply(this.provider, args);
+            }
+
+            public destroyAd(...args: any[]): void {
+                if (null === this.provider) {
+                    return;
+                }
+
+                this.provider.destroyAd.apply(this.provider, args);
+            }
+
+            public hideAd(...args: any[]): void {
+                if (null === this.provider) {
+                    return;
+                }
+
+                this.provider.hideAd.apply(this.provider, args);
+            }
         }
     }
 }

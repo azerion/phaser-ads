@@ -139,8 +139,23 @@ module Fabrique {
                     this.adLoader.requestAds(adsRequest);
                 } catch (e) {
                     console.log(e);
-                    this.adManager.onContentResumed.dispatch();
+                    this.adManager.onContentResumed.dispatch(e);
                 }
+            }
+
+            //Does nothing, but needed for Provider interface
+            public preloadAd(): void {
+                return;
+            }
+
+            //Does nothing, but needed for Provider interface
+            public destroyAd(): void {
+                return;
+            }
+
+            //Does nothing, but needed for Provider interface
+            public hideAd(): void {
+                return;
             }
 
             /**
