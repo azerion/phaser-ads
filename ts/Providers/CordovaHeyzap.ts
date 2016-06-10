@@ -25,37 +25,6 @@ module Fabrique {
                     //Failed to start heyzap, disabling ads
                     this.adsEnabled = false;
                 });
-
-                //Register event listeners
-                HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.HIDE, () => {
-                    this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.HIDE);
-                });
-                HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.SHOW_FAILED, () => {
-                    this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.SHOW_FAILED);
-                });
-                HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.CLICKED, () => {
-                    this.adManager.onAdClicked.dispatch(HeyzapAds.InterstitialAd.Events.CLICKED);
-                });
-
-                HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.HIDE, () => {
-                    this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.HIDE);
-                });
-                HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.SHOW_FAILED, () => {
-                    this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.SHOW_FAILED);
-                });
-                HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.CLICKED, () => {
-                    this.adManager.onAdClicked.dispatch(HeyzapAds.VideoAd.Events.CLICKED);
-                });
-
-                HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.HIDE, () => {
-                    this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.HIDE);
-                });
-                HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.SHOW_FAILED, () => {
-                    this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.SHOW_FAILED);
-                });
-                HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.CLICKED, () => {
-                    this.adManager.onAdClicked.dispatch(HeyzapAds.IncentivizedAd.Events.CLICKED);
-                });
             }
 
             public setManager(manager: AdManager): void {
@@ -69,6 +38,17 @@ module Fabrique {
 
                 switch(adType) {
                     case HeyzapAdTypes.Interstitial:
+                        //Register event listeners
+                        HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.HIDE, () => {
+                            this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.HIDE);
+                        });
+                        HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.SHOW_FAILED, () => {
+                            this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.SHOW_FAILED);
+                        });
+                        HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.CLICKED, () => {
+                            this.adManager.onAdClicked.dispatch(HeyzapAds.InterstitialAd.Events.CLICKED);
+                        });
+
                         HeyzapAds.InterstitialAd.show().then(() => {
                             // Native call successful.
                             this.adManager.onContentPaused.dispatch();
@@ -78,6 +58,16 @@ module Fabrique {
                         });
                         break;
                     case HeyzapAdTypes.Video:
+                        HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.HIDE, () => {
+                            this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.HIDE);
+                        });
+                        HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.SHOW_FAILED, () => {
+                            this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.SHOW_FAILED);
+                        });
+                        HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.CLICKED, () => {
+                            this.adManager.onAdClicked.dispatch(HeyzapAds.VideoAd.Events.CLICKED);
+                        });
+
                         HeyzapAds.VideoAd.show().then(() => {
                             // Native call successful.
                             this.adManager.onContentPaused.dispatch();
@@ -87,6 +77,16 @@ module Fabrique {
                         });
                         break;
                     case HeyzapAdTypes.Rewarded:
+                        HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.HIDE, () => {
+                            this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.HIDE);
+                        });
+                        HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.SHOW_FAILED, () => {
+                            this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.SHOW_FAILED);
+                        });
+                        HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.CLICKED, () => {
+                            this.adManager.onAdClicked.dispatch(HeyzapAds.IncentivizedAd.Events.CLICKED);
+                        });
+
                         HeyzapAds.IncentivizedAd.show().then(() => {
                             // Native call successful.
                             this.adManager.onContentPaused.dispatch();

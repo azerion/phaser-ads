@@ -1,5 +1,5 @@
 /*!
- * phaser-ads - version 0.6.2 
+ * phaser-ads - version 0.6.3 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
@@ -104,34 +104,6 @@ var Fabrique;
                     //Failed to start heyzap, disabling ads
                     _this.adsEnabled = false;
                 });
-                //Register event listeners
-                HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.HIDE, function () {
-                    _this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.HIDE);
-                });
-                HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.SHOW_FAILED, function () {
-                    _this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.SHOW_FAILED);
-                });
-                HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.CLICKED, function () {
-                    _this.adManager.onAdClicked.dispatch(HeyzapAds.InterstitialAd.Events.CLICKED);
-                });
-                HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.HIDE, function () {
-                    _this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.HIDE);
-                });
-                HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.SHOW_FAILED, function () {
-                    _this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.SHOW_FAILED);
-                });
-                HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.CLICKED, function () {
-                    _this.adManager.onAdClicked.dispatch(HeyzapAds.VideoAd.Events.CLICKED);
-                });
-                HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.HIDE, function () {
-                    _this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.HIDE);
-                });
-                HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.SHOW_FAILED, function () {
-                    _this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.SHOW_FAILED);
-                });
-                HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.CLICKED, function () {
-                    _this.adManager.onAdClicked.dispatch(HeyzapAds.IncentivizedAd.Events.CLICKED);
-                });
             }
             CordovaHeyzap.prototype.setManager = function (manager) {
                 this.adManager = manager;
@@ -143,6 +115,16 @@ var Fabrique;
                 }
                 switch (adType) {
                     case HeyzapAdTypes.Interstitial:
+                        //Register event listeners
+                        HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.HIDE, function () {
+                            _this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.HIDE);
+                        });
+                        HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.SHOW_FAILED, function () {
+                            _this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.SHOW_FAILED);
+                        });
+                        HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.CLICKED, function () {
+                            _this.adManager.onAdClicked.dispatch(HeyzapAds.InterstitialAd.Events.CLICKED);
+                        });
                         HeyzapAds.InterstitialAd.show().then(function () {
                             // Native call successful.
                             _this.adManager.onContentPaused.dispatch();
@@ -152,6 +134,15 @@ var Fabrique;
                         });
                         break;
                     case HeyzapAdTypes.Video:
+                        HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.HIDE, function () {
+                            _this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.HIDE);
+                        });
+                        HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.SHOW_FAILED, function () {
+                            _this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.SHOW_FAILED);
+                        });
+                        HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.CLICKED, function () {
+                            _this.adManager.onAdClicked.dispatch(HeyzapAds.VideoAd.Events.CLICKED);
+                        });
                         HeyzapAds.VideoAd.show().then(function () {
                             // Native call successful.
                             _this.adManager.onContentPaused.dispatch();
@@ -161,6 +152,15 @@ var Fabrique;
                         });
                         break;
                     case HeyzapAdTypes.Rewarded:
+                        HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.HIDE, function () {
+                            _this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.HIDE);
+                        });
+                        HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.SHOW_FAILED, function () {
+                            _this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.SHOW_FAILED);
+                        });
+                        HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.CLICKED, function () {
+                            _this.adManager.onAdClicked.dispatch(HeyzapAds.IncentivizedAd.Events.CLICKED);
+                        });
                         HeyzapAds.IncentivizedAd.show().then(function () {
                             // Native call successful.
                             _this.adManager.onContentPaused.dispatch();
