@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 0.6.0 
+ * phaser-ads - version 0.6.2 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 09-06-2016
+ * Build at 10-06-2016
  * Released under MIT License 
  */
 
@@ -105,32 +105,32 @@ var Fabrique;
                     _this.adsEnabled = false;
                 });
                 //Register event listeners
-                HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.SHOW, function () {
-                    _this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.SHOW);
+                HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.HIDE, function () {
+                    _this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.HIDE);
                 });
                 HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.SHOW_FAILED, function () {
                     _this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.SHOW_FAILED);
                 });
                 HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.CLICKED, function () {
-                    _this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.CLICKED);
+                    _this.adManager.onAdClicked.dispatch(HeyzapAds.InterstitialAd.Events.CLICKED);
                 });
-                HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.SHOW, function () {
-                    _this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.SHOW);
+                HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.HIDE, function () {
+                    _this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.HIDE);
                 });
                 HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.SHOW_FAILED, function () {
                     _this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.SHOW_FAILED);
                 });
                 HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.CLICKED, function () {
-                    _this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.CLICKED);
+                    _this.adManager.onAdClicked.dispatch(HeyzapAds.VideoAd.Events.CLICKED);
                 });
-                HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.SHOW, function () {
-                    _this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.SHOW);
+                HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.HIDE, function () {
+                    _this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.HIDE);
                 });
                 HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.SHOW_FAILED, function () {
                     _this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.SHOW_FAILED);
                 });
                 HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.CLICKED, function () {
-                    _this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.CLICKED);
+                    _this.adManager.onAdClicked.dispatch(HeyzapAds.IncentivizedAd.Events.CLICKED);
                 });
             }
             CordovaHeyzap.prototype.setManager = function (manager) {
