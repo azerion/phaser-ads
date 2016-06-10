@@ -10,6 +10,7 @@ declare module HeyzapAds {
             SHOW_FAILED: string;
             SHOW: string;
             CLICKED: string;
+            HIDE: string;
         };
         export function show(): Thenable;
         export function addEventListener(target: string, call: () => void): void;
@@ -19,6 +20,7 @@ declare module HeyzapAds {
             SHOW_FAILED: string;
             SHOW: string;
             CLICKED: string;
+            HIDE: string;
         };
         export function show(): Thenable;
         export function fetch(): Thenable;
@@ -29,6 +31,7 @@ declare module HeyzapAds {
             SHOW_FAILED: string;
             SHOW: string;
             CLICKED: string;
+            HIDE: string;
         };
         export function show(): Thenable;
         export function fetch(): Thenable;

@@ -27,8 +27,8 @@ module Fabrique {
                 });
 
                 //Register event listeners
-                HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.SHOW, () => {
-                    this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.SHOW);
+                HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.HIDE, () => {
+                    this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.HIDE);
                 });
                 HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.SHOW_FAILED, () => {
                     this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.SHOW_FAILED);
@@ -37,8 +37,8 @@ module Fabrique {
                     this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.CLICKED);
                 });
 
-                HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.SHOW, () => {
-                    this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.SHOW);
+                HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.HIDE, () => {
+                    this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.HIDE);
                 });
                 HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.SHOW_FAILED, () => {
                     this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.SHOW_FAILED);
@@ -47,8 +47,8 @@ module Fabrique {
                     this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.CLICKED);
                 });
 
-                HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.SHOW, () => {
-                    this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.SHOW);
+                HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.HIDE, () => {
+                    this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.HIDE);
                 });
                 HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.SHOW_FAILED, () => {
                     this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.SHOW_FAILED);
