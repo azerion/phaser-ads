@@ -1,5 +1,5 @@
 /*!
- * phaser-ads - version 0.6.5 
+ * phaser-ads - version 0.6.6 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
@@ -398,6 +398,10 @@ var Fabrique;
              * When the ad is finished and the game should be resumed
              */
             Ima3.prototype.onContentResumeRequested = function () {
+                if (typeof google === "undefined") {
+                    this.adManager.onContentResumed.dispatch();
+                    return;
+                }
                 console.log('onContentResumeRequested', arguments);
                 this.adContent.style.display = 'none';
                 if (this.game.device.iOS) {

@@ -226,6 +226,11 @@ module Fabrique {
              * When the ad is finished and the game should be resumed
              */
             private onContentResumeRequested() {
+                if (typeof google === "undefined") {
+                    this.adManager.onContentResumed.dispatch();
+                    return;
+                }
+
                 console.log('onContentResumeRequested', arguments);
                 this.adContent.style.display = 'none';
                 if (this.game.device.iOS) {
