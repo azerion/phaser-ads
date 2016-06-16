@@ -68,7 +68,6 @@ declare module Fabrique {
             private adRequested;
             adManager: AdManager;
             private fauxVideoElement;
-            private gameOverlay;
             constructor(game: Phaser.Game, adTagUrl: string);
             setManager(manager: AdManager): void;
             /**

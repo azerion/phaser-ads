@@ -1,5 +1,5 @@
 /*!
- * phaser-ads - version 0.6.4 
+ * phaser-ads - version 0.6.5 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
@@ -229,7 +229,6 @@ var Fabrique;
     (function (AdProvider) {
         var Ima3 = (function () {
             function Ima3(game, adTagUrl) {
-                var _this = this;
                 this.adsManager = null;
                 this.googleEnabled = false;
                 this.canPlayAds = false;
@@ -252,29 +251,15 @@ var Fabrique;
                 this.adContent.style.display = 'none';
                 //This is a work around for some ios failing issues
                 //iOS ima3 requires this information, but canvas doesn't provide it. so we create a a custom method
-                if (game.device.iOS) {
-                    this.fauxVideoElement = this.gameContent.parentNode.appendChild(document.createElement('video'));
-                    this.fauxVideoElement.id = 'phaser-ad-faux-video';
-                    this.fauxVideoElement.style.position = 'absolute';
-                    this.fauxVideoElement.style.zIndex = '999';
-                    this.fauxVideoElement.style.display = 'none';
-                    this.gameOverlay = this.gameContent.parentNode.appendChild(document.createElement('div'));
-                    this.gameOverlay.id = 'phaser-ad-game-overlay';
-                    this.gameOverlay.style.backgroundColor = '#000000';
-                    this.gameOverlay.style.position = 'absolute';
-                    this.gameOverlay.style.zIndex = '99';
-                    this.gameOverlay.style.display = 'none';
-                    this.gameContent.canPlayType = function () {
-                        return _this.fauxVideoElement.canPlayType('video/mp4');
-                    };
-                    this.gameContent.load = function () { console.log('loading video'); };
-                    this.gameContent.pause = function () { console.log('pausing video'); };
-                    this.gameContent.play = function () { console.log('playing video'); };
-                }
+                this.fauxVideoElement = this.gameContent.parentNode.appendChild(document.createElement('video'));
+                this.fauxVideoElement.id = 'phaser-ad-faux-video';
+                this.fauxVideoElement.style.position = 'absolute';
+                this.fauxVideoElement.style.zIndex = '999';
+                this.fauxVideoElement.style.display = 'none';
                 this.adTagUrl = adTagUrl;
                 this.game = game;
                 // Create the ad display container.
-                this.adDisplay = new google.ima.AdDisplayContainer(this.adContent, (game.device.iOS) ? this.fauxVideoElement : this.gameContent);
+                this.adDisplay = new google.ima.AdDisplayContainer(this.adContent, this.fauxVideoElement);
                 //Set vpaid enabled, and update locale
                 google.ima.settings.setVpaidMode(google.ima.ImaSdkSettings.VpaidMode.ENABLED);
                 google.ima.settings.setLocale('nl');
@@ -311,8 +296,6 @@ var Fabrique;
                 if (this.game.device.iOS) {
                     this.fauxVideoElement.style.width = width + 'px';
                     this.fauxVideoElement.style.height = height + 'px';
-                    this.gameOverlay.style.width = width + 'px';
-                    this.gameOverlay.style.height = height + 'px';
                 }
                 //Required for games, see:
                 //http://googleadsdeveloper.blogspot.nl/2015/10/important-changes-for-gaming-publishers.html
@@ -348,7 +331,7 @@ var Fabrique;
                 var adsRenderingSettings = new google.ima.AdsRenderingSettings();
                 adsRenderingSettings.restoreCustomPlaybackStateOnAdBreakComplete = true;
                 // videoContent should be set to the content video element.
-                this.adsManager = adsManagerLoadedEvent.getAdsManager(this.gameContent, adsRenderingSettings);
+                this.adsManager = adsManagerLoadedEvent.getAdsManager(this.fauxVideoElement, adsRenderingSettings);
                 // Add listeners to the required events.
                 this.adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, this.onAdError.bind(this));
                 this.adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED, this.onContentPauseRequested.bind(this));
@@ -362,7 +345,6 @@ var Fabrique;
                     this.adContent.style.display = 'block';
                     if (this.game.device.iOS) {
                         this.fauxVideoElement.style.display = 'block';
-                        this.gameOverlay.style.display = 'block';
                     }
                     // Initialize the ads manager. Ad rules playlist will start at this time.
                     var width = window.innerWidth; //parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
@@ -420,7 +402,6 @@ var Fabrique;
                 this.adContent.style.display = 'none';
                 if (this.game.device.iOS) {
                     this.fauxVideoElement.style.display = 'none';
-                    this.gameOverlay.style.display = 'none';
                 }
                 this.adManager.onContentResumed.dispatch();
             };

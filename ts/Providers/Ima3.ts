@@ -29,8 +29,6 @@ module Fabrique {
 
             private fauxVideoElement: HTMLMediaElement;
 
-            private gameOverlay: HTMLElement;
-
             constructor(game: Phaser.Game, adTagUrl: string) {
                 if (typeof google === "undefined") {
                     return;
@@ -53,34 +51,17 @@ module Fabrique {
 
                 //This is a work around for some ios failing issues
                 //iOS ima3 requires this information, but canvas doesn't provide it. so we create a a custom method
-                if (game.device.iOS) {
-                    this.fauxVideoElement = this.gameContent.parentNode.appendChild(document.createElement('video'));
-                    this.fauxVideoElement.id = 'phaser-ad-faux-video';
-                    this.fauxVideoElement.style.position = 'absolute';
-                    this.fauxVideoElement.style.zIndex = '999';
-                    this.fauxVideoElement.style.display = 'none';
-
-                    this.gameOverlay = this.gameContent.parentNode.appendChild(document.createElement('div'));
-                    this.gameOverlay.id = 'phaser-ad-game-overlay';
-                    this.gameOverlay.style.backgroundColor = '#000000';
-                    this.gameOverlay.style.position = 'absolute';
-                    this.gameOverlay.style.zIndex = '99';
-                    this.gameOverlay.style.display = 'none';
-
-
-                    (<any>this.gameContent).canPlayType = (): string => {
-                        return this.fauxVideoElement.canPlayType('video/mp4');
-                    };
-                    (<any>this.gameContent).load = (): void => {console.log('loading video')};
-                    (<any>this.gameContent).pause = (): void => {console.log('pausing video')};
-                    (<any>this.gameContent).play = (): void => {console.log('playing video')};
-                }
+                this.fauxVideoElement = this.gameContent.parentNode.appendChild(document.createElement('video'));
+                this.fauxVideoElement.id = 'phaser-ad-faux-video';
+                this.fauxVideoElement.style.position = 'absolute';
+                this.fauxVideoElement.style.zIndex = '999';
+                this.fauxVideoElement.style.display = 'none';
 
                 this.adTagUrl = adTagUrl;
                 this.game = game;
 
                 // Create the ad display container.
-                this.adDisplay = new google.ima.AdDisplayContainer(this.adContent, (game.device.iOS) ? this.fauxVideoElement : this.gameContent);
+                this.adDisplay = new google.ima.AdDisplayContainer(this.adContent, this.fauxVideoElement);
 
                 //Set vpaid enabled, and update locale
                 (<any>google.ima.settings).setVpaidMode((<any>google.ima).ImaSdkSettings.VpaidMode.ENABLED);
@@ -126,8 +107,6 @@ module Fabrique {
                 if (this.game.device.iOS) {
                     this.fauxVideoElement.style.width = width + 'px';
                     this.fauxVideoElement.style.height = height + 'px';
-                    this.gameOverlay.style.width = width + 'px';
-                    this.gameOverlay.style.height = height + 'px';
                 }
 
 
@@ -171,7 +150,7 @@ module Fabrique {
 
 
                 // videoContent should be set to the content video element.
-                this.adsManager = adsManagerLoadedEvent.getAdsManager(this.gameContent, adsRenderingSettings);
+                this.adsManager = adsManagerLoadedEvent.getAdsManager(this.fauxVideoElement, adsRenderingSettings);
 
                 // Add listeners to the required events.
                 this.adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, this.onAdError.bind(this));
@@ -188,7 +167,6 @@ module Fabrique {
                     this.adContent.style.display = 'block';
                     if (this.game.device.iOS) {
                         this.fauxVideoElement.style.display = 'block';
-                        this.gameOverlay.style.display = 'block';
                     }
                     // Initialize the ads manager. Ad rules playlist will start at this time.
 
@@ -252,7 +230,6 @@ module Fabrique {
                 this.adContent.style.display = 'none';
                 if (this.game.device.iOS) {
                     this.fauxVideoElement.style.display = 'none';
-                    this.gameOverlay.style.display = 'none';
                 }
                 this.adManager.onContentResumed.dispatch();
             }
