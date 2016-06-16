@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 0.6.3 
+ * phaser-ads - version 0.6.4 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 10-06-2016
+ * Build at 16-06-2016
  * Released under MIT License 
  */
 
@@ -292,7 +292,7 @@ var Fabrique;
              */
             Ima3.prototype.requestAd = function (customParams) {
                 if (!this.googleEnabled) {
-                    this.adManager.onContentResumed.dispatch();
+                    this.onContentResumeRequested();
                     return;
                 }
                 //For mobile this ad request needs to be handled post user click
@@ -322,7 +322,7 @@ var Fabrique;
                 }
                 catch (e) {
                     console.log(e);
-                    this.adManager.onContentResumed.dispatch(e);
+                    this.onContentResumeRequested();
                 }
             };
             //Does nothing, but needed for Provider interface
