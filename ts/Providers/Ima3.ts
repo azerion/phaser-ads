@@ -102,7 +102,7 @@ module Fabrique {
              */
             public requestAd(customParams?: ICustomParams): void {
                 if (!this.googleEnabled) {
-                    this.adManager.onContentResumed.dispatch();
+                    this.onContentResumeRequested();
                     return;
                 }
 
@@ -139,7 +139,7 @@ module Fabrique {
                     this.adLoader.requestAds(adsRequest);
                 } catch (e) {
                     console.log(e);
-                    this.adManager.onContentResumed.dispatch(e);
+                   this.onContentResumeRequested();
                 }
             }
 
