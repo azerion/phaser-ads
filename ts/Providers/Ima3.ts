@@ -82,6 +82,10 @@ module Fabrique {
              * Otherwise we display an ad
              */
             public requestAd(customParams?: ICustomParams): void {
+                if (this.adRequested) {
+                    return;
+                }
+
                 if (!this.googleEnabled) {
                     this.onContentResumeRequested();
                     return;
@@ -115,6 +119,7 @@ module Fabrique {
                 adsRequest.forceNonLinearFullSlot = true;
 
                 try {
+                    this.adRequested = true;
                     this.adLoader.requestAds(adsRequest);
                 } catch (e) {
                     console.log(e);
@@ -192,6 +197,7 @@ module Fabrique {
                 if (adEvent.type == google.ima.AdEvent.Type.CLICK) {
                     this.adManager.onAdClicked.dispatch();
                 } else if (adEvent.type == google.ima.AdEvent.Type.LOADED) {
+                    this.adRequested = false;
                     var ad = adEvent.getAd();
                     console.log(ad);
                     if (!ad.isLinear())
@@ -208,6 +214,10 @@ module Fabrique {
                 if (null !== this.adsManager) {
                     this.adsManager.destroy();
                     this.adsManager = null;
+                }
+
+                if (this.adRequested) {
+                    this.adRequested = false;
                 }
 
                 //We silently ignore adLoader errors, it just means there is no ad available

@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 0.6.6 
+ * phaser-ads - version 0.6.7 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 16-06-2016
+ * Build at 20-06-2016
  * Released under MIT License 
  */
 
@@ -18,8 +18,8 @@ var Fabrique;
     (function (Plugins) {
         var AdManager = (function (_super) {
             __extends(AdManager, _super);
-            function AdManager(game, parent) {
-                _super.call(this, game, parent);
+            function AdManager(game, pluginManager) {
+                _super.call(this, game, pluginManager);
                 this.onContentPaused = new Phaser.Signal();
                 this.onContentResumed = new Phaser.Signal();
                 this.onAdClicked = new Phaser.Signal();
@@ -276,6 +276,9 @@ var Fabrique;
              * Otherwise we display an ad
              */
             Ima3.prototype.requestAd = function (customParams) {
+                if (this.adRequested) {
+                    return;
+                }
                 if (!this.googleEnabled) {
                     this.onContentResumeRequested();
                     return;
@@ -301,6 +304,7 @@ var Fabrique;
                 //http://googleadsdeveloper.blogspot.nl/2015/10/important-changes-for-gaming-publishers.html
                 adsRequest.forceNonLinearFullSlot = true;
                 try {
+                    this.adRequested = true;
                     this.adLoader.requestAds(adsRequest);
                 }
                 catch (e) {
@@ -368,6 +372,7 @@ var Fabrique;
                     this.adManager.onAdClicked.dispatch();
                 }
                 else if (adEvent.type == google.ima.AdEvent.Type.LOADED) {
+                    this.adRequested = false;
                     var ad = adEvent.getAd();
                     console.log(ad);
                     if (!ad.isLinear()) {
@@ -383,6 +388,9 @@ var Fabrique;
                 if (null !== this.adsManager) {
                     this.adsManager.destroy();
                     this.adsManager = null;
+                }
+                if (this.adRequested) {
+                    this.adRequested = false;
                 }
                 //We silently ignore adLoader errors, it just means there is no ad available
                 this.onContentResumeRequested();

@@ -13,8 +13,8 @@ module Fabrique {
 
             private provider: AdProvider.IProvider = null;
 
-            constructor(game: AdGame, parent:PIXI.DisplayObject) {
-                super(game, parent);
+            constructor(game: AdGame, pluginManager: Phaser.PluginManager) {
+                super(game, pluginManager);
 
                 Object.defineProperty(game, 'ads', {
                     value: this

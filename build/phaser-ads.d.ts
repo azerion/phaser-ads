@@ -8,7 +8,7 @@ declare module Fabrique {
             onContentResumed: Phaser.Signal;
             onAdClicked: Phaser.Signal;
             private provider;
-            constructor(game: AdGame, parent: PIXI.DisplayObject);
+            constructor(game: AdGame, pluginManager: Phaser.PluginManager);
             setAdProvider(provider: AdProvider.IProvider): void;
             requestAd(...args: any[]): void;
             preloadAd(...args: any[]): void;
