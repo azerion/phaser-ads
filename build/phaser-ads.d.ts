@@ -8,11 +8,36 @@ declare module Fabrique {
             onContentResumed: Phaser.Signal;
             onAdClicked: Phaser.Signal;
             private provider;
+            private wasMuted;
             constructor(game: AdGame, pluginManager: Phaser.PluginManager);
+            /**
+             * Here we set an adprovider, any can be given as long as it implements the IProvider interface
+             *
+             * @param provider
+             */
             setAdProvider(provider: AdProvider.IProvider): void;
+            /**
+             * Here we request an ad, the arguments passed depend on the provider used!
+             * @param args
+             */
             requestAd(...args: any[]): void;
+            /**
+             * Some providers might require you to preload an ad before showing it, that can be done here
+             *
+             * @param args
+             */
             preloadAd(...args: any[]): void;
+            /**
+             * Some providers require you to destroy an add after it was shown, that can be done here.
+             *
+             * @param args
+             */
             destroyAd(...args: any[]): void;
+            /**
+             * Some providers allow you to hide an ad, you might think of an banner ad that is shown in show cases
+             *
+             * @param args
+             */
             hideAd(...args: any[]): void;
         }
     }
