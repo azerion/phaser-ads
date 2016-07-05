@@ -1,6 +1,7 @@
 declare module GoogleAds.ima {
     class ViewMode {
         static NORMAL: string;
+        static FULLSCREEN: string;
     }
 
     class AdErrorEvent {
@@ -20,6 +21,10 @@ declare module GoogleAds.ima {
             STARTED: string;
             COMPLETE: string;
             CLICK: string;
+            PAUSED: string;
+            FIRST_QUARTILE: string;
+            MIDPOINT: string;
+            THIRD_QUARTILE: string;
         };
     }
 
@@ -56,14 +61,16 @@ declare module GoogleAds.ima {
     }
 
     class AdsManager {
-        addEventListener(type: string, callback: (thingy: any) => void, something?: boolean): void;
+        isCustomClickTrackingUsed(): boolean;
+        addEventListener(type: string, callback: (thingy: any) => void, something?: boolean, context?: any): void;
         init(width: number, height: number, viewMode: string): void;
         start(): void;
         destroy(): void;
+        resize(width: number, height: number, viewMode: string): void;
     }
 
     class AdDisplayContainer {
-        constructor(content: HTMLElement, ad: HTMLElement);
+        constructor(content: HTMLElement, ad: HTMLElement, customClickTrack?: HTMLElement);
         initialize(): void;
     }
 }

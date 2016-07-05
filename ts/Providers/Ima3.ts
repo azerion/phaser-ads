@@ -70,7 +70,7 @@ module Fabrique {
                 // Create ads loader, and register events
                 this.adLoader = new google.ima.AdsLoader(this.adDisplay);
                 this.adLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, this.onAdManagerLoader, false, this);
-                this.adLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, this.onAdError.bind(this), false);
+                this.adLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, this.onAdError, false, this);
             }
 
             public setManager(manager: AdManager): void {
@@ -82,6 +82,7 @@ module Fabrique {
              * Otherwise we display an ad
              */
             public requestAd(customParams?: ICustomParams): void {
+                console.log('Ad Requested');
                 if (this.adRequested) {
                     return;
                 }
@@ -106,7 +107,7 @@ module Fabrique {
                 adsRequest.linearAdSlotWidth = width;
                 adsRequest.linearAdSlotHeight = height;
                 adsRequest.nonLinearAdSlotWidth = width;
-                adsRequest.nonLinearAdSlotHeight = height / 3;
+                adsRequest.nonLinearAdSlotHeight = height;
 
                 if (this.game.device.iOS) {
                     this.fauxVideoElement.style.width = width + 'px';
@@ -154,24 +155,41 @@ module Fabrique {
              * @param adsManagerLoadedEvent
              */
             private onAdManagerLoader(adsManagerLoadedEvent: GoogleAds.ima.AdsManagerLoadedEvent): void {
+                console.log('AdsManager loaded')
                 // Get the ads manager.
                 var adsRenderingSettings = new google.ima.AdsRenderingSettings();
                 adsRenderingSettings.restoreCustomPlaybackStateOnAdBreakComplete = true;
 
 
                 // videoContent should be set to the content video element.
-                this.adsManager = adsManagerLoadedEvent.getAdsManager(this.fauxVideoElement, adsRenderingSettings);
+                let adsManager: GoogleAds.ima.AdsManager = adsManagerLoadedEvent.getAdsManager(this.gameContent, adsRenderingSettings);
+                this.adsManager = adsManager;
+                console.log(adsManager.isCustomClickTrackingUsed());
 
                 // Add listeners to the required events.
-                this.adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, this.onAdError.bind(this));
-                this.adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED, this.onContentPauseRequested.bind(this));
-                this.adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED, this.onContentResumeRequested.bind(this));
-                this.adsManager.addEventListener(google.ima.AdEvent.Type.ALL_ADS_COMPLETED, this.onAdEvent.bind(this));
+                adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED, this.onContentPauseRequested, false, this);
+                adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED, this.onContentResumeRequested, false, this);
+                adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, this.onAdError, false, this);
 
-                // Listen to any additional events, if necessary.
-                this.adsManager.addEventListener(google.ima.AdEvent.Type.LOADED, this.onAdEvent.bind(this));
-                this.adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, this.onAdEvent.bind(this));
-                this.adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, this.onAdEvent.bind(this));
+                [
+                    google.ima.AdEvent.Type.ALL_ADS_COMPLETED,
+                    google.ima.AdEvent.Type.CLICK,
+                    google.ima.AdEvent.Type.COMPLETE,
+                    google.ima.AdEvent.Type.FIRST_QUARTILE,
+                    google.ima.AdEvent.Type.LOADED,
+                    google.ima.AdEvent.Type.MIDPOINT,
+                    google.ima.AdEvent.Type.PAUSED,
+                    google.ima.AdEvent.Type.STARTED,
+                    google.ima.AdEvent.Type.THIRD_QUARTILE
+                ].forEach((event) => {
+                    adsManager.addEventListener(
+                        event,
+                        this.onAdEvent,
+                        false,
+                        this);
+                });
+
+
 
                 try {
                     //Show the ad elements, we only need to show the faux videoelement on iOS, because the ad is displayed in there.
@@ -189,6 +207,7 @@ module Fabrique {
                     // start at this time; the call will be ignored for ad rules.
                     this.adsManager.start();
                 } catch (adError) {
+                    console.log('Adsmanager error:', adError);
                     this.onAdError(adError);
                 }
             }
@@ -198,17 +217,26 @@ module Fabrique {
              * @param adEvent
              */
             private onAdEvent(adEvent: any) {
-                console.log('onAdEvent', arguments);
-
+                console.log('onAdEvent', adEvent);
+                this.adsManager.resize(window.innerWidth, window.innerHeight, google.ima.ViewMode.NORMAL);
                 if (adEvent.type == google.ima.AdEvent.Type.CLICK) {
                     this.adManager.onAdClicked.dispatch();
                 } else if (adEvent.type == google.ima.AdEvent.Type.LOADED) {
                     this.adRequested = false;
                     var ad = adEvent.getAd();
-                    console.log(ad);
+                    console.log('is ad linear?', ad.isLinear());
                     if (!ad.isLinear())
                     {
                         this.onContentResumeRequested();
+                    }
+                    //Work around for skip/end not registering @ ios
+                    if (this.game.device.iOS) {
+                        let intervalId = setInterval(() => {
+                            if (this.fauxVideoElement.src.length > 0) {
+                                this.onContentResumeRequested();
+                                clearInterval(intervalId);
+                            }
+                        }, 200);
                     }
                 } else if (adEvent.type === google.ima.AdEvent.Type.ALL_ADS_COMPLETED) {
                     this.onContentResumeRequested();
@@ -242,12 +270,13 @@ module Fabrique {
              * When the ad is finished and the game should be resumed
              */
             private onContentResumeRequested() {
+                console.log('onContentResumeRequested', arguments);
+
                 if (typeof google === "undefined") {
                     this.adManager.onContentResumed.dispatch();
                     return;
                 }
 
-                console.log('onContentResumeRequested', arguments);
                 this.adContent.style.display = 'none';
                 if (this.game.device.iOS) {
                     this.fauxVideoElement.style.display = 'none';
