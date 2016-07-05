@@ -119,6 +119,11 @@ module Fabrique {
                 adsRequest.forceNonLinearFullSlot = true;
 
                 try {
+                    if (this.game.device.iOS) {
+                        //We need to play the video element on click, otherwise iOS won't work :(
+                        this.fauxVideoElement.play();
+                    }
+
                     this.adRequested = true;
                     this.adLoader.requestAds(adsRequest);
                 } catch (e) {
@@ -169,16 +174,17 @@ module Fabrique {
                 this.adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, this.onAdEvent.bind(this));
 
                 try {
-                    this.adContent.style.display = 'block';
+                    //Show the ad elements, we only need to show the faux videoelement on iOS, because the ad is displayed in there.
                     if (this.game.device.iOS) {
                         this.fauxVideoElement.style.display = 'block';
                     }
-                    // Initialize the ads manager. Ad rules playlist will start at this time.
+                    this.adContent.style.display = 'block';
 
+                    // Initialize the ads manager. Ad rules playlist will start at this time.
                     let width: number = window.innerWidth;//parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
                     let height: number = window.innerHeight;//parseInt(<string>(!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
-
                     this.adsManager.init(width, height, google.ima.ViewMode.NORMAL);
+
                     // Call play to start showing the ad. Single video and overlay ads will
                     // start at this time; the call will be ignored for ad rules.
                     this.adsManager.start();

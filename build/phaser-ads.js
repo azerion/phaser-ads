@@ -3,7 +3,7 @@
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 04-07-2016
+ * Build at 05-07-2016
  * Released under MIT License 
  */
 
@@ -345,6 +345,10 @@ var Fabrique;
                 //http://googleadsdeveloper.blogspot.nl/2015/10/important-changes-for-gaming-publishers.html
                 adsRequest.forceNonLinearFullSlot = true;
                 try {
+                    if (this.game.device.iOS) {
+                        //We need to play the video element on click, otherwise iOS won't work :(
+                        this.fauxVideoElement.play();
+                    }
                     this.adRequested = true;
                     this.adLoader.requestAds(adsRequest);
                 }
@@ -387,10 +391,11 @@ var Fabrique;
                 this.adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, this.onAdEvent.bind(this));
                 this.adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, this.onAdEvent.bind(this));
                 try {
-                    this.adContent.style.display = 'block';
+                    //Show the ad elements, we only need to show the faux videoelement on iOS, because the ad is displayed in there.
                     if (this.game.device.iOS) {
                         this.fauxVideoElement.style.display = 'block';
                     }
+                    this.adContent.style.display = 'block';
                     // Initialize the ads manager. Ad rules playlist will start at this time.
                     var width = window.innerWidth; //parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
                     var height = window.innerHeight; //parseInt(<string>(!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);

@@ -41,7 +41,11 @@
             //Set the ad provider, we use google Ima3 (ima 3 sdk)
             game.ads.setAdProvider(new Fabrique.AdProvider.Ima3(
                     game,
-                    'https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&correlator'
+                    'https://pubads.g.doubleclick.net/' +
+                    'gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&' +
+                    'ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&' +
+                    'unviewed_position_start=1&' +
+                    'cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator='
             ));
 
             //Content paused event is fired when the content (game) should be paused, and the ad will be played
@@ -52,6 +56,11 @@
             //This is fired when the ad is finished playing and the content (game) should be resumed
             game.ads.onContentResumed.add(function () {
                 console.error('Finished playing add');
+            });
+
+            //This is fired when the ad was clicked by the user
+            game.ads.onAdClicked.add(function () {
+                console.error('Clicked the ad!');
             });
 
             if (game.device.desktop) {
