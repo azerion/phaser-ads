@@ -405,7 +405,7 @@ var Fabrique;
                     this.adsManager.start();
                 }
                 catch (adError) {
-                    this.onAdError();
+                    this.onAdError(adError);
                 }
             };
             /**
@@ -429,8 +429,8 @@ var Fabrique;
                     this.onContentResumeRequested();
                 }
             };
-            Ima3.prototype.onAdError = function () {
-                console.log('gneric ad error');
+            Ima3.prototype.onAdError = function (error) {
+                console.log('gneric ad error', error);
                 if (null !== this.adsManager) {
                     this.adsManager.destroy();
                     this.adsManager = null;

@@ -189,7 +189,7 @@ module Fabrique {
                     // start at this time; the call will be ignored for ad rules.
                     this.adsManager.start();
                 } catch (adError) {
-                    this.onAdError();
+                    this.onAdError(adError);
                 }
             }
 
@@ -215,8 +215,8 @@ module Fabrique {
                 }
             }
 
-            private onAdError() {
-                console.log('gneric ad error');
+            private onAdError(error: any) {
+                console.log('gneric ad error', error);
                 if (null !== this.adsManager) {
                     this.adsManager.destroy();
                     this.adsManager = null;

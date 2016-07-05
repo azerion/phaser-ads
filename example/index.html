@@ -74,7 +74,7 @@
                 game.input.onTap.add(function () {
                     game.ads.requestAd({
                         deployment: 'devsite',
-                        sample_ct: 'skippablelinear'
+                        sample_ct: (this.game.device.iPhone) ? 'linear' : 'skippablelinear' //Iphone doesnt support skippable videos
                     });
                 });
             }

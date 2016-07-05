@@ -115,7 +115,7 @@ declare module Fabrique {
              * @param adEvent
              */
             private onAdEvent(adEvent);
-            private onAdError();
+            private onAdError(error);
             /**
              * When the ad starts playing, and the game should be paused
              */
