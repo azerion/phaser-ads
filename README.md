@@ -33,7 +33,7 @@ First thing you need to do after loading the plugin is attaching a provider to t
  - IMA 3  (use this for (mobile) web)
  - Cordova HeyZap (wrapping your game with Cordova? Want HeyZap ads? Then this is your provider)
 
-We'll continue this part of the readme asuming you're going to implement IMA3, if you want to use HeyZap, check the [providers section](#providers).
+We'll continue this part of the readme asuming you're going to implement IMA3.
 
 A provider can use any number of arguments configured in order to make it work, it all depends on the implementation that was made by the developer, as for our IMA3 Provider, you can create one like this:
 ```javascript
@@ -56,10 +56,6 @@ game.ads.onContentResumed.addOnce(function() {
 //Here we request the add
 game.ads.requestAd();
 ```
-
-Providers
----------
-
 
 Credits
 -------
