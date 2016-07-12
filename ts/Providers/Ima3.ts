@@ -104,6 +104,13 @@ module Fabrique {
                 let width: number = window.innerWidth;//parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
                 let height: number = window.innerHeight;//parseInt(<string>(!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
 
+                //Here we check if phaser is fullscreen or not, if we are fullscreen, we subtract some of the width and height, to counter for the resize (
+                //Fullscreen should be disabled for the ad, (onContentPaused) and requested for again when the game resumes
+                if (this.game.scale.isFullScreen && document.body.clientHeight < window.innerHeight) {
+                    height = document.body.clientHeight;
+                    width = document.body.clientWidth;
+                }
+
                 // Specify the linear and nonlinear slot sizes. This helps the SDK to
                 // select the correct creative if multiple are returned.
                 adsRequest.linearAdSlotWidth = width;
@@ -228,7 +235,6 @@ module Fabrique {
              */
             private onAdEvent(adEvent: any) {
                 console.log('onAdEvent', adEvent);
-                this.adsManager.resize(window.innerWidth, window.innerHeight, google.ima.ViewMode.NORMAL);
                 if (adEvent.type == google.ima.AdEvent.Type.CLICK) {
                     this.adManager.onAdClicked.dispatch();
                 } else if (adEvent.type == google.ima.AdEvent.Type.LOADED) {
