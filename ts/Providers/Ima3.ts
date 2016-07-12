@@ -29,6 +29,8 @@ module Fabrique {
 
             private fauxVideoElement: HTMLMediaElement;
 
+            private resizeListener: ()=> void = null;
+
             constructor(game: Phaser.Game, adTagUrl: string) {
                 if (typeof google === "undefined") {
                     return;
@@ -206,6 +208,14 @@ module Fabrique {
                     // Call play to start showing the ad. Single video and overlay ads will
                     // start at this time; the call will be ignored for ad rules.
                     this.adsManager.start();
+
+                    this.resizeListener = () => {
+                        //Window was resized, so expect something similar
+                        console.log('Resizing ad size')
+                        this.adsManager.resize(window.innerWidth, window.innerHeight, google.ima.ViewMode.NORMAL);
+                    };
+
+                    window.addEventListener('resize', this.resizeListener);
                 } catch (adError) {
                     console.log('Adsmanager error:', adError);
                     this.onAdError(adError);
@@ -248,6 +258,11 @@ module Fabrique {
                 if (null !== this.adsManager) {
                     this.adsManager.destroy();
                     this.adsManager = null;
+
+                    if (null !== this.resizeListener) {
+                        window.removeEventListener('resize', this.resizeListener);
+                        this.resizeListener = null;
+                    }
                 }
 
                 if (this.adRequested) {

@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 0.7.1 
+ * phaser-ads - version 0.7.2 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 05-07-2016
+ * Build at 12-07-2016
  * Released under MIT License 
  */
 
@@ -276,6 +276,7 @@ var Fabrique;
                 this.adTagUrl = '';
                 this.adRequested = false;
                 this.adManager = null;
+                this.resizeListener = null;
                 if (typeof google === "undefined") {
                     return;
                 }
@@ -416,6 +417,12 @@ var Fabrique;
                     // Call play to start showing the ad. Single video and overlay ads will
                     // start at this time; the call will be ignored for ad rules.
                     this.adsManager.start();
+                    this.resizeListener = function () {
+                        //Window was resized, so expect something similar
+                        console.log('Resizing ad size');
+                        _this.adsManager.resize(window.innerWidth, window.innerHeight, google.ima.ViewMode.NORMAL);
+                    };
+                    window.addEventListener('resize', this.resizeListener);
                 }
                 catch (adError) {
                     console.log('Adsmanager error:', adError);
@@ -459,6 +466,10 @@ var Fabrique;
                 if (null !== this.adsManager) {
                     this.adsManager.destroy();
                     this.adsManager = null;
+                    if (null !== this.resizeListener) {
+                        window.removeEventListener('resize', this.resizeListener);
+                        this.resizeListener = null;
+                    }
                 }
                 if (this.adRequested) {
                     this.adRequested = false;
