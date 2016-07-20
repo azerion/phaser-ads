@@ -31,6 +31,14 @@ module Fabrique {
             public setAdProvider(provider: AdProvider.IProvider): void {
                 this.provider = provider;
                 this.provider.setManager(this);
+
+                //We add a listener to when the content should be resumed in order to unmute audio
+                this.onContentResumed.add(() => {
+                    if (!this.wasMuted) {
+                        //Here we unmute audio, but only if it wasn't muted before requesting an add
+                        this.game.sound.mute = false;
+                    }
+                });
             }
 
             /**
@@ -48,13 +56,6 @@ module Fabrique {
                 //Let's mute audio for the game, we can resume the audi playback once the add has played
                 this.game.sound.mute = true;
 
-                //We add a once listener to when the content should be resumed in order to unmute audio
-                this.onContentResumed.addOnce(() => {
-                    if (!this.wasMuted) {
-                        //Here we unmute audio, but only if it wasn't muted before requesting an add
-                        this.game.sound.mute = false;
-                    }
-                });
                 this.provider.requestAd.apply(this.provider, args);
             }
 

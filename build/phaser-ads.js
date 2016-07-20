@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 0.7.3 
+ * phaser-ads - version 0.7.4 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 12-07-2016
+ * Build at 20-07-2016
  * Released under MIT License 
  */
 
@@ -35,15 +35,22 @@ var Fabrique;
              * @param provider
              */
             AdManager.prototype.setAdProvider = function (provider) {
+                var _this = this;
                 this.provider = provider;
                 this.provider.setManager(this);
+                //We add a listener to when the content should be resumed in order to unmute audio
+                this.onContentResumed.add(function () {
+                    if (!_this.wasMuted) {
+                        //Here we unmute audio, but only if it wasn't muted before requesting an add
+                        _this.game.sound.mute = false;
+                    }
+                });
             };
             /**
              * Here we request an ad, the arguments passed depend on the provider used!
              * @param args
              */
             AdManager.prototype.requestAd = function () {
-                var _this = this;
                 var args = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
@@ -56,13 +63,6 @@ var Fabrique;
                 this.wasMuted = this.game.sound.mute;
                 //Let's mute audio for the game, we can resume the audi playback once the add has played
                 this.game.sound.mute = true;
-                //We add a once listener to when the content should be resumed in order to unmute audio
-                this.onContentResumed.addOnce(function () {
-                    if (!_this.wasMuted) {
-                        //Here we unmute audio, but only if it wasn't muted before requesting an add
-                        _this.game.sound.mute = false;
-                    }
-                });
                 this.provider.requestAd.apply(this.provider, args);
             };
             /**
