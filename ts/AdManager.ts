@@ -9,6 +9,8 @@ module Fabrique {
 
             public onContentResumed: Phaser.Signal = new Phaser.Signal();
 
+            public onAdsDisabled: Phaser.Signal = new Phaser.Signal();
+
             public onAdClicked: Phaser.Signal = new Phaser.Signal();
 
             private provider: AdProvider.IProvider = null;
@@ -99,6 +101,15 @@ module Fabrique {
                 }
 
                 this.provider.hideAd.apply(this.provider, args);
+            }
+
+            /**
+             * Checks if ads are enabled or blocked
+             *
+             * @param args
+             */
+            public adsEnabled(): boolean {
+                return this.provider.adsEnabled;
             }
         }
     }

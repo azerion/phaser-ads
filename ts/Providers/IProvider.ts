@@ -4,6 +4,7 @@ module Fabrique {
     export module AdProvider {
         export interface IProvider {
             adManager: AdManager;
+            adsEnabled: boolean;
 
             setManager(manager: AdManager): void;
             requestAd(...args: any[]): void;

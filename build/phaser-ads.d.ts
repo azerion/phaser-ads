@@ -6,6 +6,7 @@ declare module Fabrique {
         class AdManager extends Phaser.Plugin {
             onContentPaused: Phaser.Signal;
             onContentResumed: Phaser.Signal;
+            onAdsDisabled: Phaser.Signal;
             onAdClicked: Phaser.Signal;
             private provider;
             private wasMuted;
@@ -39,6 +40,12 @@ declare module Fabrique {
              * @param args
              */
             hideAd(...args: any[]): void;
+            /**
+             * Checks if ads are enabled or blocked
+             *
+             * @param args
+             */
+            adsEnabled(): boolean;
         }
     }
 }
@@ -52,7 +59,7 @@ declare module Fabrique {
         }
         class CordovaHeyzap implements IProvider {
             adManager: AdManager;
-            private adsEnabled;
+            adsEnabled: boolean;
             constructor(game: Phaser.Game, publisherId: string);
             setManager(manager: AdManager): void;
             requestAd(adType: HeyzapAdTypes, bannerAdPositions?: string): void;
@@ -67,6 +74,7 @@ declare module Fabrique {
     module AdProvider {
         interface IProvider {
             adManager: AdManager;
+            adsEnabled: boolean;
             setManager(manager: AdManager): void;
             requestAd(...args: any[]): void;
             preloadAd(...args: any[]): void;
@@ -87,7 +95,7 @@ declare module Fabrique {
             private adLoader;
             private adsManager;
             private googleEnabled;
-            private canPlayAds;
+            adsEnabled: boolean;
             private adTagUrl;
             private game;
             private adRequested;
@@ -126,6 +134,11 @@ declare module Fabrique {
              */
             private onContentResumeRequested();
             private parseCustomParams(customParams);
+            /**
+             * Checks id the ads are enabled
+             * @returns {boolean}
+             */
+            private areAdsEnabled();
         }
     }
 }

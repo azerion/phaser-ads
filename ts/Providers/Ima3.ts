@@ -17,7 +17,7 @@ module Fabrique {
 
             private googleEnabled: boolean = false;
 
-            private canPlayAds: boolean = false;
+            public adsEnabled: boolean = true;
 
             private adTagUrl: string = '';
 
@@ -32,6 +32,8 @@ module Fabrique {
             private resizeListener: ()=> void = null;
 
             constructor(game: Phaser.Game, adTagUrl: string) {
+                this.adsEnabled = this.areAdsEnabled();
+
                 if (typeof google === "undefined") {
                     return;
                 }
@@ -87,6 +89,10 @@ module Fabrique {
                 console.log('Ad Requested');
                 if (this.adRequested) {
                     return;
+                }
+
+                if (!this.adsEnabled) {
+                    this.adManager.onAdsDisabled.dispatch(true);
                 }
 
                 if (!this.googleEnabled) {
@@ -164,7 +170,7 @@ module Fabrique {
              * @param adsManagerLoadedEvent
              */
             private onAdManagerLoader(adsManagerLoadedEvent: GoogleAds.ima.AdsManagerLoadedEvent): void {
-                console.log('AdsManager loaded')
+                console.log('AdsManager loaded');
                 // Get the ads manager.
                 var adsRenderingSettings = new google.ima.AdsRenderingSettings();
                 adsRenderingSettings.restoreCustomPlaybackStateOnAdBreakComplete = true;
@@ -218,7 +224,7 @@ module Fabrique {
 
                     this.resizeListener = () => {
                         //Window was resized, so expect something similar
-                        console.log('Resizing ad size')
+                        console.log('Resizing ad size');
                         this.adsManager.resize(window.innerWidth, window.innerHeight, google.ima.ViewMode.NORMAL);
                     };
 
@@ -320,6 +326,32 @@ module Fabrique {
                 }
 
                 return '';
+            }
+
+            /**
+             * Checks id the ads are enabled
+             * @returns {boolean}
+             */
+            private areAdsEnabled(): boolean {
+                let test: HTMLElement = document.createElement('div');
+                test.innerHTML = '&nbsp;';
+                test.className = 'adsbox';
+                document.body.appendChild(test);
+
+                let adsEnabled: boolean;
+                let isEnabled = () => {
+                    let enabled: boolean = true;
+                    if (test.offsetHeight === 0) {
+                        enabled = false;
+                    }
+                    test.remove();
+
+                    return enabled;
+                }
+
+                window.setTimeout(adsEnabled = isEnabled(), 100);
+
+                return adsEnabled;
             }
         }
     }

@@ -1,12 +1,3 @@
-/*!
- * phaser-ads - version 0.7.4 
- * A Phaser plugin for providing nice ads integration in your phaser.io game
- *
- * OrangeGames
- * Build at 20-07-2016
- * Released under MIT License 
- */
-
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -22,6 +13,7 @@ var Fabrique;
                 _super.call(this, game, pluginManager);
                 this.onContentPaused = new Phaser.Signal();
                 this.onContentResumed = new Phaser.Signal();
+                this.onAdsDisabled = new Phaser.Signal();
                 this.onAdClicked = new Phaser.Signal();
                 this.provider = null;
                 this.wasMuted = false;
@@ -112,6 +104,14 @@ var Fabrique;
                     return;
                 }
                 this.provider.hideAd.apply(this.provider, args);
+            };
+            /**
+             * Checks if ads are enabled or blocked
+             *
+             * @param args
+             */
+            AdManager.prototype.adsEnabled = function () {
+                return this.provider.adsEnabled;
             };
             return AdManager;
         })(Phaser.Plugin);
@@ -272,11 +272,12 @@ var Fabrique;
             function Ima3(game, adTagUrl) {
                 this.adsManager = null;
                 this.googleEnabled = false;
-                this.canPlayAds = false;
+                this.adsEnabled = true;
                 this.adTagUrl = '';
                 this.adRequested = false;
                 this.adManager = null;
                 this.resizeListener = null;
+                this.adsEnabled = this.areAdsEnabled();
                 if (typeof google === "undefined") {
                     return;
                 }
@@ -321,6 +322,9 @@ var Fabrique;
                 console.log('Ad Requested');
                 if (this.adRequested) {
                     return;
+                }
+                if (!this.adsEnabled) {
+                    this.adManager.onAdsDisabled.dispatch(true);
                 }
                 if (!this.googleEnabled) {
                     this.onContentResumeRequested();
@@ -518,6 +522,27 @@ var Fabrique;
                     return '&cust_params=' + encodeURIComponent(customDataString);
                 }
                 return '';
+            };
+            /**
+             * Checks id the ads are enabled
+             * @returns {boolean}
+             */
+            Ima3.prototype.areAdsEnabled = function () {
+                var test = document.createElement('div');
+                test.innerHTML = '&nbsp;';
+                test.className = 'adsbox';
+                document.body.appendChild(test);
+                var adsEnabled;
+                var isEnabled = function () {
+                    var enabled = true;
+                    if (test.offsetHeight === 0) {
+                        enabled = false;
+                    }
+                    test.remove();
+                    return enabled;
+                };
+                window.setTimeout(adsEnabled = isEnabled(), 100);
+                return adsEnabled;
             };
             return Ima3;
         })();

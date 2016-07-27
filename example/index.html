@@ -57,12 +57,12 @@
 
             //Content paused event is fired when the content (game) should be paused, and the ad will be played
             game.ads.onContentPaused.add(function () {
-                console.error('Started playing add');
+                console.error('Started playing ad.');
             });
 
             //This is fired when the ad is finished playing and the content (game) should be resumed
             game.ads.onContentResumed.add(function () {
-                console.error('Finished playing add');
+                console.error('Finished playing ad.');
             });
 
             //This is fired when the ad was clicked by the user
@@ -70,31 +70,62 @@
                 console.error('Clicked the ad!');
             });
 
-            if (game.device.desktop) {
-                //Simple timeout to show sound will be muted behind an ad
-                setTimeout(function () {
-                    //This is how we request an ad for desktop
-                    game.ads.requestAd({
-                        deployment: 'devsite',
-                        sample_ct: 'skippablelinear'
-                    });
-                }, 1000);
-            } else {
-                //In mobile we need to activate it by user input
-                game.input.onTap.add(function () {
-                    game.ads.requestAd({
-                        deployment: 'devsite',
-                        sample_ct: (this.game.device.iPhone) ? 'linear' : 'skippablelinear' //Iphone doesnt support skippable videos
-                    });
+            //This is fired when the ad was clicked by the user
+            game.ads.onAdsDisabled.add(function () {
+                console.error('Ads are being blocked.');
+            });
+
+            //called when the button is clicked
+            var showAd = function() {
+                button.inputEnabled = false;
+                button.visible = false;
+
+                //the actual game content, behind the ad
+                var text = game.add.text(game.width / 2, game.height / 2, 'If you see this, there is no Ad being displayed', {
+                    font: '30px Arial',
+                    fill: '#ffffff'
                 });
+                text.anchor.set(0.5);
+
+                var adsEnabled = game.ads.provider.areAdsEnabled();
+                if (adsEnabled) {
+                    if (game.device.desktop) {
+                        //This is how we request an ad for desktop
+                        game.ads.requestAd({
+                            deployment: 'devsite',
+                            sample_ct: 'skippablelinear'
+                        });
+                    } else {
+                        //In mobile we need to activate it by user input
+                        game.ads.requestAd({
+                            deployment: 'devsite',
+                            sample_ct: (this.game.device.iPhone) ? 'linear' : 'skippablelinear' //Iphone doesn't support skippable videos
+                        });
+                    }
+                } else {
+                    //the actual game content, behind the ad
+                    var text = game.add.text(game.width / 2, game.height / 2 + 60, 'Ads are being blocked.', {
+                        font: '25px Arial',
+                        fill: '#cc0000'
+                    });
+                    text.anchor.set(0.5);
+                }
             }
 
-            //the actual game content, behind the ad
-            var text = game.add.text(game.width / 2, game.height / 2, 'If you see this, there is no Ad beeing displayed', {
-                font: '30px Arial',
-                fill: '#ffffff'
+            //create button to start ads
+            var graphics = game.make.graphics(0, 0);
+            graphics.beginFill(0xff6600)
+                    .drawRoundedRect(0, 0, 200, 60, 13)
+                    .endFill();
+            var texture = graphics.generateTexture();
+            var button = game.add.button(game.width / 2, game.height / 2, texture, showAd);
+            button.anchor.set(0.5, 0.5);
+            var label = game.add.text(0, 0, 'See ad', {
+                'font': 'bold 30px Arial',
+                'fill': '#000'
             });
-            text.anchor.set(0.5);
+            label.anchor.set(0.5);
+            button.addChild(label);
         }
     </script>
 </head>

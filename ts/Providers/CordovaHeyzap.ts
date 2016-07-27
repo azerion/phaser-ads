@@ -10,7 +10,7 @@ module Fabrique {
         export class CordovaHeyzap implements IProvider {
             public adManager: AdManager;
 
-            private adsEnabled: boolean = false;
+            public adsEnabled: boolean = false;
 
             constructor(game: Phaser.Game, publisherId: string) {
                 if (game.device.cordova || game.device.crosswalk) {
