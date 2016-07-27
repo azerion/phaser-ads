@@ -51,7 +51,11 @@ module Fabrique {
                 this.adContent.style.position = 'absolute';
                 this.adContent.style.zIndex = '9999';
                 this.adContent.style.display = 'none';
-
+                this.adContent.style.top = '0';
+                this.adContent.style.left = '0';
+                this.adContent.style.width = '100%';
+                this.adContent.style.height = '100%';
+                this.adContent.style.overflow = 'hidden';
 
                 //This is a work around for some ios failing issues
                 //iOS ima3 requires this information, but canvas doesn't provide it. so we create a a custom method

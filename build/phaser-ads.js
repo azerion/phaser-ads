@@ -1,3 +1,12 @@
+/*!
+ * phaser-ads - version 0.7.5 
+ * A Phaser plugin for providing nice ads integration in your phaser.io game
+ *
+ * OrangeGames
+ * Build at 27-07-2016
+ * Released under MIT License 
+ */
+
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -292,6 +301,11 @@ var Fabrique;
                 this.adContent.style.position = 'absolute';
                 this.adContent.style.zIndex = '9999';
                 this.adContent.style.display = 'none';
+                this.adContent.style.top = '0';
+                this.adContent.style.left = '0';
+                this.adContent.style.width = '100%';
+                this.adContent.style.height = '100%';
+                this.adContent.style.overflow = 'hidden';
                 //This is a work around for some ios failing issues
                 //iOS ima3 requires this information, but canvas doesn't provide it. so we create a a custom method
                 this.fauxVideoElement = this.gameContent.parentNode.appendChild(document.createElement('video'));
