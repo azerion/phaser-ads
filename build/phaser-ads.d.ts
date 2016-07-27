@@ -3,9 +3,17 @@ declare module Fabrique {
         interface AdGame extends Phaser.Game {
             ads: Fabrique.Plugins.AdManager;
         }
+        enum AdEvent {
+            start = 0,
+            firstQuartile = 1,
+            midPoint = 2,
+            thirdQuartile = 3,
+            complete = 4,
+        }
         class AdManager extends Phaser.Plugin {
             onContentPaused: Phaser.Signal;
             onContentResumed: Phaser.Signal;
+            onAdProgression: Phaser.Signal;
             onAdsDisabled: Phaser.Signal;
             onAdClicked: Phaser.Signal;
             private provider;

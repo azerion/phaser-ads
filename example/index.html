@@ -70,6 +70,11 @@
                 console.error('Clicked the ad!');
             });
 
+            //This gives us details about how far the users is viewing the add
+            game.ads.onAdProgression.add(function (progression) {
+                console.error(progression);
+            });
+
             //This is fired when the ad was clicked by the user
             game.ads.onAdsDisabled.add(function () {
                 console.error('Ads are being blocked.');

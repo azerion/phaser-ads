@@ -16,12 +16,21 @@ var Fabrique;
 (function (Fabrique) {
     var Plugins;
     (function (Plugins) {
+        (function (AdEvent) {
+            AdEvent[AdEvent["start"] = 0] = "start";
+            AdEvent[AdEvent["firstQuartile"] = 1] = "firstQuartile";
+            AdEvent[AdEvent["midPoint"] = 2] = "midPoint";
+            AdEvent[AdEvent["thirdQuartile"] = 3] = "thirdQuartile";
+            AdEvent[AdEvent["complete"] = 4] = "complete";
+        })(Plugins.AdEvent || (Plugins.AdEvent = {}));
+        var AdEvent = Plugins.AdEvent;
         var AdManager = (function (_super) {
             __extends(AdManager, _super);
             function AdManager(game, pluginManager) {
                 _super.call(this, game, pluginManager);
                 this.onContentPaused = new Phaser.Signal();
                 this.onContentResumed = new Phaser.Signal();
+                this.onAdProgression = new Phaser.Signal();
                 this.onAdsDisabled = new Phaser.Signal();
                 this.onAdClicked = new Phaser.Signal();
                 this.provider = null;
@@ -460,28 +469,45 @@ var Fabrique;
             Ima3.prototype.onAdEvent = function (adEvent) {
                 var _this = this;
                 console.log('onAdEvent', adEvent);
-                if (adEvent.type == google.ima.AdEvent.Type.CLICK) {
-                    this.adManager.onAdClicked.dispatch();
-                }
-                else if (adEvent.type == google.ima.AdEvent.Type.LOADED) {
-                    this.adRequested = false;
-                    var ad = adEvent.getAd();
-                    console.log('is ad linear?', ad.isLinear());
-                    if (!ad.isLinear()) {
+                switch (adEvent.type) {
+                    case google.ima.AdEvent.Type.CLICK:
+                        this.adManager.onAdClicked.dispatch();
+                        break;
+                    case google.ima.AdEvent.Type.LOADED:
+                        this.adRequested = false;
+                        var ad = adEvent.getAd();
+                        console.log('is ad linear?', ad.isLinear());
+                        if (!ad.isLinear()) {
+                            this.onContentResumeRequested();
+                        }
+                        //Work around for skip/end not registering @ ios
+                        if (this.game.device.iOS) {
+                            var intervalId = setInterval(function () {
+                                if (_this.fauxVideoElement.src.length > 0) {
+                                    _this.onContentResumeRequested();
+                                    clearInterval(intervalId);
+                                }
+                            }, 200);
+                        }
+                        break;
+                    case google.ima.AdEvent.Type.STARTED:
+                        this.adManager.onAdProgression.dispatch(Fabrique.Plugins.AdEvent.start);
+                        break;
+                    case google.ima.AdEvent.Type.FIRST_QUARTILE:
+                        this.adManager.onAdProgression.dispatch(Fabrique.Plugins.AdEvent.firstQuartile);
+                        break;
+                    case google.ima.AdEvent.Type.MIDPOINT:
+                        this.adManager.onAdProgression.dispatch(Fabrique.Plugins.AdEvent.midPoint);
+                        break;
+                    case google.ima.AdEvent.Type.THIRD_QUARTILE:
+                        this.adManager.onAdProgression.dispatch(Fabrique.Plugins.AdEvent.thirdQuartile);
+                        break;
+                    case google.ima.AdEvent.Type.COMPLETE:
+                        this.adManager.onAdProgression.dispatch(Fabrique.Plugins.AdEvent.complete);
+                        break;
+                    case google.ima.AdEvent.Type.ALL_ADS_COMPLETED:
                         this.onContentResumeRequested();
-                    }
-                    //Work around for skip/end not registering @ ios
-                    if (this.game.device.iOS) {
-                        var intervalId = setInterval(function () {
-                            if (_this.fauxVideoElement.src.length > 0) {
-                                _this.onContentResumeRequested();
-                                clearInterval(intervalId);
-                            }
-                        }, 200);
-                    }
-                }
-                else if (adEvent.type === google.ima.AdEvent.Type.ALL_ADS_COMPLETED) {
-                    this.onContentResumeRequested();
+                        break;
                 }
             };
             Ima3.prototype.onAdError = function (error) {

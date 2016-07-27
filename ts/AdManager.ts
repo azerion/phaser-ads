@@ -4,10 +4,20 @@ module Fabrique {
             ads: Fabrique.Plugins.AdManager;
         }
 
+        export enum AdEvent {
+            start,
+            firstQuartile,
+            midPoint,
+            thirdQuartile,
+            complete
+        }
+
         export class AdManager extends Phaser.Plugin {
             public onContentPaused: Phaser.Signal = new Phaser.Signal();
 
             public onContentResumed: Phaser.Signal = new Phaser.Signal();
+
+            public onAdProgression: Phaser.Signal = new Phaser.Signal();
 
             public onAdsDisabled: Phaser.Signal = new Phaser.Signal();
 

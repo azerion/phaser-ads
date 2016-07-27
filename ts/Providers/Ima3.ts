@@ -245,27 +245,47 @@ module Fabrique {
              */
             private onAdEvent(adEvent: any) {
                 console.log('onAdEvent', adEvent);
-                if (adEvent.type == google.ima.AdEvent.Type.CLICK) {
-                    this.adManager.onAdClicked.dispatch();
-                } else if (adEvent.type == google.ima.AdEvent.Type.LOADED) {
-                    this.adRequested = false;
-                    var ad = adEvent.getAd();
-                    console.log('is ad linear?', ad.isLinear());
-                    if (!ad.isLinear())
-                    {
+
+                switch (adEvent.type) {
+                    case google.ima.AdEvent.Type.CLICK:
+                        this.adManager.onAdClicked.dispatch();
+                        break;
+                    case google.ima.AdEvent.Type.LOADED:
+                        this.adRequested = false;
+                        var ad = adEvent.getAd();
+                        console.log('is ad linear?', ad.isLinear());
+                        if (!ad.isLinear())
+                        {
+                            this.onContentResumeRequested();
+                        }
+                        //Work around for skip/end not registering @ ios
+                        if (this.game.device.iOS) {
+                            let intervalId = setInterval(() => {
+                                if (this.fauxVideoElement.src.length > 0) {
+                                    this.onContentResumeRequested();
+                                    clearInterval(intervalId);
+                                }
+                            }, 200);
+                        }
+                        break;
+                    case google.ima.AdEvent.Type.STARTED:
+                        this.adManager.onAdProgression.dispatch(Plugins.AdEvent.start);
+                        break;
+                    case google.ima.AdEvent.Type.FIRST_QUARTILE:
+                        this.adManager.onAdProgression.dispatch(Plugins.AdEvent.firstQuartile);
+                        break;
+                    case google.ima.AdEvent.Type.MIDPOINT:
+                        this.adManager.onAdProgression.dispatch(Plugins.AdEvent.midPoint);
+                        break;
+                    case google.ima.AdEvent.Type.THIRD_QUARTILE:
+                        this.adManager.onAdProgression.dispatch(Plugins.AdEvent.thirdQuartile);
+                        break;
+                    case google.ima.AdEvent.Type.COMPLETE:
+                        this.adManager.onAdProgression.dispatch(Plugins.AdEvent.complete);
+                        break;
+                    case google.ima.AdEvent.Type.ALL_ADS_COMPLETED:
                         this.onContentResumeRequested();
-                    }
-                    //Work around for skip/end not registering @ ios
-                    if (this.game.device.iOS) {
-                        let intervalId = setInterval(() => {
-                            if (this.fauxVideoElement.src.length > 0) {
-                                this.onContentResumeRequested();
-                                clearInterval(intervalId);
-                            }
-                        }, 200);
-                    }
-                } else if (adEvent.type === google.ima.AdEvent.Type.ALL_ADS_COMPLETED) {
-                    this.onContentResumeRequested();
+                        break;
                 }
             }
 
