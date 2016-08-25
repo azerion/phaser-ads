@@ -1,11 +1,11 @@
 Phaser Ads
 ==========
-A Phaser plugin for providing nice ads integration in your phaser.io game trough the IMA3 sdk.
+A Phaser plugin for providing nice ads integration in your Phaser.io game through the IMA3 SDK.
 
 Key features:
- - IMA3 sdk support
+ - IMA3 SDK support
  - HeyZap for Cordova suppport
- - Ads on for your mobile web experience
+ - Ads for your mobile web experience
  - Pluggable ad providers
  - Integrates nicely into Phaser
  - Fullscreen ad support
@@ -17,7 +17,7 @@ First you want to get a fresh copy of the plugin. You can get it from this repo 
 npm install phaser-ads --save-dev
 ```
 
-Next up you'd want to add it to your list of js sources you load into your game
+Next up you'd want to add it to your list of js sources you load into your game:
 ```html
 <script src="path/to/phaser-ads.min.js"></script>
 ```
@@ -29,13 +29,13 @@ game.add.plugin(Fabrique.Plugins.AdManager);
 
 Usage
 -----
-First thing you need to do after loading the plugin is attaching a provider to the adManager, by default we supply 2 provider for you to choose one;
+First thing you need to do after loading the plugin is attaching a provider to the adManager. By default we supply 2 providers for you to choose from:
  - IMA 3  (use this for (mobile) web)
  - Cordova HeyZap (wrapping your game with Cordova? Want HeyZap ads? Then this is your provider)
 
 We'll continue this part of the readme asuming you're going to implement IMA3.
 
-A provider can use any number of arguments configured in order to make it work, it all depends on the implementation that was made by the developer, as for our IMA3 Provider, you can create one like this:
+A provider can use any number of arguments configured in order to make it work, it all depends on the implementation that was made by the developer. For our IMA3 Provider you can create one like this:
 ```javascript
 //let's create a new provider, first argument should be the game, second should be the ad tag URL
 var provider = new Fabrique.AdProvider.Ima3(
@@ -43,23 +43,22 @@ var provider = new Fabrique.AdProvider.Ima3(
    'https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&correlator'
 );
 game.ads.setAdProvider(provider);
-
 ```
 
-Now all you need to do now is request an ad, and add an event listener that is called when the ad is completed/skipped/finished/done playing.
+Now all you need to do is request an ad, and add an event listener that is called when the ad is completed/skipped/finished/done playing.
 ```javascript
 game.ads.onContentResumed.addOnce(function() {
     // This gets called when the ad is complete
     game.state.start('NextState');
 });
 
-//Here we request the add
+//Here we request the ad
 game.ads.requestAd();
 ```
 
 Credits
 -------
-The IMA3 provider is based on the code provided by Google for their [IMA3 SDK](https://github.com/googleads/googleads-ima-html5/releases)
+The IMA3 provider is based on the code provided by Google for their [IMA3 SDK](https://github.com/googleads/googleads-ima-html5/releases).
 
 Disclaimer
 ----------
