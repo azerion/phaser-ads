@@ -27,8 +27,6 @@ module Fabrique {
 
             public adManager: AdManager = null;
 
-            private fauxVideoElement: HTMLMediaElement;
-
             private resizeListener: ()=> void = null;
 
             constructor(game: Phaser.Game, adTagUrl: string) {
@@ -57,19 +55,11 @@ module Fabrique {
                 this.adContent.style.height = '100%';
                 this.adContent.style.overflow = 'hidden';
 
-                //This is a work around for some ios failing issues
-                //iOS ima3 requires this information, but canvas doesn't provide it. so we create a a custom method
-                this.fauxVideoElement = this.gameContent.parentNode.appendChild(document.createElement('video'));
-                this.fauxVideoElement.id = 'phaser-ad-faux-video';
-                this.fauxVideoElement.style.position = 'absolute';
-                this.fauxVideoElement.style.zIndex = '999';
-                this.fauxVideoElement.style.display = 'none';
-
                 this.adTagUrl = adTagUrl;
                 this.game = game;
 
                 // Create the ad display container.
-                this.adDisplay = new google.ima.AdDisplayContainer(this.adContent, this.fauxVideoElement);
+                this.adDisplay = new google.ima.AdDisplayContainer(this.adContent);
 
                 //Set vpaid enabled, and update locale
                 (<any>google.ima.settings).setVpaidMode((<any>google.ima).ImaSdkSettings.VpaidMode.ENABLED);
@@ -128,22 +118,11 @@ module Fabrique {
                 adsRequest.nonLinearAdSlotWidth = width;
                 adsRequest.nonLinearAdSlotHeight = height;
 
-                if (this.game.device.iOS) {
-                    this.fauxVideoElement.style.width = width + 'px';
-                    this.fauxVideoElement.style.height = height + 'px';
-                }
-
-
                 //Required for games, see:
                 //http://googleadsdeveloper.blogspot.nl/2015/10/important-changes-for-gaming-publishers.html
                 adsRequest.forceNonLinearFullSlot = true;
 
                 try {
-                    if (this.game.device.iOS) {
-                        //We need to play the video element on click, otherwise iOS won't work :(
-                        this.fauxVideoElement.play();
-                    }
-
                     this.adRequested = true;
                     this.adLoader.requestAds(adsRequest);
                 } catch (e) {
@@ -212,9 +191,6 @@ module Fabrique {
 
                 try {
                     //Show the ad elements, we only need to show the faux videoelement on iOS, because the ad is displayed in there.
-                    if (this.game.device.iOS) {
-                        this.fauxVideoElement.style.display = 'block';
-                    }
                     this.adContent.style.display = 'block';
 
                     // Initialize the ads manager. Ad rules playlist will start at this time.
@@ -257,15 +233,6 @@ module Fabrique {
                         if (!ad.isLinear())
                         {
                             this.onContentResumeRequested();
-                        }
-                        //Work around for skip/end not registering @ ios
-                        if (this.game.device.iOS) {
-                            let intervalId = setInterval(() => {
-                                if (this.fauxVideoElement.src.length > 0) {
-                                    this.onContentResumeRequested();
-                                    clearInterval(intervalId);
-                                }
-                            }, 200);
                         }
                         break;
                     case google.ima.AdEvent.Type.STARTED:
@@ -329,9 +296,6 @@ module Fabrique {
                 }
 
                 this.adContent.style.display = 'none';
-                if (this.game.device.iOS) {
-                    this.fauxVideoElement.style.display = 'none';
-                }
                 this.adManager.onContentResumed.dispatch();
             }
 
@@ -368,10 +332,10 @@ module Fabrique {
                     if (test.offsetHeight === 0) {
                         enabled = false;
                     }
-                    test.remove();
+                    test.parentNode.removeChild(test);
 
                     return enabled;
-                }
+                };
 
                 window.setTimeout(adsEnabled = isEnabled(), 100);
 

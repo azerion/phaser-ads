@@ -70,7 +70,7 @@ declare module GoogleAds.ima {
     }
 
     class AdDisplayContainer {
-        constructor(content: HTMLElement, ad: HTMLElement, customClickTrack?: HTMLElement);
+        constructor(content: HTMLElement, ad?: HTMLElement, customClickTrack?: HTMLElement);
         initialize(): void;
     }
 }

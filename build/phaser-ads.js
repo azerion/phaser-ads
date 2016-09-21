@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 0.7.5 
+ * phaser-ads - version 0.8.0 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 27-07-2016
+ * Build at 21-09-2016
  * Released under MIT License 
  */
 
@@ -315,17 +315,10 @@ var Fabrique;
                 this.adContent.style.width = '100%';
                 this.adContent.style.height = '100%';
                 this.adContent.style.overflow = 'hidden';
-                //This is a work around for some ios failing issues
-                //iOS ima3 requires this information, but canvas doesn't provide it. so we create a a custom method
-                this.fauxVideoElement = this.gameContent.parentNode.appendChild(document.createElement('video'));
-                this.fauxVideoElement.id = 'phaser-ad-faux-video';
-                this.fauxVideoElement.style.position = 'absolute';
-                this.fauxVideoElement.style.zIndex = '999';
-                this.fauxVideoElement.style.display = 'none';
                 this.adTagUrl = adTagUrl;
                 this.game = game;
                 // Create the ad display container.
-                this.adDisplay = new google.ima.AdDisplayContainer(this.adContent, this.fauxVideoElement);
+                this.adDisplay = new google.ima.AdDisplayContainer(this.adContent);
                 //Set vpaid enabled, and update locale
                 google.ima.settings.setVpaidMode(google.ima.ImaSdkSettings.VpaidMode.ENABLED);
                 google.ima.settings.setLocale('nl');
@@ -372,18 +365,10 @@ var Fabrique;
                 adsRequest.linearAdSlotHeight = height;
                 adsRequest.nonLinearAdSlotWidth = width;
                 adsRequest.nonLinearAdSlotHeight = height;
-                if (this.game.device.iOS) {
-                    this.fauxVideoElement.style.width = width + 'px';
-                    this.fauxVideoElement.style.height = height + 'px';
-                }
                 //Required for games, see:
                 //http://googleadsdeveloper.blogspot.nl/2015/10/important-changes-for-gaming-publishers.html
                 adsRequest.forceNonLinearFullSlot = true;
                 try {
-                    if (this.game.device.iOS) {
-                        //We need to play the video element on click, otherwise iOS won't work :(
-                        this.fauxVideoElement.play();
-                    }
                     this.adRequested = true;
                     this.adLoader.requestAds(adsRequest);
                 }
@@ -439,9 +424,6 @@ var Fabrique;
                 });
                 try {
                     //Show the ad elements, we only need to show the faux videoelement on iOS, because the ad is displayed in there.
-                    if (this.game.device.iOS) {
-                        this.fauxVideoElement.style.display = 'block';
-                    }
                     this.adContent.style.display = 'block';
                     // Initialize the ads manager. Ad rules playlist will start at this time.
                     var width = window.innerWidth; //parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
@@ -467,7 +449,6 @@ var Fabrique;
              * @param adEvent
              */
             Ima3.prototype.onAdEvent = function (adEvent) {
-                var _this = this;
                 console.log('onAdEvent', adEvent);
                 switch (adEvent.type) {
                     case google.ima.AdEvent.Type.CLICK:
@@ -479,15 +460,6 @@ var Fabrique;
                         console.log('is ad linear?', ad.isLinear());
                         if (!ad.isLinear()) {
                             this.onContentResumeRequested();
-                        }
-                        //Work around for skip/end not registering @ ios
-                        if (this.game.device.iOS) {
-                            var intervalId = setInterval(function () {
-                                if (_this.fauxVideoElement.src.length > 0) {
-                                    _this.onContentResumeRequested();
-                                    clearInterval(intervalId);
-                                }
-                            }, 200);
                         }
                         break;
                     case google.ima.AdEvent.Type.STARTED:
@@ -543,9 +515,6 @@ var Fabrique;
                     return;
                 }
                 this.adContent.style.display = 'none';
-                if (this.game.device.iOS) {
-                    this.fauxVideoElement.style.display = 'none';
-                }
                 this.adManager.onContentResumed.dispatch();
             };
             Ima3.prototype.parseCustomParams = function (customParams) {
@@ -578,7 +547,7 @@ var Fabrique;
                     if (test.offsetHeight === 0) {
                         enabled = false;
                     }
-                    test.remove();
+                    test.parentNode.removeChild(test);
                     return enabled;
                 };
                 window.setTimeout(adsEnabled = isEnabled(), 100);

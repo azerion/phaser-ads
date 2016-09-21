@@ -66,7 +66,7 @@ module.exports = function (grunt) {
                     unused: true,
                     if_return: true,
                     join_vars: true,
-                    drop_console: false
+                    drop_console: true
                 },
                 mangle: true,
                 beautify: false
