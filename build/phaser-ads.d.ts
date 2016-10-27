@@ -55,7 +55,7 @@ declare module Fabrique {
             private interstitialShowable;
             private insentive;
             private insentiveShowable;
-            constructor(game: Phaser.Game, provider: CocoonProvider, config: any);
+            constructor(game: Phaser.Game, provider: CocoonProvider, config?: any);
             setManager(manager: AdManager): void;
             showAd(adType: CocoonAdType): void;
             preloadAd(adType: CocoonAdType, adId?: string): void;

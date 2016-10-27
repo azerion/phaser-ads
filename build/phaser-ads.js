@@ -1,5 +1,5 @@
 /*!
- * phaser-ads - version 1.0.0-alpha1 
+ * phaser-ads - version 1.0.0-alpha2 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
@@ -241,7 +241,6 @@ var Fabrique;
                 }
                 if (adType === CocoonAdType.insentive) {
                     this.insentive = this.cocoonProvider.createRewardedVideo(adId);
-                    this.interstitial = this.cocoonProvider.createInterstitial(adId);
                     this.insentive.on('load', function () {
                         _this.insentiveShowable = true;
                     });

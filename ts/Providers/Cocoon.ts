@@ -32,7 +32,7 @@ module Fabrique {
 
             private insentiveShowable: boolean = false;
 
-            constructor(game: Phaser.Game, provider: CocoonProvider, config: any) {
+            constructor(game: Phaser.Game, provider: CocoonProvider, config?: any) {
                 if ((game.device.cordova || game.device.crosswalk) && (Cocoon && Cocoon.Ads)) {
                     this.adsEnabled = true;
                 } else {
@@ -172,7 +172,6 @@ module Fabrique {
 
                 if (adType === CocoonAdType.insentive) {
                     this.insentive = this.cocoonProvider.createRewardedVideo(adId);
-                    this.interstitial = this.cocoonProvider.createInterstitial(adId);
                     this.insentive.on('load', () => {
                         this.insentiveShowable = true;
                     });
