@@ -1,8 +1,6 @@
 /// <reference path="../vendor/cordova-heyzap.d.ts" />
 /// <reference path="../vendor/cocoon.d.ts" />
 /// <reference path="../vendor/google-ima3-sdk.d.ts" />
-/// <reference path="../node_modules/phaser/typescript/pixi.d.ts" />
-/// <reference path="../node_modules/phaser/typescript/phaser.d.ts" />
 declare module Fabrique {
     module Plugins {
         interface AdGame extends Phaser.Game {
@@ -21,11 +19,12 @@ declare module Fabrique {
             onAdProgression: Phaser.Signal;
             onAdsDisabled: Phaser.Signal;
             onAdClicked: Phaser.Signal;
+            onAdRewardGranted: Phaser.Signal;
             private provider;
             private wasMuted;
             constructor(game: AdGame, pluginManager: Phaser.PluginManager);
             setAdProvider(provider: AdProvider.IProvider): void;
-            requestAd(...args: any[]): void;
+            showAd(...args: any[]): void;
             preloadAd(...args: any[]): void;
             destroyAd(...args: any[]): void;
             hideAd(...args: any[]): void;
@@ -41,17 +40,27 @@ declare module Fabrique {
             Chartboost = 2,
             Heyzap = 3,
         }
+        enum CocoonAdType {
+            banner = 0,
+            interstitial = 1,
+            insentive = 2,
+        }
         class CocoonAds implements IProvider {
             adManager: AdManager;
             adsEnabled: boolean;
             private cocoonProvider;
+            private banner;
+            private bannerShowable;
+            private interstitial;
+            private interstitialShowable;
+            private insentive;
+            private insentiveShowable;
             constructor(game: Phaser.Game, provider: CocoonProvider, config: any);
             setManager(manager: AdManager): void;
-            requestAd(...args: any[]): void;
-            preloadAd(...args: any[]): void;
-            destroyAd(...args: any[]): void;
-            hideAd(...args: any[]): void;
-            showAd(...args: any[]): void;
+            showAd(adType: CocoonAdType): void;
+            preloadAd(adType: CocoonAdType, adId?: string): void;
+            destroyAd(adType: CocoonAdType): void;
+            hideAd(adType: CocoonAdType): void;
         }
     }
 }
@@ -68,9 +77,8 @@ declare module Fabrique {
             adsEnabled: boolean;
             constructor(game: Phaser.Game, publisherId: string);
             setManager(manager: AdManager): void;
-            requestAd(adType: HeyzapAdTypes, bannerAdPositions?: string): void;
+            showAd(adType: HeyzapAdTypes, bannerAdPositions?: string): void;
             preloadAd(adType: HeyzapAdTypes): void;
-            showAd(): void;
             destroyAd(adType: HeyzapAdTypes): void;
             hideAd(adType: HeyzapAdTypes): void;
         }
@@ -83,7 +91,6 @@ declare module Fabrique {
             adManager: AdManager;
             adsEnabled: boolean;
             setManager(manager: AdManager): void;
-            requestAd(...args: any[]): void;
             preloadAd(...args: any[]): void;
             destroyAd(...args: any[]): void;
             hideAd(...args: any[]): void;
@@ -111,11 +118,10 @@ declare module Fabrique {
             private resizeListener;
             constructor(game: Phaser.Game, adTagUrl: string);
             setManager(manager: AdManager): void;
-            requestAd(customParams?: ICustomParams): void;
+            showAd(customParams?: ICustomParams): void;
             preloadAd(): void;
             destroyAd(): void;
             hideAd(): void;
-            showAd(): void;
             private onAdManagerLoader(adsManagerLoadedEvent);
             private onAdEvent(adEvent);
             private onAdError(error);

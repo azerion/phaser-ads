@@ -7,11 +7,12 @@ declare module Cocoon {
         }
         export interface IAdProvider {
             configure(config: any): void;
-            createBanner(config?: any): IBanner;
-            createInterstitial(config?: any): IBanner;
-            createRewardedVideo(config?: any): IBanner;
-            createRewardedVideo(config?: any): IBanner;
+            createBanner(adId?: any): IBanner;
+            createInterstitial(adId?: any): IBanner;
+            createRewardedVideo(adId?: any): IBanner;
             showDebug(): void;
+            releaseBanner(banner: IBanner): void;
+            releaseInterstitial(interstitial: IBanner): void;
 
         }
 

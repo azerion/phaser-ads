@@ -31,7 +31,7 @@ module Fabrique {
                 this.adManager = manager;
             }
 
-            public requestAd(adType: HeyzapAdTypes, bannerAdPositions?: string): void {
+            public showAd(adType: HeyzapAdTypes, bannerAdPositions?: string): void {
                 if (!this.adsEnabled) {
                     this.adManager.onContentResumed.dispatch();
                 }
@@ -118,10 +118,6 @@ module Fabrique {
                     });
                 }
 
-                return;
-            }
-
-            public showAd(): void {
                 return;
             }
 

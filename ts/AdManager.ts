@@ -23,6 +23,8 @@ module Fabrique {
 
             public onAdClicked: Phaser.Signal = new Phaser.Signal();
 
+            public onAdRewardGranted: Phaser.Signal = new Phaser.Signal();
+
             private provider: AdProvider.IProvider = null;
 
             private wasMuted: boolean = false;
@@ -57,7 +59,7 @@ module Fabrique {
              * Here we request an ad, the arguments passed depend on the provider used!
              * @param args
              */
-            public requestAd(...args: any[]): void {
+            public showAd(...args: any[]): void {
                 if (null === this.provider) {
                     throw new Error('Can not request an ad without an provider, please attach an ad provider!');
                 }
@@ -67,7 +69,7 @@ module Fabrique {
                 //Let's mute audio for the game, we can resume the audi playback once the add has played
                 this.game.sound.mute = true;
 
-                this.provider.requestAd.apply(this.provider, args);
+                this.provider.showAd.apply(this.provider, args);
             }
 
             /**

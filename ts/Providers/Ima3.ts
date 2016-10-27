@@ -79,7 +79,7 @@ module Fabrique {
              * Doing an ad request, if anything is wrong with the lib (missing ima3, failed request) we just dispatch the contentResumed event
              * Otherwise we display an ad
              */
-            public requestAd(customParams?: ICustomParams): void {
+            public showAd(customParams?: ICustomParams): void {
                 console.log('Ad Requested');
                 if (this.adRequested) {
                     return;
@@ -143,10 +143,6 @@ module Fabrique {
 
             //Does nothing, but needed for Provider interface
             public hideAd(): void {
-                return;
-            }
-
-            public showAd(): void {
                 return;
             }
 
