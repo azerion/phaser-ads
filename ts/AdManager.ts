@@ -60,7 +60,6 @@ module Fabrique {
             public requestAd(...args: any[]): void {
                 if (null === this.provider) {
                     throw new Error('Can not request an ad without an provider, please attach an ad provider!');
-                    return;
                 }
 
                 //first we check if the sound was already muted before we requested an add
@@ -79,7 +78,6 @@ module Fabrique {
             public preloadAd(...args: any[]): void {
                 if (null === this.provider) {
                     throw new Error('Can not preload an ad without an provider, please attach an ad provider!');
-                    return;
                 }
 
                 this.provider.preloadAd.apply(this.provider, args);
@@ -93,7 +91,6 @@ module Fabrique {
             public destroyAd(...args: any[]): void {
                 if (null === this.provider) {
                     throw new Error('Can not destroy an ad without an provider, please attach an ad provider!');
-                    return;
                 }
 
                 this.provider.destroyAd.apply(this.provider, args);
@@ -107,7 +104,6 @@ module Fabrique {
             public hideAd(...args: any[]): void {
                 if (null === this.provider) {
                     throw new Error('Can not hide an ad without an provider, please attach an ad provider!');
-                    return;
                 }
 
                 this.provider.hideAd.apply(this.provider, args);

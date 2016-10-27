@@ -121,6 +121,10 @@ module Fabrique {
                 return;
             }
 
+            public showAd(): void {
+                return;
+            }
+
             public destroyAd(adType: HeyzapAdTypes): void {
                 if (!this.adsEnabled) {
                     return;

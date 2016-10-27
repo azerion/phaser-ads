@@ -146,6 +146,10 @@ module Fabrique {
                 return;
             }
 
+            public showAd(): void {
+                return;
+            }
+
             /**
              * Called when the ads manager was loaded.
              * We register all ad related events here, and initialize the manager with the game width/height

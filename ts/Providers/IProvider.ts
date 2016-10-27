@@ -11,6 +11,7 @@ module Fabrique {
             preloadAd(...args: any[]): void;
             destroyAd(...args: any[]): void;
             hideAd(...args: any[]): void;
+            showAd(...args: any[]): void;
         }
     }
 }
