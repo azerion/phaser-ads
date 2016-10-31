@@ -69,7 +69,7 @@ module Fabrique {
                 }
 
                 if (adType === CocoonAdType.banner) {
-                    if (!this.bannerShowable && null === this.banner) {
+                    if (!this.bannerShowable || null === this.banner) {
                         //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
                         return;
@@ -93,7 +93,7 @@ module Fabrique {
                 }
 
                 if (adType === CocoonAdType.interstitial) {
-                    if (!this.interstitialShowable && null === this.interstitial) {
+                    if (!this.interstitialShowable || null === this.interstitial) {
                         //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
                         return;
@@ -117,7 +117,7 @@ module Fabrique {
                 }
 
                 if (adType === CocoonAdType.insentive) {
-                    if (!this.interstitialShowable && null === this.insentive) {
+                    if (!this.interstitialShowable || null === this.insentive) {
                         //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
                         return;
@@ -152,7 +152,11 @@ module Fabrique {
                     return;
                 }
 
+                //Some cleanup before preloading a new ad
+                this.destroyAd(adType);
+
                 if (adType === CocoonAdType.banner) {
+
                     this.banner = this.cocoonProvider.createBanner(adId);
                     this.banner.on('load', () => {
                         this.bannerShowable = true;
@@ -191,13 +195,13 @@ module Fabrique {
                     return;
                 }
 
-                if (adType === CocoonAdType.banner) {
+                if (adType === CocoonAdType.banner && null !== this.banner) {
                     this.cocoonProvider.releaseBanner(this.banner);
                     this.banner = null;
                     this.bannerShowable = false;
                 }
 
-                if (adType === CocoonAdType.interstitial) {
+                if (adType === CocoonAdType.interstitial && null !== this.interstitial) {
                     this.cocoonProvider.releaseInterstitial(this.interstitial);
                     this.interstitial = null;
                     this.interstitialShowable = false;

@@ -1,5 +1,5 @@
 /*!
- * phaser-ads - version 1.0.0-alpha4 
+ * phaser-ads - version 1.0.0-alpha5 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
@@ -159,7 +159,7 @@ var Fabrique;
                     return;
                 }
                 if (adType === CocoonAdType.banner) {
-                    if (!this.bannerShowable && null === this.banner) {
+                    if (!this.bannerShowable || null === this.banner) {
                         this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
                         return;
                     }
@@ -177,7 +177,7 @@ var Fabrique;
                     this.banner.show();
                 }
                 if (adType === CocoonAdType.interstitial) {
-                    if (!this.interstitialShowable && null === this.interstitial) {
+                    if (!this.interstitialShowable || null === this.interstitial) {
                         this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
                         return;
                     }
@@ -195,7 +195,7 @@ var Fabrique;
                     this.interstitial.show();
                 }
                 if (adType === CocoonAdType.insentive) {
-                    if (!this.interstitialShowable && null === this.insentive) {
+                    if (!this.interstitialShowable || null === this.insentive) {
                         this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
                         return;
                     }
@@ -223,6 +223,7 @@ var Fabrique;
                 if (!this.adsEnabled) {
                     return;
                 }
+                this.destroyAd(adType);
                 if (adType === CocoonAdType.banner) {
                     this.banner = this.cocoonProvider.createBanner(adId);
                     this.banner.on('load', function () {
@@ -258,12 +259,12 @@ var Fabrique;
                 if (!this.adsEnabled) {
                     return;
                 }
-                if (adType === CocoonAdType.banner) {
+                if (adType === CocoonAdType.banner && null !== this.banner) {
                     this.cocoonProvider.releaseBanner(this.banner);
                     this.banner = null;
                     this.bannerShowable = false;
                 }
-                if (adType === CocoonAdType.interstitial) {
+                if (adType === CocoonAdType.interstitial && null !== this.interstitial) {
                     this.cocoonProvider.releaseInterstitial(this.interstitial);
                     this.interstitial = null;
                     this.interstitialShowable = false;
