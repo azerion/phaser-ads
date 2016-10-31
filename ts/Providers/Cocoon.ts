@@ -65,12 +65,14 @@ module Fabrique {
             public showAd(adType: CocoonAdType): void {
                 if (!this.adsEnabled) {
                     this.adManager.onContentResumed.dispatch();
+                    return;
                 }
 
                 if (adType === CocoonAdType.banner) {
                     if (!this.bannerShowable && null === this.banner) {
                         //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
+                        return;
                     }
 
                     this.banner.on('click', () => {
@@ -94,6 +96,7 @@ module Fabrique {
                     if (!this.interstitialShowable && null === this.interstitial) {
                         //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
+                        return;
                     }
 
                     this.interstitial.on('click', () => {
@@ -117,6 +120,7 @@ module Fabrique {
                     if (!this.interstitialShowable && null === this.insentive) {
                         //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
+                        return;
                     }
 
                     this.insentive.on('click', () => {

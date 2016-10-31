@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 1.0.0-alpha2 
+ * phaser-ads - version 1.0.0-alpha3 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 27-10-2016
+ * Build at 31-10-2016
  * Released under MIT License 
  */
 
@@ -156,10 +156,12 @@ var Fabrique;
                 var _this = this;
                 if (!this.adsEnabled) {
                     this.adManager.onContentResumed.dispatch();
+                    return;
                 }
                 if (adType === CocoonAdType.banner) {
                     if (!this.bannerShowable && null === this.banner) {
                         this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
+                        return;
                     }
                     this.banner.on('click', function () {
                         _this.adManager.onAdClicked.dispatch(CocoonAdType.banner);
@@ -177,6 +179,7 @@ var Fabrique;
                 if (adType === CocoonAdType.interstitial) {
                     if (!this.interstitialShowable && null === this.interstitial) {
                         this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
+                        return;
                     }
                     this.interstitial.on('click', function () {
                         _this.adManager.onAdClicked.dispatch(CocoonAdType.interstitial);
@@ -194,6 +197,7 @@ var Fabrique;
                 if (adType === CocoonAdType.insentive) {
                     if (!this.interstitialShowable && null === this.insentive) {
                         this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
+                        return;
                     }
                     this.insentive.on('click', function () {
                         _this.adManager.onAdClicked.dispatch(CocoonAdType.insentive);
