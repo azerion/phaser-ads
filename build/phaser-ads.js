@@ -1,5 +1,5 @@
 /*!
- * phaser-ads - version 1.0.0-alpha3 
+ * phaser-ads - version 1.0.0-alpha4 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
@@ -126,7 +126,7 @@ var Fabrique;
                 this.interstitialShowable = false;
                 this.insentive = null;
                 this.insentiveShowable = false;
-                if ((game.device.cordova || game.device.crosswalk) && (Cocoon && Cocoon.Ads)) {
+                if ((game.device.cordova || game.device.crosswalk) && (Cocoon && Cocoon.Ad)) {
                     this.adsEnabled = true;
                 }
                 else {
@@ -135,16 +135,16 @@ var Fabrique;
                 switch (provider) {
                     default:
                     case CocoonProvider.AdMob:
-                        this.cocoonProvider = Cocoon.Ads.AdMob;
+                        this.cocoonProvider = Cocoon.Ad.AdMob;
                         break;
                     case CocoonProvider.Chartboost:
-                        this.cocoonProvider = Cocoon.Ads.Chartboost;
+                        this.cocoonProvider = Cocoon.Ad.Chartboost;
                         break;
                     case CocoonProvider.Heyzap:
-                        this.cocoonProvider = Cocoon.Ads.Heyzap;
+                        this.cocoonProvider = Cocoon.Ad.Heyzap;
                         break;
                     case CocoonProvider.MoPub:
-                        this.cocoonProvider = Cocoon.Ads.MoPub;
+                        this.cocoonProvider = Cocoon.Ad.MoPub;
                         break;
                 }
                 this.cocoonProvider.configure(config);

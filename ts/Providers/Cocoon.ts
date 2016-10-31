@@ -18,22 +18,22 @@ module Fabrique {
 
             public adsEnabled: boolean = false;
 
-            private cocoonProvider: Cocoon.Ads.IAdProvider;
+            private cocoonProvider: Cocoon.Ad.IAdProvider;
 
-            private banner: Cocoon.Ads.IBanner = null;
+            private banner: Cocoon.Ad.IBanner = null;
 
             private bannerShowable: boolean = false;
 
-            private interstitial: Cocoon.Ads.IBanner = null;
+            private interstitial: Cocoon.Ad.IBanner = null;
 
             private interstitialShowable: boolean = false;
 
-            private insentive: Cocoon.Ads.IBanner = null;
+            private insentive: Cocoon.Ad.IBanner = null;
 
             private insentiveShowable: boolean = false;
 
             constructor(game: Phaser.Game, provider: CocoonProvider, config?: any) {
-                if ((game.device.cordova || game.device.crosswalk) && (Cocoon && Cocoon.Ads)) {
+                if ((game.device.cordova || game.device.crosswalk) && (Cocoon && Cocoon.Ad)) {
                     this.adsEnabled = true;
                 } else {
                     return;
@@ -42,16 +42,16 @@ module Fabrique {
                 switch (provider) {
                     default:
                     case CocoonProvider.AdMob:
-                        this.cocoonProvider = Cocoon.Ads.AdMob;
+                        this.cocoonProvider = Cocoon.Ad.AdMob;
                         break;
                     case CocoonProvider.Chartboost:
-                        this.cocoonProvider = Cocoon.Ads.Chartboost;
+                        this.cocoonProvider = Cocoon.Ad.Chartboost;
                         break;
                     case CocoonProvider.Heyzap:
-                        this.cocoonProvider = Cocoon.Ads.Heyzap;
+                        this.cocoonProvider = Cocoon.Ad.Heyzap;
                         break;
                     case CocoonProvider.MoPub:
-                        this.cocoonProvider = Cocoon.Ads.MoPub;
+                        this.cocoonProvider = Cocoon.Ad.MoPub;
                         break;
                 }
 

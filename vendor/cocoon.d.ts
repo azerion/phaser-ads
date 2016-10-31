@@ -1,5 +1,5 @@
 declare module Cocoon {
-    export module Ads {
+    export module Ad {
         export interface IBanner {
             show(): void;
             hide(): void;
