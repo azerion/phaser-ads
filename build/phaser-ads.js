@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 1.0.0-alpha5 
+ * phaser-ads - version 1.0.0-alpha10 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 31-10-2016
+ * Build at 01-11-2016
  * Released under MIT License 
  */
 
@@ -58,8 +58,10 @@ var Fabrique;
                 if (null === this.provider) {
                     throw new Error('Can not request an ad without an provider, please attach an ad provider!');
                 }
-                this.wasMuted = this.game.sound.mute;
-                this.game.sound.mute = true;
+                if (!(this.provider instanceof Fabrique.AdProvider.CocoonAds) && args[2] === Fabrique.AdProvider.CocoonAdType.banner) {
+                    this.wasMuted = this.game.sound.mute;
+                    this.game.sound.mute = true;
+                }
                 this.provider.showAd.apply(this.provider, args);
             };
             AdManager.prototype.preloadAd = function () {
@@ -89,6 +91,9 @@ var Fabrique;
                 }
                 if (null === this.provider) {
                     throw new Error('Can not hide an ad without an provider, please attach an ad provider!');
+                }
+                if (!this.wasMuted) {
+                    this.game.sound.mute = false;
                 }
                 this.provider.hideAd.apply(this.provider, args);
             };
@@ -153,7 +158,6 @@ var Fabrique;
                 this.adManager = manager;
             };
             CocoonAds.prototype.showAd = function (adType) {
-                var _this = this;
                 if (!this.adsEnabled) {
                     this.adManager.onContentResumed.dispatch();
                     return;
@@ -163,17 +167,6 @@ var Fabrique;
                         this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
                         return;
                     }
-                    this.banner.on('click', function () {
-                        _this.adManager.onAdClicked.dispatch(CocoonAdType.banner);
-                    });
-                    this.banner.on('show', function () {
-                        _this.adManager.onContentPaused.dispatch(CocoonAdType.banner);
-                    });
-                    this.banner.on('dismiss', function () {
-                        _this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
-                        _this.bannerShowable = false;
-                        _this.banner = null;
-                    });
                     this.banner.show();
                 }
                 if (adType === CocoonAdType.interstitial) {
@@ -181,6 +174,54 @@ var Fabrique;
                         this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
                         return;
                     }
+                    this.interstitial.show();
+                }
+                if (adType === CocoonAdType.insentive) {
+                    if (!this.interstitialShowable || null === this.insentive) {
+                        this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
+                        return;
+                    }
+                    this.insentive.show();
+                }
+            };
+            CocoonAds.prototype.preloadAd = function (adType, adId, bannerPosition) {
+                var _this = this;
+                if (!this.adsEnabled) {
+                    return;
+                }
+                this.destroyAd(adType);
+                if (adType === CocoonAdType.banner) {
+                    this.banner = this.cocoonProvider.createBanner(adId);
+                    if (bannerPosition) {
+                        this.banner.setLayout(bannerPosition);
+                    }
+                    this.banner.on('load', function () {
+                        _this.bannerShowable = true;
+                    });
+                    this.banner.on('fail', function () {
+                        _this.bannerShowable = false;
+                        _this.banner = null;
+                    });
+                    this.banner.on('click', function () {
+                        _this.adManager.onAdClicked.dispatch(CocoonAdType.banner);
+                    });
+                    this.banner.on('show', function () {
+                    });
+                    this.banner.on('dismiss', function () {
+                        _this.bannerShowable = false;
+                        _this.banner = null;
+                    });
+                    this.banner.load();
+                }
+                if (adType === CocoonAdType.interstitial) {
+                    this.interstitial = this.cocoonProvider.createInterstitial(adId);
+                    this.interstitial.on('load', function () {
+                        _this.interstitialShowable = true;
+                    });
+                    this.interstitial.on('fail', function () {
+                        _this.interstitialShowable = false;
+                        _this.interstitial = null;
+                    });
                     this.interstitial.on('click', function () {
                         _this.adManager.onAdClicked.dispatch(CocoonAdType.interstitial);
                     });
@@ -192,13 +233,17 @@ var Fabrique;
                         _this.interstitialShowable = false;
                         _this.interstitial = null;
                     });
-                    this.interstitial.show();
+                    this.interstitial.load();
                 }
                 if (adType === CocoonAdType.insentive) {
-                    if (!this.interstitialShowable || null === this.insentive) {
-                        this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
-                        return;
-                    }
+                    this.insentive = this.cocoonProvider.createRewardedVideo(adId);
+                    this.insentive.on('load', function () {
+                        _this.insentiveShowable = true;
+                    });
+                    this.interstitial.on('fail', function () {
+                        _this.insentiveShowable = false;
+                        _this.insentive = null;
+                    });
                     this.insentive.on('click', function () {
                         _this.adManager.onAdClicked.dispatch(CocoonAdType.insentive);
                     });
@@ -215,44 +260,7 @@ var Fabrique;
                         _this.interstitialShowable = false;
                         _this.insentive = null;
                     });
-                    this.insentive.show();
-                }
-            };
-            CocoonAds.prototype.preloadAd = function (adType, adId) {
-                var _this = this;
-                if (!this.adsEnabled) {
-                    return;
-                }
-                this.destroyAd(adType);
-                if (adType === CocoonAdType.banner) {
-                    this.banner = this.cocoonProvider.createBanner(adId);
-                    this.banner.on('load', function () {
-                        _this.bannerShowable = true;
-                    });
-                    this.banner.on('fail', function () {
-                        _this.bannerShowable = false;
-                        _this.banner = null;
-                    });
-                }
-                if (adType === CocoonAdType.interstitial) {
-                    this.interstitial = this.cocoonProvider.createInterstitial(adId);
-                    this.interstitial.on('load', function () {
-                        _this.interstitialShowable = true;
-                    });
-                    this.interstitial.on('fail', function () {
-                        _this.interstitialShowable = false;
-                        _this.interstitial = null;
-                    });
-                }
-                if (adType === CocoonAdType.insentive) {
-                    this.insentive = this.cocoonProvider.createRewardedVideo(adId);
-                    this.insentive.on('load', function () {
-                        _this.insentiveShowable = true;
-                    });
-                    this.interstitial.on('fail', function () {
-                        _this.insentiveShowable = false;
-                        _this.insentive = null;
-                    });
+                    this.insentive.load();
                 }
             };
             CocoonAds.prototype.destroyAd = function (adType) {

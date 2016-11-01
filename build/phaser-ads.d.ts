@@ -58,7 +58,7 @@ declare module Fabrique {
             constructor(game: Phaser.Game, provider: CocoonProvider, config?: any);
             setManager(manager: AdManager): void;
             showAd(adType: CocoonAdType): void;
-            preloadAd(adType: CocoonAdType, adId?: string): void;
+            preloadAd(adType: CocoonAdType, adId?: string, bannerPosition?: string): void;
             destroyAd(adType: CocoonAdType): void;
             hideAd(adType: CocoonAdType): void;
         }

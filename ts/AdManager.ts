@@ -64,10 +64,13 @@ module Fabrique {
                     throw new Error('Can not request an ad without an provider, please attach an ad provider!');
                 }
 
-                //first we check if the sound was already muted before we requested an add
-                this.wasMuted = this.game.sound.mute;
-                //Let's mute audio for the game, we can resume the audi playback once the add has played
-                this.game.sound.mute = true;
+                //Let's not do this for banner's
+                if (!(this.provider instanceof AdProvider.CocoonAds) && args[2] === AdProvider.CocoonAdType.banner) {
+                    //first we check if the sound was already muted before we requested an add
+                    this.wasMuted = this.game.sound.mute;
+                    //Let's mute audio for the game, we can resume the audi playback once the add has played
+                    this.game.sound.mute = true;
+                }
 
                 this.provider.showAd.apply(this.provider, args);
             }
@@ -106,6 +109,11 @@ module Fabrique {
             public hideAd(...args: any[]): void {
                 if (null === this.provider) {
                     throw new Error('Can not hide an ad without an provider, please attach an ad provider!');
+                }
+
+                if (!this.wasMuted) {
+                    //Here we unmute audio, but only if it wasn't muted before requesting an add
+                    this.game.sound.mute = false;
                 }
 
                 this.provider.hideAd.apply(this.provider, args);

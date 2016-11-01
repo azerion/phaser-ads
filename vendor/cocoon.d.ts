@@ -3,7 +3,9 @@ declare module Cocoon {
         export interface IBanner {
             show(): void;
             hide(): void;
+            load(): void;
             on(eventName: "load" | "fail" | "show" | "dismiss" | "click" | "reward", listener?: () => void): void;
+            setLayout(layout: string): void;
         }
         export interface IAdProvider {
             configure(config: any): void;
@@ -15,6 +17,12 @@ declare module Cocoon {
             releaseInterstitial(interstitial: IBanner): void;
 
         }
+
+        export var BannerLayout: {
+            TOP_CENTER: string,
+            BOTTOM_CENTER: string,
+            CUSTOM: string
+        };
 
         export var AdMob: IAdProvider;
         export var MoPub: IAdProvider;

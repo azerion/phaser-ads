@@ -75,20 +75,6 @@ module Fabrique {
                         return;
                     }
 
-                    this.banner.on('click', () => {
-                        this.adManager.onAdClicked.dispatch(CocoonAdType.banner);
-                    });
-
-                    this.banner.on('show', () => {
-                        this.adManager.onContentPaused.dispatch(CocoonAdType.banner);
-                    });
-
-                    this.banner.on('dismiss', () => {
-                        this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
-                        this.bannerShowable = false;
-                        this.banner = null;
-                    });
-
                     this.banner.show();
                 }
 
@@ -99,6 +85,66 @@ module Fabrique {
                         return;
                     }
 
+                    this.interstitial.show();
+                }
+
+                if (adType === CocoonAdType.insentive) {
+                    if (!this.interstitialShowable || null === this.insentive) {
+                        //No banner ad available, skipping
+                        this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
+                        return;
+                    }
+
+                    this.insentive.show();
+                }
+            }
+
+            public preloadAd(adType: CocoonAdType, adId?: string, bannerPosition?: string): void {
+                if (!this.adsEnabled) {
+                    return;
+                }
+
+                //Some cleanup before preloading a new ad
+                this.destroyAd(adType);
+
+                if (adType === CocoonAdType.banner) {
+                    this.banner = this.cocoonProvider.createBanner(adId);
+                    if (bannerPosition) {
+                        this.banner.setLayout(bannerPosition);
+                    }
+                    this.banner.on('load', () => {
+                        this.bannerShowable = true;
+                    });
+                    this.banner.on('fail', () => {
+                        this.bannerShowable = false;
+                        this.banner = null;
+                    });
+                    this.banner.on('click', () => {
+                        this.adManager.onAdClicked.dispatch(CocoonAdType.banner);
+                    });
+
+                    //Banner don't pause or resume content
+                    this.banner.on('show', () => {
+                        // this.adManager.onContentPaused.dispatch(CocoonAdType.banner);
+                    });
+
+                    this.banner.on('dismiss', () => {
+                        // this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
+                        this.bannerShowable = false;
+                        this.banner = null;
+                    });
+                    this.banner.load();
+                }
+
+                if (adType === CocoonAdType.interstitial) {
+                    this.interstitial = this.cocoonProvider.createInterstitial(adId);
+                    this.interstitial.on('load', () => {
+                        this.interstitialShowable = true;
+                    });
+                    this.interstitial.on('fail', () => {
+                        this.interstitialShowable = false;
+                        this.interstitial = null;
+                    });
                     this.interstitial.on('click', () => {
                         this.adManager.onAdClicked.dispatch(CocoonAdType.interstitial);
                     });
@@ -112,17 +158,18 @@ module Fabrique {
                         this.interstitialShowable = false;
                         this.interstitial = null;
                     });
-
-                    this.interstitial.show();
+                    this.interstitial.load();
                 }
 
                 if (adType === CocoonAdType.insentive) {
-                    if (!this.interstitialShowable || null === this.insentive) {
-                        //No banner ad available, skipping
-                        this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
-                        return;
-                    }
-
+                    this.insentive = this.cocoonProvider.createRewardedVideo(adId);
+                    this.insentive.on('load', () => {
+                        this.insentiveShowable = true;
+                    });
+                    this.interstitial.on('fail', () => {
+                        this.insentiveShowable = false;
+                        this.insentive = null;
+                    });
                     this.insentive.on('click', () => {
                         this.adManager.onAdClicked.dispatch(CocoonAdType.insentive);
                     });
@@ -142,51 +189,7 @@ module Fabrique {
                         this.interstitialShowable = false;
                         this.insentive = null;
                     });
-
-                    this.insentive.show();
-                }
-            }
-
-            public preloadAd(adType: CocoonAdType, adId?: string): void {
-                if (!this.adsEnabled) {
-                    return;
-                }
-
-                //Some cleanup before preloading a new ad
-                this.destroyAd(adType);
-
-                if (adType === CocoonAdType.banner) {
-
-                    this.banner = this.cocoonProvider.createBanner(adId);
-                    this.banner.on('load', () => {
-                        this.bannerShowable = true;
-                    });
-                    this.banner.on('fail', () => {
-                        this.bannerShowable = false;
-                        this.banner = null;
-                    })
-                }
-
-                if (adType === CocoonAdType.interstitial) {
-                    this.interstitial = this.cocoonProvider.createInterstitial(adId);
-                    this.interstitial.on('load', () => {
-                        this.interstitialShowable = true;
-                    });
-                    this.interstitial.on('fail', () => {
-                        this.interstitialShowable = false;
-                        this.interstitial = null;
-                    });
-                }
-
-                if (adType === CocoonAdType.insentive) {
-                    this.insentive = this.cocoonProvider.createRewardedVideo(adId);
-                    this.insentive.on('load', () => {
-                        this.insentiveShowable = true;
-                    });
-                    this.interstitial.on('fail', () => {
-                        this.insentiveShowable = false;
-                        this.insentive = null;
-                    });
+                    this.insentive.load();
                 }
             }
 
