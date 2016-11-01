@@ -130,8 +130,8 @@ module Fabrique {
 
                     this.banner.on('dismiss', () => {
                         // this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
-                        this.bannerShowable = false;
-                        this.banner = null;
+                        // this.bannerShowable = false;
+                        // this.banner = null;
                     });
                     this.banner.load();
                 }
@@ -216,28 +216,22 @@ module Fabrique {
                     return;
                 }
 
-                if (adType === CocoonAdType.banner) {
+                if (adType === CocoonAdType.interstitial && null !== this.interstitial) {
                     this.interstitial.hide();
-                    this.interstitialShowable = true;
-                    this.interstitial = null;
 
-                    this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
+                    // this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
                 }
 
-                if (adType === CocoonAdType.interstitial) {
+                if (adType === CocoonAdType.banner && null !==this.banner) {
                     this.banner.hide();
-                    this.bannerShowable = false;
-                    this.banner = null;
 
-                    this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
+                    // this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
                 }
 
-                if (adType === CocoonAdType.insentive) {
+                if (adType === CocoonAdType.insentive && null !== this.insentive) {
                     this.insentive.hide();
-                    this.insentiveShowable = false;
-                    this.insentive = null;
 
-                    this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
+                    // this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
                 }
             }
         }

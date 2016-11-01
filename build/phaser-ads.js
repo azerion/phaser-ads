@@ -1,5 +1,5 @@
 /*!
- * phaser-ads - version 1.0.0-alpha10 
+ * phaser-ads - version 1.0.0-alpha11 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
@@ -58,7 +58,8 @@ var Fabrique;
                 if (null === this.provider) {
                     throw new Error('Can not request an ad without an provider, please attach an ad provider!');
                 }
-                if (!(this.provider instanceof Fabrique.AdProvider.CocoonAds) && args[2] === Fabrique.AdProvider.CocoonAdType.banner) {
+                console.log(args);
+                if (args[2] && args[2] !== Fabrique.AdProvider.CocoonAdType.banner) {
                     this.wasMuted = this.game.sound.mute;
                     this.game.sound.mute = true;
                 }
@@ -208,8 +209,6 @@ var Fabrique;
                     this.banner.on('show', function () {
                     });
                     this.banner.on('dismiss', function () {
-                        _this.bannerShowable = false;
-                        _this.banner = null;
                     });
                     this.banner.load();
                 }
@@ -282,23 +281,14 @@ var Fabrique;
                 if (!this.adsEnabled) {
                     return;
                 }
-                if (adType === CocoonAdType.banner) {
+                if (adType === CocoonAdType.interstitial && null !== this.interstitial) {
                     this.interstitial.hide();
-                    this.interstitialShowable = true;
-                    this.interstitial = null;
-                    this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
                 }
-                if (adType === CocoonAdType.interstitial) {
+                if (adType === CocoonAdType.banner && null !== this.banner) {
                     this.banner.hide();
-                    this.bannerShowable = false;
-                    this.banner = null;
-                    this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
                 }
-                if (adType === CocoonAdType.insentive) {
+                if (adType === CocoonAdType.insentive && null !== this.insentive) {
                     this.insentive.hide();
-                    this.insentiveShowable = false;
-                    this.insentive = null;
-                    this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
                 }
             };
             return CocoonAds;

@@ -63,9 +63,9 @@ module Fabrique {
                 if (null === this.provider) {
                     throw new Error('Can not request an ad without an provider, please attach an ad provider!');
                 }
-
+                console.log(args);
                 //Let's not do this for banner's
-                if (!(this.provider instanceof AdProvider.CocoonAds) && args[2] === AdProvider.CocoonAdType.banner) {
+                if (args[2] && args[2] !== AdProvider.CocoonAdType.banner) {
                     //first we check if the sound was already muted before we requested an add
                     this.wasMuted = this.game.sound.mute;
                     //Let's mute audio for the game, we can resume the audi playback once the add has played
