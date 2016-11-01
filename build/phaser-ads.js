@@ -1,5 +1,5 @@
 /*!
- * phaser-ads - version 1.0.0-alpha11 
+ * phaser-ads - version 1.0.0-alpha12 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
@@ -58,8 +58,7 @@ var Fabrique;
                 if (null === this.provider) {
                     throw new Error('Can not request an ad without an provider, please attach an ad provider!');
                 }
-                console.log(args);
-                if (args[2] && args[2] !== Fabrique.AdProvider.CocoonAdType.banner) {
+                if (args[0] && args[0] !== Fabrique.AdProvider.CocoonAdType.banner) {
                     this.wasMuted = this.game.sound.mute;
                     this.game.sound.mute = true;
                 }
