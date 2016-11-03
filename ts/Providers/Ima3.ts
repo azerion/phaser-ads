@@ -42,7 +42,6 @@ module Fabrique {
                 // this.gameContent.currentTime = 100;
                 this.gameContent.style.position = 'absolute';
                 this.gameContent.style.width = '100%';
-                this.gameContent.style.height = '100%';
 
                 this.adContent = this.gameContent.parentNode.appendChild(document.createElement('div'));
                 this.adContent.id = 'phaser-ad-container';
@@ -79,7 +78,7 @@ module Fabrique {
              * Doing an ad request, if anything is wrong with the lib (missing ima3, failed request) we just dispatch the contentResumed event
              * Otherwise we display an ad
              */
-            public requestAd(customParams?: ICustomParams): void {
+            public showAd(customParams?: ICustomParams): void {
                 console.log('Ad Requested');
                 if (this.adRequested) {
                     return;

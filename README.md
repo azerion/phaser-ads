@@ -3,10 +3,11 @@ Phaser Ads
 A Phaser plugin for providing nice ads integration in your Phaser.io game through the IMA3 SDK.
 
 Key features:
- - IMA3 SDK support
- - HeyZap for Cordova suppport
  - Ads for your mobile web experience
  - Pluggable ad providers
+  - IMA3 SDK
+  - Cocoon.io (support for AdMob/HeyZap/MoPub/Chartboost)
+  - HeyZap for Cordova
  - Integrates nicely into Phaser
  - Fullscreen ad support
 
@@ -31,6 +32,7 @@ Usage
 -----
 First thing you need to do after loading the plugin is attaching a provider to the adManager. By default we supply 2 providers for you to choose from:
  - IMA 3  (use this for (mobile) web)
+ - Cocoon.io ()
  - Cordova HeyZap (wrapping your game with Cordova? Want HeyZap ads? Then this is your provider)
 
 We'll continue this part of the readme asuming you're going to implement IMA3.
@@ -53,7 +55,7 @@ game.ads.onContentResumed.addOnce(function() {
 });
 
 //Here we request the ad
-game.ads.requestAd();
+game.ads.showAd();
 ```
 
 Credits

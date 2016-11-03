@@ -7,10 +7,10 @@ module Fabrique {
             adsEnabled: boolean;
 
             setManager(manager: AdManager): void;
-            requestAd(...args: any[]): void;
             preloadAd(...args: any[]): void;
             destroyAd(...args: any[]): void;
             hideAd(...args: any[]): void;
+            showAd(...args: any[]): void;
         }
     }
 }

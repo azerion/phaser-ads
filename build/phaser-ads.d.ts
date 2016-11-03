@@ -1,3 +1,6 @@
+/// <reference path="../vendor/cordova-heyzap.d.ts" />
+/// <reference path="../vendor/cocoon.d.ts" />
+/// <reference path="../vendor/google-ima3-sdk.d.ts" />
 declare module Fabrique {
     module Plugins {
         interface AdGame extends Phaser.Game {
@@ -16,44 +19,48 @@ declare module Fabrique {
             onAdProgression: Phaser.Signal;
             onAdsDisabled: Phaser.Signal;
             onAdClicked: Phaser.Signal;
+            onAdRewardGranted: Phaser.Signal;
             private provider;
             private wasMuted;
             constructor(game: AdGame, pluginManager: Phaser.PluginManager);
-            /**
-             * Here we set an adprovider, any can be given as long as it implements the IProvider interface
-             *
-             * @param provider
-             */
             setAdProvider(provider: AdProvider.IProvider): void;
-            /**
-             * Here we request an ad, the arguments passed depend on the provider used!
-             * @param args
-             */
-            requestAd(...args: any[]): void;
-            /**
-             * Some providers might require you to preload an ad before showing it, that can be done here
-             *
-             * @param args
-             */
+            showAd(...args: any[]): void;
             preloadAd(...args: any[]): void;
-            /**
-             * Some providers require you to destroy an add after it was shown, that can be done here.
-             *
-             * @param args
-             */
             destroyAd(...args: any[]): void;
-            /**
-             * Some providers allow you to hide an ad, you might think of an banner ad that is shown in show cases
-             *
-             * @param args
-             */
             hideAd(...args: any[]): void;
-            /**
-             * Checks if ads are enabled or blocked
-             *
-             * @param args
-             */
             adsEnabled(): boolean;
+        }
+    }
+}
+declare module Fabrique {
+    module AdProvider {
+        enum CocoonProvider {
+            AdMob = 0,
+            MoPub = 1,
+            Chartboost = 2,
+            Heyzap = 3,
+        }
+        enum CocoonAdType {
+            banner = 0,
+            interstitial = 1,
+            insentive = 2,
+        }
+        class CocoonAds implements IProvider {
+            adManager: AdManager;
+            adsEnabled: boolean;
+            private cocoonProvider;
+            private banner;
+            private bannerShowable;
+            private interstitial;
+            private interstitialShowable;
+            private insentive;
+            private insentiveShowable;
+            constructor(game: Phaser.Game, provider: CocoonProvider, config?: any);
+            setManager(manager: AdManager): void;
+            showAd(adType: CocoonAdType): void;
+            preloadAd(adType: CocoonAdType, adId?: string, bannerPosition?: string): void;
+            destroyAd(adType: CocoonAdType): void;
+            hideAd(adType: CocoonAdType): void;
         }
     }
 }
@@ -70,7 +77,7 @@ declare module Fabrique {
             adsEnabled: boolean;
             constructor(game: Phaser.Game, publisherId: string);
             setManager(manager: AdManager): void;
-            requestAd(adType: HeyzapAdTypes, bannerAdPositions?: string): void;
+            showAd(adType: HeyzapAdTypes, bannerAdPositions?: string): void;
             preloadAd(adType: HeyzapAdTypes): void;
             destroyAd(adType: HeyzapAdTypes): void;
             hideAd(adType: HeyzapAdTypes): void;
@@ -84,10 +91,10 @@ declare module Fabrique {
             adManager: AdManager;
             adsEnabled: boolean;
             setManager(manager: AdManager): void;
-            requestAd(...args: any[]): void;
             preloadAd(...args: any[]): void;
             destroyAd(...args: any[]): void;
             hideAd(...args: any[]): void;
+            showAd(...args: any[]): void;
         }
     }
 }
@@ -111,40 +118,16 @@ declare module Fabrique {
             private resizeListener;
             constructor(game: Phaser.Game, adTagUrl: string);
             setManager(manager: AdManager): void;
-            /**
-             * Doing an ad request, if anything is wrong with the lib (missing ima3, failed request) we just dispatch the contentResumed event
-             * Otherwise we display an ad
-             */
-            requestAd(customParams?: ICustomParams): void;
+            showAd(customParams?: ICustomParams): void;
             preloadAd(): void;
             destroyAd(): void;
             hideAd(): void;
-            /**
-             * Called when the ads manager was loaded.
-             * We register all ad related events here, and initialize the manager with the game width/height
-             *
-             * @param adsManagerLoadedEvent
-             */
             private onAdManagerLoader(adsManagerLoadedEvent);
-            /**
-             * Generic ad events are handled here
-             * @param adEvent
-             */
             private onAdEvent(adEvent);
             private onAdError(error);
-            /**
-             * When the ad starts playing, and the game should be paused
-             */
             private onContentPauseRequested();
-            /**
-             * When the ad is finished and the game should be resumed
-             */
             private onContentResumeRequested();
             private parseCustomParams(customParams);
-            /**
-             * Checks id the ads are enabled
-             * @returns {boolean}
-             */
             private areAdsEnabled();
         }
     }

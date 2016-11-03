@@ -23,6 +23,8 @@ module Fabrique {
 
             public onAdClicked: Phaser.Signal = new Phaser.Signal();
 
+            public onAdRewardGranted: Phaser.Signal = new Phaser.Signal();
+
             private provider: AdProvider.IProvider = null;
 
             private wasMuted: boolean = false;
@@ -57,18 +59,19 @@ module Fabrique {
              * Here we request an ad, the arguments passed depend on the provider used!
              * @param args
              */
-            public requestAd(...args: any[]): void {
+            public showAd(...args: any[]): void {
                 if (null === this.provider) {
                     throw new Error('Can not request an ad without an provider, please attach an ad provider!');
-                    return;
+                }
+                //Let's not do this for banner's
+                if (args[0] && args[0] !== AdProvider.CocoonAdType.banner) {
+                    //first we check if the sound was already muted before we requested an add
+                    this.wasMuted = this.game.sound.mute;
+                    //Let's mute audio for the game, we can resume the audi playback once the add has played
+                    this.game.sound.mute = true;
                 }
 
-                //first we check if the sound was already muted before we requested an add
-                this.wasMuted = this.game.sound.mute;
-                //Let's mute audio for the game, we can resume the audi playback once the add has played
-                this.game.sound.mute = true;
-
-                this.provider.requestAd.apply(this.provider, args);
+                this.provider.showAd.apply(this.provider, args);
             }
 
             /**
@@ -79,7 +82,6 @@ module Fabrique {
             public preloadAd(...args: any[]): void {
                 if (null === this.provider) {
                     throw new Error('Can not preload an ad without an provider, please attach an ad provider!');
-                    return;
                 }
 
                 this.provider.preloadAd.apply(this.provider, args);
@@ -93,7 +95,6 @@ module Fabrique {
             public destroyAd(...args: any[]): void {
                 if (null === this.provider) {
                     throw new Error('Can not destroy an ad without an provider, please attach an ad provider!');
-                    return;
                 }
 
                 this.provider.destroyAd.apply(this.provider, args);
@@ -107,7 +108,11 @@ module Fabrique {
             public hideAd(...args: any[]): void {
                 if (null === this.provider) {
                     throw new Error('Can not hide an ad without an provider, please attach an ad provider!');
-                    return;
+                }
+
+                if (!this.wasMuted) {
+                    //Here we unmute audio, but only if it wasn't muted before requesting an add
+                    this.game.sound.mute = false;
                 }
 
                 this.provider.hideAd.apply(this.provider, args);
