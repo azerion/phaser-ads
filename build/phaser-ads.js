@@ -1,5 +1,5 @@
 /*!
- * phaser-ads - version 1.0.0-alpha13 
+ * phaser-ads - version 1.0.0 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
