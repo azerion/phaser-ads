@@ -42,7 +42,6 @@ module Fabrique {
                 // this.gameContent.currentTime = 100;
                 this.gameContent.style.position = 'absolute';
                 this.gameContent.style.width = '100%';
-                this.gameContent.style.height = '100%';
 
                 this.adContent = this.gameContent.parentNode.appendChild(document.createElement('div'));
                 this.adContent.id = 'phaser-ad-container';

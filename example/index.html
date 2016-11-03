@@ -96,13 +96,13 @@
                 if (adsEnabled) {
                     if (game.device.desktop) {
                         //This is how we request an ad for desktop
-                        game.ads.requestAd({
+                        game.ads.showAd({
                             deployment: 'devsite',
                             sample_ct: 'skippablelinear'
                         });
                     } else {
                         //In mobile we need to activate it by user input
-                        game.ads.requestAd({
+                        game.ads.showAd({
                             deployment: 'devsite',
                             sample_ct: (this.game.device.iPhone) ? 'linear' : 'skippablelinear' //Iphone doesn't support skippable videos
                         });
