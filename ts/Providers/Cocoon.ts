@@ -180,13 +180,13 @@ module Fabrique {
 
                     this.insentive.on('dismiss', () => {
                         this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
-                        this.interstitialShowable = false;
+                        this.insentiveShowable = false;
                         this.insentive = null;
                     });
 
                     this.insentive.on('reward', () => {
                         this.adManager.onAdRewardGranted.dispatch(CocoonAdType.insentive);
-                        this.interstitialShowable = false;
+                        this.insentiveShowable = false;
                         this.insentive = null;
                     });
                     this.insentive.load();
