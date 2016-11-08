@@ -27,12 +27,12 @@ module Fabrique {
 
             public adManager: AdManager = null;
 
-            private resizeListener: ()=> void = null;
+            private resizeListener: () => void = null;
 
             constructor(game: Phaser.Game, adTagUrl: string) {
                 this.adsEnabled = this.areAdsEnabled();
 
-                if (typeof google === "undefined") {
+                if (typeof google === 'undefined') {
                     return;
                 }
 
@@ -97,11 +97,11 @@ module Fabrique {
                 this.adDisplay.initialize();
 
                 // Request video ads.
-                var adsRequest = new google.ima.AdsRequest();
+                let adsRequest: GoogleAds.ima.AdsRequest = new google.ima.AdsRequest();
                 adsRequest.adTagUrl = this.adTagUrl + this.parseCustomParams(customParams);
 
-                let width: number = window.innerWidth;//parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
-                let height: number = window.innerHeight;//parseInt(<string>(!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
+                let width: number = window.innerWidth; //parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
+                let height: number = window.innerHeight; //parseInt(<string>(!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
 
                 //Here we check if phaser is fullscreen or not, if we are fullscreen, we subtract some of the width and height, to counter for the resize (
                 //Fullscreen should be disabled for the ad, (onContentPaused) and requested for again when the game resumes
@@ -126,7 +126,7 @@ module Fabrique {
                     this.adLoader.requestAds(adsRequest);
                 } catch (e) {
                     console.log(e);
-                   this.onContentResumeRequested();
+                    this.onContentResumeRequested();
                 }
             }
 
@@ -154,9 +154,8 @@ module Fabrique {
             private onAdManagerLoader(adsManagerLoadedEvent: GoogleAds.ima.AdsManagerLoadedEvent): void {
                 console.log('AdsManager loaded');
                 // Get the ads manager.
-                var adsRenderingSettings = new google.ima.AdsRenderingSettings();
+                let adsRenderingSettings: GoogleAds.ima.AdsRenderingSettings = new google.ima.AdsRenderingSettings();
                 adsRenderingSettings.restoreCustomPlaybackStateOnAdBreakComplete = true;
-
 
                 // videoContent should be set to the content video element.
                 let adsManager: GoogleAds.ima.AdsManager = adsManagerLoadedEvent.getAdsManager(this.gameContent, adsRenderingSettings);
@@ -178,7 +177,7 @@ module Fabrique {
                     google.ima.AdEvent.Type.PAUSED,
                     google.ima.AdEvent.Type.STARTED,
                     google.ima.AdEvent.Type.THIRD_QUARTILE
-                ].forEach((event) => {
+                ].forEach((event: string) => {
                     adsManager.addEventListener(
                         event,
                         this.onAdEvent,
@@ -186,15 +185,13 @@ module Fabrique {
                         this);
                 });
 
-
-
                 try {
                     //Show the ad elements, we only need to show the faux videoelement on iOS, because the ad is displayed in there.
                     this.adContent.style.display = 'block';
 
                     // Initialize the ads manager. Ad rules playlist will start at this time.
-                    let width: number = window.innerWidth;//parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
-                    let height: number = window.innerHeight;//parseInt(<string>(!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
+                    let width: number = window.innerWidth; //parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
+                    let height: number = window.innerHeight; //parseInt(<string>(!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
                     this.adsManager.init(width, height, google.ima.ViewMode.NORMAL);
 
                     // Call play to start showing the ad. Single video and overlay ads will
@@ -218,7 +215,7 @@ module Fabrique {
              * Generic ad events are handled here
              * @param adEvent
              */
-            private onAdEvent(adEvent: any) {
+            private onAdEvent(adEvent: any): void {
                 console.log('onAdEvent', adEvent);
 
                 switch (adEvent.type) {
@@ -227,10 +224,9 @@ module Fabrique {
                         break;
                     case google.ima.AdEvent.Type.LOADED:
                         this.adRequested = false;
-                        var ad = adEvent.getAd();
+                        let ad: any = adEvent.getAd();
                         console.log('is ad linear?', ad.isLinear());
-                        if (!ad.isLinear())
-                        {
+                        if (!ad.isLinear()) {
                             this.onContentResumeRequested();
                         }
                         break;
@@ -255,7 +251,7 @@ module Fabrique {
                 }
             }
 
-            private onAdError(error: any) {
+            private onAdError(error: any): void {
                 console.log('gneric ad error', error);
                 if (null !== this.adsManager) {
                     this.adsManager.destroy();
@@ -272,13 +268,13 @@ module Fabrique {
                 }
 
                 //We silently ignore adLoader errors, it just means there is no ad available
-                this.onContentResumeRequested()
+                this.onContentResumeRequested();
             }
 
             /**
              * When the ad starts playing, and the game should be paused
              */
-            private onContentPauseRequested() {
+            private onContentPauseRequested(): void {
                 console.log('onContentPauseRequested', arguments);
                 this.adManager.onContentPaused.dispatch();
             }
@@ -286,10 +282,10 @@ module Fabrique {
             /**
              * When the ad is finished and the game should be resumed
              */
-            private onContentResumeRequested() {
+            private onContentResumeRequested(): void {
                 console.log('onContentResumeRequested', arguments);
 
-                if (typeof google === "undefined") {
+                if (typeof google === 'undefined') {
                     this.adManager.onContentResumed.dispatch();
                     return;
                 }
@@ -302,12 +298,14 @@ module Fabrique {
                 if (undefined !== customParams) {
                     let customDataString: string = '';
                     for (let key in customParams) {
-                        if (customDataString.length > 0) {
-                            customDataString += '' +
-                                '&';
+                        if (customParams.hasOwnProperty(key)) {
+                            if (customDataString.length > 0) {
+                                customDataString += '' +
+                                    '&';
+                            }
+                            let param: any = (Array.isArray(customParams[key])) ? (<any[]>customParams[key]).join(',') : customParams[key];
+                            customDataString += key + '=' + param;
                         }
-                        var param = (Array.isArray(customParams[key])) ? (<any[]>customParams[key]).join(',') : customParams[key];
-                        customDataString += key + '=' + param;
                     }
                     return '&cust_params=' + encodeURIComponent(customDataString);
                 }
@@ -326,7 +324,7 @@ module Fabrique {
                 document.body.appendChild(test);
 
                 let adsEnabled: boolean;
-                let isEnabled = () => {
+                let isEnabled: () => boolean = () => {
                     let enabled: boolean = true;
                     if (test.offsetHeight === 0) {
                         enabled = false;

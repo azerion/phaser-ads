@@ -222,7 +222,7 @@ module Fabrique {
                     // this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
                 }
 
-                if (adType === CocoonAdType.banner && null !==this.banner) {
+                if (adType === CocoonAdType.banner && null !== this.banner) {
                     this.banner.hide();
 
                     // this.adManager.onContentResumed.dispatch(CocoonAdType.banner);

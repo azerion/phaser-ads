@@ -25,16 +25,9 @@ module.exports = function (grunt) {
         },
         //Typescript settings per build
         ts: {
-            options: {
-                module: 'amd',
-                target: 'es5',
-                sourceMap: true,
-                declaration: true,
-                noImplicitAny:true
-            },
             dist: {
+                tsconfig: './config/tsconfig.json',
                 src: ['ts/**/*.ts'],
-                reference: 'vendor/references.ts',
                 dest: 'build/<%= pkg.name %>.js'
             }
         },
@@ -77,6 +70,17 @@ module.exports = function (grunt) {
         },
         clean: {
             dist: ['build']
+        },
+        tslint: {
+            options: {
+                // can be a configuration object or a filepath to tslint.json
+                configuration: "./config/tslint.json"
+            },
+            dist: {
+                src: [
+                    'ts/**/*.ts'
+                ]
+            }
         }
     });
 
@@ -84,11 +88,13 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-banner');
     grunt.loadNpmTasks('grunt-ts');
+    grunt.loadNpmTasks('grunt-tslint');
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-watch');
 
     //dist Build
     grunt.registerTask('dist', [
+        'tslint',
         'clean:dist',     //Clean the dist folder
         'ts:dist',//Run typescript on the preprocessed files, for dist (client)
         'uglify:dist',    //Minify everything

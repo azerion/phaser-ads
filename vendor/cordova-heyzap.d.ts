@@ -1,9 +1,5 @@
-interface Thenable {
-    then(cb1: () => void, cb2?: (...args: any[]) => void): Thenable;
-}
-
 declare module HeyzapAds {
-    export function start(published_id: string): Thenable;
+    export function start(published_id: string): Thenable<any>;
 
 	export module InterstitialAd {
         export var Events: {
@@ -12,7 +8,7 @@ declare module HeyzapAds {
             CLICKED: string;
             HIDE: string;
         };
-        export function show(): Thenable;
+        export function show(): Thenable<any>;
         export function addEventListener(target: string, call: () => void): void;
     }
     export module VideoAd {
@@ -22,8 +18,8 @@ declare module HeyzapAds {
             CLICKED: string;
             HIDE: string;
         };
-        export function show(): Thenable;
-        export function fetch(): Thenable;
+        export function show(): Thenable<any>;
+        export function fetch(): Thenable<any>;
         export function addEventListener(target: string, call: () => void): void;
     }
     export module IncentivizedAd {
@@ -33,8 +29,8 @@ declare module HeyzapAds {
             CLICKED: string;
             HIDE: string;
         };
-        export function show(): Thenable;
-        export function fetch(): Thenable;
+        export function show(): Thenable<any>;
+        export function fetch(): Thenable<any>;
         export function addEventListener(target: string, call: () => void): void;
     }
     export module BannerAd {
@@ -45,9 +41,9 @@ declare module HeyzapAds {
             SHOW: string;
             CLICKED: string;
         };
-        export function show(position: string): Thenable;
-        export function hide(): Thenable;
-        export function destroy(): Thenable;
+        export function show(position: string): Thenable<any>;
+        export function hide(): Thenable<any>;
+        export function destroy(): Thenable<any>;
         export function addEventListener(target: string, call: () => void): void;
     }
 }

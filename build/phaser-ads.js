@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 1.0.0 
+ * phaser-ads - version 1.0.1 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 03-11-2016
+ * Build at 08-11-2016
  * Released under MIT License 
  */
 
@@ -40,16 +40,27 @@ var Fabrique;
                     value: this
                 });
             }
+            /**
+             * Here we set an adprovider, any can be given as long as it implements the IProvider interface
+             *
+             * @param provider
+             */
             AdManager.prototype.setAdProvider = function (provider) {
                 var _this = this;
                 this.provider = provider;
                 this.provider.setManager(this);
+                //We add a listener to when the content should be resumed in order to unmute audio
                 this.onContentResumed.add(function () {
                     if (!_this.wasMuted) {
+                        //Here we unmute audio, but only if it wasn't muted before requesting an add
                         _this.game.sound.mute = false;
                     }
                 });
             };
+            /**
+             * Here we request an ad, the arguments passed depend on the provider used!
+             * @param args
+             */
             AdManager.prototype.showAd = function () {
                 var args = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
@@ -58,12 +69,20 @@ var Fabrique;
                 if (null === this.provider) {
                     throw new Error('Can not request an ad without an provider, please attach an ad provider!');
                 }
+                //Let's not do this for banner's
                 if (args[0] && args[0] !== Fabrique.AdProvider.CocoonAdType.banner) {
+                    //first we check if the sound was already muted before we requested an add
                     this.wasMuted = this.game.sound.mute;
+                    //Let's mute audio for the game, we can resume the audi playback once the add has played
                     this.game.sound.mute = true;
                 }
                 this.provider.showAd.apply(this.provider, args);
             };
+            /**
+             * Some providers might require you to preload an ad before showing it, that can be done here
+             *
+             * @param args
+             */
             AdManager.prototype.preloadAd = function () {
                 var args = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
@@ -74,6 +93,11 @@ var Fabrique;
                 }
                 this.provider.preloadAd.apply(this.provider, args);
             };
+            /**
+             * Some providers require you to destroy an add after it was shown, that can be done here.
+             *
+             * @param args
+             */
             AdManager.prototype.destroyAd = function () {
                 var args = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
@@ -84,6 +108,11 @@ var Fabrique;
                 }
                 this.provider.destroyAd.apply(this.provider, args);
             };
+            /**
+             * Some providers allow you to hide an ad, you might think of an banner ad that is shown in show cases
+             *
+             * @param args
+             */
             AdManager.prototype.hideAd = function () {
                 var args = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
@@ -93,10 +122,16 @@ var Fabrique;
                     throw new Error('Can not hide an ad without an provider, please attach an ad provider!');
                 }
                 if (!this.wasMuted) {
+                    //Here we unmute audio, but only if it wasn't muted before requesting an add
                     this.game.sound.mute = false;
                 }
                 this.provider.hideAd.apply(this.provider, args);
             };
+            /**
+             * Checks if ads are enabled or blocked
+             *
+             * @param args
+             */
             AdManager.prototype.adsEnabled = function () {
                 return this.provider.adsEnabled;
             };
@@ -164,6 +199,7 @@ var Fabrique;
                 }
                 if (adType === CocoonAdType.banner) {
                     if (!this.bannerShowable || null === this.banner) {
+                        //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
                         return;
                     }
@@ -171,6 +207,7 @@ var Fabrique;
                 }
                 if (adType === CocoonAdType.interstitial) {
                     if (!this.interstitialShowable || null === this.interstitial) {
+                        //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
                         return;
                     }
@@ -178,6 +215,7 @@ var Fabrique;
                 }
                 if (adType === CocoonAdType.insentive) {
                     if (!this.interstitialShowable || null === this.insentive) {
+                        //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
                         return;
                     }
@@ -189,6 +227,7 @@ var Fabrique;
                 if (!this.adsEnabled) {
                     return;
                 }
+                //Some cleanup before preloading a new ad
                 this.destroyAd(adType);
                 if (adType === CocoonAdType.banner) {
                     this.banner = this.cocoonProvider.createBanner(adId);
@@ -205,9 +244,14 @@ var Fabrique;
                     this.banner.on('click', function () {
                         _this.adManager.onAdClicked.dispatch(CocoonAdType.banner);
                     });
+                    //Banner don't pause or resume content
                     this.banner.on('show', function () {
+                        // this.adManager.onContentPaused.dispatch(CocoonAdType.banner);
                     });
                     this.banner.on('dismiss', function () {
+                        // this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
+                        // this.bannerShowable = false;
+                        // this.banner = null;
                     });
                     this.banner.load();
                 }
@@ -250,12 +294,12 @@ var Fabrique;
                     });
                     this.insentive.on('dismiss', function () {
                         _this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
-                        _this.interstitialShowable = false;
+                        _this.insentiveShowable = false;
                         _this.insentive = null;
                     });
                     this.insentive.on('reward', function () {
                         _this.adManager.onAdRewardGranted.dispatch(CocoonAdType.insentive);
-                        _this.interstitialShowable = false;
+                        _this.insentiveShowable = false;
                         _this.insentive = null;
                     });
                     this.insentive.load();
@@ -317,7 +361,9 @@ var Fabrique;
                     return;
                 }
                 HeyzapAds.start(publisherId).then(function () {
+                    // Native call successful.
                 }, function (error) {
+                    //Failed to start heyzap, disabling ads
                     _this.adsEnabled = false;
                 });
             }
@@ -331,6 +377,7 @@ var Fabrique;
                 }
                 switch (adType) {
                     case HeyzapAdTypes.Interstitial:
+                        //Register event listeners
                         HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.HIDE, function () {
                             _this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.HIDE);
                         });
@@ -341,8 +388,10 @@ var Fabrique;
                             _this.adManager.onAdClicked.dispatch(HeyzapAds.InterstitialAd.Events.CLICKED);
                         });
                         HeyzapAds.InterstitialAd.show().then(function () {
+                            // Native call successful.
                             _this.adManager.onContentPaused.dispatch();
                         }, function (error) {
+                            //Failed to show insentive ad, continue operations
                             _this.adManager.onContentResumed.dispatch();
                         });
                         break;
@@ -357,8 +406,10 @@ var Fabrique;
                             _this.adManager.onAdClicked.dispatch(HeyzapAds.VideoAd.Events.CLICKED);
                         });
                         HeyzapAds.VideoAd.show().then(function () {
+                            // Native call successful.
                             _this.adManager.onContentPaused.dispatch();
                         }, function (error) {
+                            //Failed to show insentive ad, continue operations
                             _this.adManager.onContentResumed.dispatch();
                         });
                         break;
@@ -373,14 +424,18 @@ var Fabrique;
                             _this.adManager.onAdClicked.dispatch(HeyzapAds.IncentivizedAd.Events.CLICKED);
                         });
                         HeyzapAds.IncentivizedAd.show().then(function () {
+                            // Native call successful.
                             _this.adManager.onContentPaused.dispatch();
                         }, function (error) {
+                            //Failed to show insentive ad, continue operations
                             _this.adManager.onContentResumed.dispatch();
                         });
                         break;
                     case HeyzapAdTypes.Banner:
                         HeyzapAds.BannerAd.show(bannerAdPositions).then(function () {
+                            // Native call successful.
                         }, function (error) {
+                            // Handle Error
                         });
                         break;
                 }
@@ -391,7 +446,9 @@ var Fabrique;
                 }
                 if (adType === HeyzapAdTypes.Rewarded) {
                     HeyzapAds.IncentivizedAd.fetch().then(function () {
+                        // Native call successful.
                     }, function (error) {
+                        // Handle Error
                     });
                 }
                 return;
@@ -402,7 +459,9 @@ var Fabrique;
                 }
                 if (adType === HeyzapAdTypes.Banner) {
                     HeyzapAds.BannerAd.destroy().then(function () {
+                        // Native call successful.
                     }, function (error) {
+                        // Handle Error
                     });
                 }
                 return;
@@ -413,7 +472,9 @@ var Fabrique;
                 }
                 if (adType === HeyzapAdTypes.Banner) {
                     HeyzapAds.BannerAd.hide().then(function () {
+                        // Native call successful.
                     }, function (error) {
+                        // Handle Error
                     });
                 }
                 return;
@@ -438,11 +499,12 @@ var Fabrique;
                 this.adManager = null;
                 this.resizeListener = null;
                 this.adsEnabled = this.areAdsEnabled();
-                if (typeof google === "undefined") {
+                if (typeof google === 'undefined') {
                     return;
                 }
                 this.googleEnabled = true;
                 this.gameContent = (typeof game.parent === 'string') ? document.getElementById(game.parent) : game.parent;
+                // this.gameContent.currentTime = 100;
                 this.gameContent.style.position = 'absolute';
                 this.gameContent.style.width = '100%';
                 this.adContent = this.gameContent.parentNode.appendChild(document.createElement('div'));
@@ -457,9 +519,12 @@ var Fabrique;
                 this.adContent.style.overflow = 'hidden';
                 this.adTagUrl = adTagUrl;
                 this.game = game;
+                // Create the ad display container.
                 this.adDisplay = new google.ima.AdDisplayContainer(this.adContent);
+                //Set vpaid enabled, and update locale
                 google.ima.settings.setVpaidMode(google.ima.ImaSdkSettings.VpaidMode.ENABLED);
                 google.ima.settings.setLocale('nl');
+                // Create ads loader, and register events
                 this.adLoader = new google.ima.AdsLoader(this.adDisplay);
                 this.adLoader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, this.onAdManagerLoader, false, this);
                 this.adLoader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, this.onAdError, false, this);
@@ -467,6 +532,10 @@ var Fabrique;
             Ima3.prototype.setManager = function (manager) {
                 this.adManager = manager;
             };
+            /**
+             * Doing an ad request, if anything is wrong with the lib (missing ima3, failed request) we just dispatch the contentResumed event
+             * Otherwise we display an ad
+             */
             Ima3.prototype.showAd = function (customParams) {
                 console.log('Ad Requested');
                 if (this.adRequested) {
@@ -479,19 +548,27 @@ var Fabrique;
                     this.onContentResumeRequested();
                     return;
                 }
+                //For mobile this ad request needs to be handled post user click
                 this.adDisplay.initialize();
+                // Request video ads.
                 var adsRequest = new google.ima.AdsRequest();
                 adsRequest.adTagUrl = this.adTagUrl + this.parseCustomParams(customParams);
-                var width = window.innerWidth;
-                var height = window.innerHeight;
+                var width = window.innerWidth; //parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
+                var height = window.innerHeight; //parseInt(<string>(!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
+                //Here we check if phaser is fullscreen or not, if we are fullscreen, we subtract some of the width and height, to counter for the resize (
+                //Fullscreen should be disabled for the ad, (onContentPaused) and requested for again when the game resumes
                 if (this.game.scale.isFullScreen && document.body.clientHeight < window.innerHeight) {
                     height = document.body.clientHeight;
                     width = document.body.clientWidth;
                 }
+                // Specify the linear and nonlinear slot sizes. This helps the SDK to
+                // select the correct creative if multiple are returned.
                 adsRequest.linearAdSlotWidth = width;
                 adsRequest.linearAdSlotHeight = height;
                 adsRequest.nonLinearAdSlotWidth = width;
                 adsRequest.nonLinearAdSlotHeight = height;
+                //Required for games, see:
+                //http://googleadsdeveloper.blogspot.nl/2015/10/important-changes-for-gaming-publishers.html
                 adsRequest.forceNonLinearFullSlot = true;
                 try {
                     this.adRequested = true;
@@ -502,23 +579,35 @@ var Fabrique;
                     this.onContentResumeRequested();
                 }
             };
+            //Does nothing, but needed for Provider interface
             Ima3.prototype.preloadAd = function () {
                 return;
             };
+            //Does nothing, but needed for Provider interface
             Ima3.prototype.destroyAd = function () {
                 return;
             };
+            //Does nothing, but needed for Provider interface
             Ima3.prototype.hideAd = function () {
                 return;
             };
+            /**
+             * Called when the ads manager was loaded.
+             * We register all ad related events here, and initialize the manager with the game width/height
+             *
+             * @param adsManagerLoadedEvent
+             */
             Ima3.prototype.onAdManagerLoader = function (adsManagerLoadedEvent) {
                 var _this = this;
                 console.log('AdsManager loaded');
+                // Get the ads manager.
                 var adsRenderingSettings = new google.ima.AdsRenderingSettings();
                 adsRenderingSettings.restoreCustomPlaybackStateOnAdBreakComplete = true;
+                // videoContent should be set to the content video element.
                 var adsManager = adsManagerLoadedEvent.getAdsManager(this.gameContent, adsRenderingSettings);
                 this.adsManager = adsManager;
                 console.log(adsManager.isCustomClickTrackingUsed());
+                // Add listeners to the required events.
                 adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED, this.onContentPauseRequested, false, this);
                 adsManager.addEventListener(google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED, this.onContentResumeRequested, false, this);
                 adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, this.onAdError, false, this);
@@ -536,12 +625,17 @@ var Fabrique;
                     adsManager.addEventListener(event, _this.onAdEvent, false, _this);
                 });
                 try {
+                    //Show the ad elements, we only need to show the faux videoelement on iOS, because the ad is displayed in there.
                     this.adContent.style.display = 'block';
-                    var width = window.innerWidth;
-                    var height = window.innerHeight;
+                    // Initialize the ads manager. Ad rules playlist will start at this time.
+                    var width = window.innerWidth; //parseInt(<string>(!this.game.canvas.style.width ? this.game.canvas.width : this.game.canvas.style.width), 10);
+                    var height = window.innerHeight; //parseInt(<string>(!this.game.canvas.style.height ? this.game.canvas.height : this.game.canvas.style.height), 10);
                     this.adsManager.init(width, height, google.ima.ViewMode.NORMAL);
+                    // Call play to start showing the ad. Single video and overlay ads will
+                    // start at this time; the call will be ignored for ad rules.
                     this.adsManager.start();
                     this.resizeListener = function () {
+                        //Window was resized, so expect something similar
                         console.log('Resizing ad size');
                         _this.adsManager.resize(window.innerWidth, window.innerHeight, google.ima.ViewMode.NORMAL);
                     };
@@ -552,6 +646,10 @@ var Fabrique;
                     this.onAdError(adError);
                 }
             };
+            /**
+             * Generic ad events are handled here
+             * @param adEvent
+             */
             Ima3.prototype.onAdEvent = function (adEvent) {
                 console.log('onAdEvent', adEvent);
                 switch (adEvent.type) {
@@ -599,15 +697,22 @@ var Fabrique;
                 if (this.adRequested) {
                     this.adRequested = false;
                 }
+                //We silently ignore adLoader errors, it just means there is no ad available
                 this.onContentResumeRequested();
             };
+            /**
+             * When the ad starts playing, and the game should be paused
+             */
             Ima3.prototype.onContentPauseRequested = function () {
                 console.log('onContentPauseRequested', arguments);
                 this.adManager.onContentPaused.dispatch();
             };
+            /**
+             * When the ad is finished and the game should be resumed
+             */
             Ima3.prototype.onContentResumeRequested = function () {
                 console.log('onContentResumeRequested', arguments);
-                if (typeof google === "undefined") {
+                if (typeof google === 'undefined') {
                     this.adManager.onContentResumed.dispatch();
                     return;
                 }
@@ -618,17 +723,23 @@ var Fabrique;
                 if (undefined !== customParams) {
                     var customDataString = '';
                     for (var key in customParams) {
-                        if (customDataString.length > 0) {
-                            customDataString += '' +
-                                '&';
+                        if (customParams.hasOwnProperty(key)) {
+                            if (customDataString.length > 0) {
+                                customDataString += '' +
+                                    '&';
+                            }
+                            var param = (Array.isArray(customParams[key])) ? customParams[key].join(',') : customParams[key];
+                            customDataString += key + '=' + param;
                         }
-                        var param = (Array.isArray(customParams[key])) ? customParams[key].join(',') : customParams[key];
-                        customDataString += key + '=' + param;
                     }
                     return '&cust_params=' + encodeURIComponent(customDataString);
                 }
                 return '';
             };
+            /**
+             * Checks id the ads are enabled
+             * @returns {boolean}
+             */
             Ima3.prototype.areAdsEnabled = function () {
                 var test = document.createElement('div');
                 test.innerHTML = '&nbsp;';
