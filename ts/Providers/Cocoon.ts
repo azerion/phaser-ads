@@ -166,7 +166,7 @@ module Fabrique {
                     this.insentive.on('load', () => {
                         this.insentiveShowable = true;
                     });
-                    this.interstitial.on('fail', () => {
+                    this.insentive.on('fail', () => {
                         this.insentiveShowable = false;
                         this.insentive = null;
                     });

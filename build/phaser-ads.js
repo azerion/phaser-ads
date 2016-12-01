@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 1.0.1 
+ * phaser-ads - version 1.0.2 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 08-11-2016
+ * Build at 01-12-2016
  * Released under MIT License 
  */
 
@@ -282,7 +282,7 @@ var Fabrique;
                     this.insentive.on('load', function () {
                         _this.insentiveShowable = true;
                     });
-                    this.interstitial.on('fail', function () {
+                    this.insentive.on('fail', function () {
                         _this.insentiveShowable = false;
                         _this.insentive = null;
                     });
