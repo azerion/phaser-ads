@@ -1,6 +1,6 @@
 module Fabrique {
     export module Plugins {
-        export interface AdGame extends Phaser.Game {
+        export interface IAdGame extends Phaser.Game {
             ads: Fabrique.Plugins.AdManager;
         }
 
@@ -29,7 +29,7 @@ module Fabrique {
 
             private wasMuted: boolean = false;
 
-            constructor(game: AdGame, pluginManager: Phaser.PluginManager) {
+            constructor(game: IAdGame, pluginManager: Phaser.PluginManager) {
                 super(game, pluginManager);
 
                 Object.defineProperty(game, 'ads', {
@@ -89,7 +89,7 @@ module Fabrique {
 
             /**
              * Some providers require you to destroy an add after it was shown, that can be done here.
-             * 
+             *
              * @param args
              */
             public destroyAd(...args: any[]): void {

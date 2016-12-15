@@ -166,7 +166,7 @@ module Fabrique {
                     this.insentive.on('load', () => {
                         this.insentiveShowable = true;
                     });
-                    this.interstitial.on('fail', () => {
+                    this.insentive.on('fail', () => {
                         this.insentiveShowable = false;
                         this.insentive = null;
                     });
@@ -180,13 +180,13 @@ module Fabrique {
 
                     this.insentive.on('dismiss', () => {
                         this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
-                        this.interstitialShowable = false;
+                        this.insentiveShowable = false;
                         this.insentive = null;
                     });
 
                     this.insentive.on('reward', () => {
                         this.adManager.onAdRewardGranted.dispatch(CocoonAdType.insentive);
-                        this.interstitialShowable = false;
+                        this.insentiveShowable = false;
                         this.insentive = null;
                     });
                     this.insentive.load();
@@ -222,7 +222,7 @@ module Fabrique {
                     // this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
                 }
 
-                if (adType === CocoonAdType.banner && null !==this.banner) {
+                if (adType === CocoonAdType.banner && null !== this.banner) {
                     this.banner.hide();
 
                     // this.adManager.onContentResumed.dispatch(CocoonAdType.banner);

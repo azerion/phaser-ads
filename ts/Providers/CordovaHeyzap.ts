@@ -36,7 +36,7 @@ module Fabrique {
                     this.adManager.onContentResumed.dispatch();
                 }
 
-                switch(adType) {
+                switch (adType) {
                     case HeyzapAdTypes.Interstitial:
                         //Register event listeners
                         HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.HIDE, () => {
