@@ -1,64 +1,65 @@
-declare module Fabrique {
-    module Plugins {
-        interface IAdGame extends Phaser.Game {
-            ads: Fabrique.Plugins.AdManager;
-        }
-        enum AdEvent {
-            start = 0,
-            firstQuartile = 1,
-            midPoint = 2,
-            thirdQuartile = 3,
-            complete = 4,
-        }
-        class AdManager extends Phaser.Plugin {
-            onContentPaused: Phaser.Signal;
-            onContentResumed: Phaser.Signal;
-            onAdProgression: Phaser.Signal;
-            onAdsDisabled: Phaser.Signal;
-            onAdClicked: Phaser.Signal;
-            onAdRewardGranted: Phaser.Signal;
-            private provider;
-            private wasMuted;
-            constructor(game: IAdGame, pluginManager: Phaser.PluginManager);
-            /**
-             * Here we set an adprovider, any can be given as long as it implements the IProvider interface
-             *
-             * @param provider
-             */
-            setAdProvider(provider: AdProvider.IProvider): void;
-            /**
-             * Here we request an ad, the arguments passed depend on the provider used!
-             * @param args
-             */
-            showAd(...args: any[]): void;
-            /**
-             * Some providers might require you to preload an ad before showing it, that can be done here
-             *
-             * @param args
-             */
-            preloadAd(...args: any[]): void;
-            /**
-             * Some providers require you to destroy an add after it was shown, that can be done here.
-             *
-             * @param args
-             */
-            destroyAd(...args: any[]): void;
-            /**
-             * Some providers allow you to hide an ad, you might think of an banner ad that is shown in show cases
-             *
-             * @param args
-             */
-            hideAd(...args: any[]): void;
-            /**
-             * Checks if ads are enabled or blocked
-             *
-             * @param args
-             */
-            adsEnabled(): boolean;
-        }
+declare module 'phaser-ads' {
+    export = PhaserAds;
+}
+declare module PhaserAds {
+    interface IAdGame extends Phaser.Game {
+        ads: AdManager;
+    }
+    enum AdEvent {
+        start = 0,
+        firstQuartile = 1,
+        midPoint = 2,
+        thirdQuartile = 3,
+        complete = 4,
+    }
+    class AdManager extends Phaser.Plugin {
+        onContentPaused: Phaser.Signal;
+        onContentResumed: Phaser.Signal;
+        onAdProgression: Phaser.Signal;
+        onAdsDisabled: Phaser.Signal;
+        onAdClicked: Phaser.Signal;
+        onAdRewardGranted: Phaser.Signal;
+        private provider;
+        private wasMuted;
+        constructor(game: IAdGame, pluginManager: Phaser.PluginManager);
+        /**
+         * Here we set an adprovider, any can be given as long as it implements the IProvider interface
+         *
+         * @param provider
+         */
+        setAdProvider(provider: AdProvider.IProvider): void;
+        /**
+         * Here we request an ad, the arguments passed depend on the provider used!
+         * @param args
+         */
+        showAd(...args: any[]): void;
+        /**
+         * Some providers might require you to preload an ad before showing it, that can be done here
+         *
+         * @param args
+         */
+        preloadAd(...args: any[]): void;
+        /**
+         * Some providers require you to destroy an add after it was shown, that can be done here.
+         *
+         * @param args
+         */
+        destroyAd(...args: any[]): void;
+        /**
+         * Some providers allow you to hide an ad, you might think of an banner ad that is shown in show cases
+         *
+         * @param args
+         */
+        hideAd(...args: any[]): void;
+        /**
+         * Checks if ads are enabled or blocked
+         *
+         * @param args
+         */
+        adsEnabled(): boolean;
     }
 }
-declare module Fabrique {
+declare module PhaserAds {
     module AdProvider {
         enum CocoonProvider {
             AdMob = 0,
@@ -90,7 +91,7 @@ declare module Fabrique {
         }
     }
 }
-declare module Fabrique {
+declare module PhaserAds {
     module AdProvider {
         enum HeyzapAdTypes {
             Interstitial = 0,
@@ -110,8 +111,7 @@ declare module Fabrique {
         }
     }
 }
-import AdManager = Fabrique.Plugins.AdManager;
-declare module Fabrique {
+declare module PhaserAds {
     module AdProvider {
         interface IProvider {
             adManager: AdManager;
@@ -124,7 +124,7 @@ declare module Fabrique {
         }
     }
 }
-declare module Fabrique {
+declare module PhaserAds {
     module AdProvider {
         interface ICustomParams {
             [name: string]: string | number | any[];

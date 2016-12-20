@@ -1,6 +1,4 @@
-import AdManager = Fabrique.Plugins.AdManager;
-
-module Fabrique {
+module PhaserAds {
     export module AdProvider {
         export interface IProvider {
             adManager: AdManager;
