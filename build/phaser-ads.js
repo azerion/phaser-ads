@@ -7,6 +7,15 @@
  * Released under MIT License 
  */
 
+/*!
+ * phaser-ads - version 2.0.0 
+ * A Phaser plugin for providing nice ads integration in your phaser.io game
+ *
+ * OrangeGames
+ * Build at 20-12-2016
+ * Released under MIT License 
+ */
+
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -14,29 +23,30 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var PhaserAds;
 (function (PhaserAds) {
+    var AdEvent;
     (function (AdEvent) {
         AdEvent[AdEvent["start"] = 0] = "start";
         AdEvent[AdEvent["firstQuartile"] = 1] = "firstQuartile";
         AdEvent[AdEvent["midPoint"] = 2] = "midPoint";
         AdEvent[AdEvent["thirdQuartile"] = 3] = "thirdQuartile";
         AdEvent[AdEvent["complete"] = 4] = "complete";
-    })(PhaserAds.AdEvent || (PhaserAds.AdEvent = {}));
-    var AdEvent = PhaserAds.AdEvent;
+    })(AdEvent = PhaserAds.AdEvent || (PhaserAds.AdEvent = {}));
     var AdManager = (function (_super) {
         __extends(AdManager, _super);
         function AdManager(game, pluginManager) {
-            _super.call(this, game, pluginManager);
-            this.onContentPaused = new Phaser.Signal();
-            this.onContentResumed = new Phaser.Signal();
-            this.onAdProgression = new Phaser.Signal();
-            this.onAdsDisabled = new Phaser.Signal();
-            this.onAdClicked = new Phaser.Signal();
-            this.onAdRewardGranted = new Phaser.Signal();
-            this.provider = null;
-            this.wasMuted = false;
+            var _this = _super.call(this, game, pluginManager) || this;
+            _this.onContentPaused = new Phaser.Signal();
+            _this.onContentResumed = new Phaser.Signal();
+            _this.onAdProgression = new Phaser.Signal();
+            _this.onAdsDisabled = new Phaser.Signal();
+            _this.onAdClicked = new Phaser.Signal();
+            _this.onAdRewardGranted = new Phaser.Signal();
+            _this.provider = null;
+            _this.wasMuted = false;
             Object.defineProperty(game, 'ads', {
-                value: this
+                value: _this
             });
+            return _this;
         }
         /**
          * Here we set an adprovider, any can be given as long as it implements the IProvider interface
@@ -62,7 +72,7 @@ var PhaserAds;
         AdManager.prototype.showAd = function () {
             var args = [];
             for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i - 0] = arguments[_i];
+                args[_i] = arguments[_i];
             }
             if (null === this.provider) {
                 throw new Error('Can not request an ad without an provider, please attach an ad provider!');
@@ -84,7 +94,7 @@ var PhaserAds;
         AdManager.prototype.preloadAd = function () {
             var args = [];
             for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i - 0] = arguments[_i];
+                args[_i] = arguments[_i];
             }
             if (null === this.provider) {
                 throw new Error('Can not preload an ad without an provider, please attach an ad provider!');
@@ -99,7 +109,7 @@ var PhaserAds;
         AdManager.prototype.destroyAd = function () {
             var args = [];
             for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i - 0] = arguments[_i];
+                args[_i] = arguments[_i];
             }
             if (null === this.provider) {
                 throw new Error('Can not destroy an ad without an provider, please attach an ad provider!');
@@ -114,7 +124,7 @@ var PhaserAds;
         AdManager.prototype.hideAd = function () {
             var args = [];
             for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i - 0] = arguments[_i];
+                args[_i] = arguments[_i];
             }
             if (null === this.provider) {
                 throw new Error('Can not hide an ad without an provider, please attach an ad provider!');
@@ -141,19 +151,19 @@ var PhaserAds;
 (function (PhaserAds) {
     var AdProvider;
     (function (AdProvider) {
+        var CocoonProvider;
         (function (CocoonProvider) {
             CocoonProvider[CocoonProvider["AdMob"] = 0] = "AdMob";
             CocoonProvider[CocoonProvider["MoPub"] = 1] = "MoPub";
             CocoonProvider[CocoonProvider["Chartboost"] = 2] = "Chartboost";
             CocoonProvider[CocoonProvider["Heyzap"] = 3] = "Heyzap";
-        })(AdProvider.CocoonProvider || (AdProvider.CocoonProvider = {}));
-        var CocoonProvider = AdProvider.CocoonProvider;
+        })(CocoonProvider = AdProvider.CocoonProvider || (AdProvider.CocoonProvider = {}));
+        var CocoonAdType;
         (function (CocoonAdType) {
             CocoonAdType[CocoonAdType["banner"] = 0] = "banner";
             CocoonAdType[CocoonAdType["interstitial"] = 1] = "interstitial";
             CocoonAdType[CocoonAdType["insentive"] = 2] = "insentive";
-        })(AdProvider.CocoonAdType || (AdProvider.CocoonAdType = {}));
-        var CocoonAdType = AdProvider.CocoonAdType;
+        })(CocoonAdType = AdProvider.CocoonAdType || (AdProvider.CocoonAdType = {}));
         var CocoonAds = (function () {
             function CocoonAds(game, provider, config) {
                 this.adsEnabled = false;
@@ -340,13 +350,13 @@ var PhaserAds;
 (function (PhaserAds) {
     var AdProvider;
     (function (AdProvider) {
+        var HeyzapAdTypes;
         (function (HeyzapAdTypes) {
             HeyzapAdTypes[HeyzapAdTypes["Interstitial"] = 0] = "Interstitial";
             HeyzapAdTypes[HeyzapAdTypes["Video"] = 1] = "Video";
             HeyzapAdTypes[HeyzapAdTypes["Rewarded"] = 2] = "Rewarded";
             HeyzapAdTypes[HeyzapAdTypes["Banner"] = 3] = "Banner";
-        })(AdProvider.HeyzapAdTypes || (AdProvider.HeyzapAdTypes = {}));
-        var HeyzapAdTypes = AdProvider.HeyzapAdTypes;
+        })(HeyzapAdTypes = AdProvider.HeyzapAdTypes || (AdProvider.HeyzapAdTypes = {}));
         var CordovaHeyzap = (function () {
             function CordovaHeyzap(game, publisherId) {
                 var _this = this;

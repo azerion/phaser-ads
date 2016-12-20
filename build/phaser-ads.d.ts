@@ -113,19 +113,6 @@ declare module PhaserAds {
 }
 declare module PhaserAds {
     module AdProvider {
-        interface IProvider {
-            adManager: AdManager;
-            adsEnabled: boolean;
-            setManager(manager: AdManager): void;
-            preloadAd(...args: any[]): void;
-            destroyAd(...args: any[]): void;
-            hideAd(...args: any[]): void;
-            showAd(...args: any[]): void;
-        }
-    }
-}
-declare module PhaserAds {
-    module AdProvider {
         interface ICustomParams {
             [name: string]: string | number | any[];
         }
@@ -179,6 +166,19 @@ declare module PhaserAds {
              * @returns {boolean}
              */
             private areAdsEnabled();
+        }
+    }
+}
+declare module PhaserAds {
+    module AdProvider {
+        interface IProvider {
+            adManager: AdManager;
+            adsEnabled: boolean;
+            setManager(manager: AdManager): void;
+            preloadAd(...args: any[]): void;
+            destroyAd(...args: any[]): void;
+            hideAd(...args: any[]): void;
+            showAd(...args: any[]): void;
         }
     }
 }

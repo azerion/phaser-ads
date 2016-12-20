@@ -25,7 +25,7 @@ Next up you'd want to add it to your list of js sources you load into your game:
 
 After adding the script to the page you can activate it by enabling the plugin:
 ```javascript
-game.add.plugin(Fabrique.Plugins.AdManager);
+game.add.plugin(PhaserAds.AdManager);
 ```
 
 Usage
@@ -40,7 +40,7 @@ We'll continue this part of the readme asuming you're going to implement IMA3.
 A provider can use any number of arguments configured in order to make it work, it all depends on the implementation that was made by the developer. For our IMA3 Provider you can create one like this:
 ```javascript
 //let's create a new provider, first argument should be the game, second should be the ad tag URL
-var provider = new Fabrique.AdProvider.Ima3(
+var provider = new PhaserAds.AdProvider.Ima3(
    game,
    'https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&correlator'
 );
