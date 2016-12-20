@@ -1,4 +1,4 @@
-module Fabrique {
+module PhaserAds {
     export module AdProvider {
         export enum HeyzapAdTypes {
             Interstitial,

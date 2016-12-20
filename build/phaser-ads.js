@@ -1,9 +1,18 @@
 /*!
- * phaser-ads - version 1.0.2 
+ * phaser-ads - version 2.0.0 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 01-12-2016
+ * Build at 20-12-2016
+ * Released under MIT License 
+ */
+
+/*!
+ * phaser-ads - version 2.0.0 
+ * A Phaser plugin for providing nice ads integration in your phaser.io game
+ *
+ * OrangeGames
+ * Build at 20-12-2016
  * Released under MIT License 
  */
 
@@ -12,151 +21,149 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Fabrique;
-(function (Fabrique) {
-    var Plugins;
-    (function (Plugins) {
-        (function (AdEvent) {
-            AdEvent[AdEvent["start"] = 0] = "start";
-            AdEvent[AdEvent["firstQuartile"] = 1] = "firstQuartile";
-            AdEvent[AdEvent["midPoint"] = 2] = "midPoint";
-            AdEvent[AdEvent["thirdQuartile"] = 3] = "thirdQuartile";
-            AdEvent[AdEvent["complete"] = 4] = "complete";
-        })(Plugins.AdEvent || (Plugins.AdEvent = {}));
-        var AdEvent = Plugins.AdEvent;
-        var AdManager = (function (_super) {
-            __extends(AdManager, _super);
-            function AdManager(game, pluginManager) {
-                _super.call(this, game, pluginManager);
-                this.onContentPaused = new Phaser.Signal();
-                this.onContentResumed = new Phaser.Signal();
-                this.onAdProgression = new Phaser.Signal();
-                this.onAdsDisabled = new Phaser.Signal();
-                this.onAdClicked = new Phaser.Signal();
-                this.onAdRewardGranted = new Phaser.Signal();
-                this.provider = null;
-                this.wasMuted = false;
-                Object.defineProperty(game, 'ads', {
-                    value: this
-                });
-            }
-            /**
-             * Here we set an adprovider, any can be given as long as it implements the IProvider interface
-             *
-             * @param provider
-             */
-            AdManager.prototype.setAdProvider = function (provider) {
-                var _this = this;
-                this.provider = provider;
-                this.provider.setManager(this);
-                //We add a listener to when the content should be resumed in order to unmute audio
-                this.onContentResumed.add(function () {
-                    if (!_this.wasMuted) {
-                        //Here we unmute audio, but only if it wasn't muted before requesting an add
-                        _this.game.sound.mute = false;
-                    }
-                });
-            };
-            /**
-             * Here we request an ad, the arguments passed depend on the provider used!
-             * @param args
-             */
-            AdManager.prototype.showAd = function () {
-                var args = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    args[_i - 0] = arguments[_i];
-                }
-                if (null === this.provider) {
-                    throw new Error('Can not request an ad without an provider, please attach an ad provider!');
-                }
-                //Let's not do this for banner's
-                if (args[0] && args[0] !== Fabrique.AdProvider.CocoonAdType.banner) {
-                    //first we check if the sound was already muted before we requested an add
-                    this.wasMuted = this.game.sound.mute;
-                    //Let's mute audio for the game, we can resume the audi playback once the add has played
-                    this.game.sound.mute = true;
-                }
-                this.provider.showAd.apply(this.provider, args);
-            };
-            /**
-             * Some providers might require you to preload an ad before showing it, that can be done here
-             *
-             * @param args
-             */
-            AdManager.prototype.preloadAd = function () {
-                var args = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    args[_i - 0] = arguments[_i];
-                }
-                if (null === this.provider) {
-                    throw new Error('Can not preload an ad without an provider, please attach an ad provider!');
-                }
-                this.provider.preloadAd.apply(this.provider, args);
-            };
-            /**
-             * Some providers require you to destroy an add after it was shown, that can be done here.
-             *
-             * @param args
-             */
-            AdManager.prototype.destroyAd = function () {
-                var args = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    args[_i - 0] = arguments[_i];
-                }
-                if (null === this.provider) {
-                    throw new Error('Can not destroy an ad without an provider, please attach an ad provider!');
-                }
-                this.provider.destroyAd.apply(this.provider, args);
-            };
-            /**
-             * Some providers allow you to hide an ad, you might think of an banner ad that is shown in show cases
-             *
-             * @param args
-             */
-            AdManager.prototype.hideAd = function () {
-                var args = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    args[_i - 0] = arguments[_i];
-                }
-                if (null === this.provider) {
-                    throw new Error('Can not hide an ad without an provider, please attach an ad provider!');
-                }
-                if (!this.wasMuted) {
+var PhaserAds;
+(function (PhaserAds) {
+    var AdEvent;
+    (function (AdEvent) {
+        AdEvent[AdEvent["start"] = 0] = "start";
+        AdEvent[AdEvent["firstQuartile"] = 1] = "firstQuartile";
+        AdEvent[AdEvent["midPoint"] = 2] = "midPoint";
+        AdEvent[AdEvent["thirdQuartile"] = 3] = "thirdQuartile";
+        AdEvent[AdEvent["complete"] = 4] = "complete";
+    })(AdEvent = PhaserAds.AdEvent || (PhaserAds.AdEvent = {}));
+    var AdManager = (function (_super) {
+        __extends(AdManager, _super);
+        function AdManager(game, pluginManager) {
+            var _this = _super.call(this, game, pluginManager) || this;
+            _this.onContentPaused = new Phaser.Signal();
+            _this.onContentResumed = new Phaser.Signal();
+            _this.onAdProgression = new Phaser.Signal();
+            _this.onAdsDisabled = new Phaser.Signal();
+            _this.onAdClicked = new Phaser.Signal();
+            _this.onAdRewardGranted = new Phaser.Signal();
+            _this.provider = null;
+            _this.wasMuted = false;
+            Object.defineProperty(game, 'ads', {
+                value: _this
+            });
+            return _this;
+        }
+        /**
+         * Here we set an adprovider, any can be given as long as it implements the IProvider interface
+         *
+         * @param provider
+         */
+        AdManager.prototype.setAdProvider = function (provider) {
+            var _this = this;
+            this.provider = provider;
+            this.provider.setManager(this);
+            //We add a listener to when the content should be resumed in order to unmute audio
+            this.onContentResumed.add(function () {
+                if (!_this.wasMuted) {
                     //Here we unmute audio, but only if it wasn't muted before requesting an add
-                    this.game.sound.mute = false;
+                    _this.game.sound.mute = false;
                 }
-                this.provider.hideAd.apply(this.provider, args);
-            };
-            /**
-             * Checks if ads are enabled or blocked
-             *
-             * @param args
-             */
-            AdManager.prototype.adsEnabled = function () {
-                return this.provider.adsEnabled;
-            };
-            return AdManager;
-        }(Phaser.Plugin));
-        Plugins.AdManager = AdManager;
-    })(Plugins = Fabrique.Plugins || (Fabrique.Plugins = {}));
-})(Fabrique || (Fabrique = {}));
-var Fabrique;
-(function (Fabrique) {
+            });
+        };
+        /**
+         * Here we request an ad, the arguments passed depend on the provider used!
+         * @param args
+         */
+        AdManager.prototype.showAd = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            if (null === this.provider) {
+                throw new Error('Can not request an ad without an provider, please attach an ad provider!');
+            }
+            //Let's not do this for banner's
+            if (args[0] && args[0] !== PhaserAds.AdProvider.CocoonAdType.banner) {
+                //first we check if the sound was already muted before we requested an add
+                this.wasMuted = this.game.sound.mute;
+                //Let's mute audio for the game, we can resume the audi playback once the add has played
+                this.game.sound.mute = true;
+            }
+            this.provider.showAd.apply(this.provider, args);
+        };
+        /**
+         * Some providers might require you to preload an ad before showing it, that can be done here
+         *
+         * @param args
+         */
+        AdManager.prototype.preloadAd = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            if (null === this.provider) {
+                throw new Error('Can not preload an ad without an provider, please attach an ad provider!');
+            }
+            this.provider.preloadAd.apply(this.provider, args);
+        };
+        /**
+         * Some providers require you to destroy an add after it was shown, that can be done here.
+         *
+         * @param args
+         */
+        AdManager.prototype.destroyAd = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            if (null === this.provider) {
+                throw new Error('Can not destroy an ad without an provider, please attach an ad provider!');
+            }
+            this.provider.destroyAd.apply(this.provider, args);
+        };
+        /**
+         * Some providers allow you to hide an ad, you might think of an banner ad that is shown in show cases
+         *
+         * @param args
+         */
+        AdManager.prototype.hideAd = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            if (null === this.provider) {
+                throw new Error('Can not hide an ad without an provider, please attach an ad provider!');
+            }
+            if (!this.wasMuted) {
+                //Here we unmute audio, but only if it wasn't muted before requesting an add
+                this.game.sound.mute = false;
+            }
+            this.provider.hideAd.apply(this.provider, args);
+        };
+        /**
+         * Checks if ads are enabled or blocked
+         *
+         * @param args
+         */
+        AdManager.prototype.adsEnabled = function () {
+            return this.provider.adsEnabled;
+        };
+        return AdManager;
+    }(Phaser.Plugin));
+    PhaserAds.AdManager = AdManager;
+})(PhaserAds || (PhaserAds = {}));
+var PhaserAds;
+(function (PhaserAds) {
     var AdProvider;
     (function (AdProvider) {
+        var CocoonProvider;
         (function (CocoonProvider) {
             CocoonProvider[CocoonProvider["AdMob"] = 0] = "AdMob";
             CocoonProvider[CocoonProvider["MoPub"] = 1] = "MoPub";
             CocoonProvider[CocoonProvider["Chartboost"] = 2] = "Chartboost";
             CocoonProvider[CocoonProvider["Heyzap"] = 3] = "Heyzap";
-        })(AdProvider.CocoonProvider || (AdProvider.CocoonProvider = {}));
-        var CocoonProvider = AdProvider.CocoonProvider;
+        })(CocoonProvider = AdProvider.CocoonProvider || (AdProvider.CocoonProvider = {}));
+        var CocoonAdType;
         (function (CocoonAdType) {
             CocoonAdType[CocoonAdType["banner"] = 0] = "banner";
             CocoonAdType[CocoonAdType["interstitial"] = 1] = "interstitial";
             CocoonAdType[CocoonAdType["insentive"] = 2] = "insentive";
-        })(AdProvider.CocoonAdType || (AdProvider.CocoonAdType = {}));
-        var CocoonAdType = AdProvider.CocoonAdType;
+        })(CocoonAdType = AdProvider.CocoonAdType || (AdProvider.CocoonAdType = {}));
         var CocoonAds = (function () {
             function CocoonAds(game, provider, config) {
                 this.adsEnabled = false;
@@ -337,19 +344,19 @@ var Fabrique;
             return CocoonAds;
         }());
         AdProvider.CocoonAds = CocoonAds;
-    })(AdProvider = Fabrique.AdProvider || (Fabrique.AdProvider = {}));
-})(Fabrique || (Fabrique = {}));
-var Fabrique;
-(function (Fabrique) {
+    })(AdProvider = PhaserAds.AdProvider || (PhaserAds.AdProvider = {}));
+})(PhaserAds || (PhaserAds = {}));
+var PhaserAds;
+(function (PhaserAds) {
     var AdProvider;
     (function (AdProvider) {
+        var HeyzapAdTypes;
         (function (HeyzapAdTypes) {
             HeyzapAdTypes[HeyzapAdTypes["Interstitial"] = 0] = "Interstitial";
             HeyzapAdTypes[HeyzapAdTypes["Video"] = 1] = "Video";
             HeyzapAdTypes[HeyzapAdTypes["Rewarded"] = 2] = "Rewarded";
             HeyzapAdTypes[HeyzapAdTypes["Banner"] = 3] = "Banner";
-        })(AdProvider.HeyzapAdTypes || (AdProvider.HeyzapAdTypes = {}));
-        var HeyzapAdTypes = AdProvider.HeyzapAdTypes;
+        })(HeyzapAdTypes = AdProvider.HeyzapAdTypes || (AdProvider.HeyzapAdTypes = {}));
         var CordovaHeyzap = (function () {
             function CordovaHeyzap(game, publisherId) {
                 var _this = this;
@@ -482,11 +489,10 @@ var Fabrique;
             return CordovaHeyzap;
         }());
         AdProvider.CordovaHeyzap = CordovaHeyzap;
-    })(AdProvider = Fabrique.AdProvider || (Fabrique.AdProvider = {}));
-})(Fabrique || (Fabrique = {}));
-var AdManager = Fabrique.Plugins.AdManager;
-var Fabrique;
-(function (Fabrique) {
+    })(AdProvider = PhaserAds.AdProvider || (PhaserAds.AdProvider = {}));
+})(PhaserAds || (PhaserAds = {}));
+var PhaserAds;
+(function (PhaserAds) {
     var AdProvider;
     (function (AdProvider) {
         var Ima3 = (function () {
@@ -665,19 +671,19 @@ var Fabrique;
                         }
                         break;
                     case google.ima.AdEvent.Type.STARTED:
-                        this.adManager.onAdProgression.dispatch(Fabrique.Plugins.AdEvent.start);
+                        this.adManager.onAdProgression.dispatch(PhaserAds.AdEvent.start);
                         break;
                     case google.ima.AdEvent.Type.FIRST_QUARTILE:
-                        this.adManager.onAdProgression.dispatch(Fabrique.Plugins.AdEvent.firstQuartile);
+                        this.adManager.onAdProgression.dispatch(PhaserAds.AdEvent.firstQuartile);
                         break;
                     case google.ima.AdEvent.Type.MIDPOINT:
-                        this.adManager.onAdProgression.dispatch(Fabrique.Plugins.AdEvent.midPoint);
+                        this.adManager.onAdProgression.dispatch(PhaserAds.AdEvent.midPoint);
                         break;
                     case google.ima.AdEvent.Type.THIRD_QUARTILE:
-                        this.adManager.onAdProgression.dispatch(Fabrique.Plugins.AdEvent.thirdQuartile);
+                        this.adManager.onAdProgression.dispatch(PhaserAds.AdEvent.thirdQuartile);
                         break;
                     case google.ima.AdEvent.Type.COMPLETE:
-                        this.adManager.onAdProgression.dispatch(Fabrique.Plugins.AdEvent.complete);
+                        this.adManager.onAdProgression.dispatch(PhaserAds.AdEvent.complete);
                         break;
                     case google.ima.AdEvent.Type.ALL_ADS_COMPLETED:
                         this.onContentResumeRequested();
@@ -760,6 +766,6 @@ var Fabrique;
             return Ima3;
         }());
         AdProvider.Ima3 = Ima3;
-    })(AdProvider = Fabrique.AdProvider || (Fabrique.AdProvider = {}));
-})(Fabrique || (Fabrique = {}));
+    })(AdProvider = PhaserAds.AdProvider || (PhaserAds.AdProvider = {}));
+})(PhaserAds || (PhaserAds = {}));
 //# sourceMappingURL=phaser-ads.js.map

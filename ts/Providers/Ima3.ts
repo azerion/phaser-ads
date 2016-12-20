@@ -1,4 +1,4 @@
-module Fabrique {
+module PhaserAds {
     export module AdProvider {
         export interface ICustomParams {
             [name: string]: string | number| any[];
@@ -231,19 +231,19 @@ module Fabrique {
                         }
                         break;
                     case google.ima.AdEvent.Type.STARTED:
-                        this.adManager.onAdProgression.dispatch(Plugins.AdEvent.start);
+                        this.adManager.onAdProgression.dispatch(AdEvent.start);
                         break;
                     case google.ima.AdEvent.Type.FIRST_QUARTILE:
-                        this.adManager.onAdProgression.dispatch(Plugins.AdEvent.firstQuartile);
+                        this.adManager.onAdProgression.dispatch(AdEvent.firstQuartile);
                         break;
                     case google.ima.AdEvent.Type.MIDPOINT:
-                        this.adManager.onAdProgression.dispatch(Plugins.AdEvent.midPoint);
+                        this.adManager.onAdProgression.dispatch(AdEvent.midPoint);
                         break;
                     case google.ima.AdEvent.Type.THIRD_QUARTILE:
-                        this.adManager.onAdProgression.dispatch(Plugins.AdEvent.thirdQuartile);
+                        this.adManager.onAdProgression.dispatch(AdEvent.thirdQuartile);
                         break;
                     case google.ima.AdEvent.Type.COMPLETE:
-                        this.adManager.onAdProgression.dispatch(Plugins.AdEvent.complete);
+                        this.adManager.onAdProgression.dispatch(AdEvent.complete);
                         break;
                     case google.ima.AdEvent.Type.ALL_ADS_COMPLETED:
                         this.onContentResumeRequested();

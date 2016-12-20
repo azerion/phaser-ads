@@ -5,7 +5,7 @@ module.exports = function (grunt) {
         //Get some details from the package.json
         pkg: grunt.file.readJSON('package.json'),
         banner: '/*!\n' +
-        ' * <%= pkg.name %> - version <%= pkg.version %> \n' +
+        ' * <%= pkg.config.name %> - version <%= pkg.version %> \n' +
         ' * <%= pkg.description %>\n' +
         ' *\n' +
         ' * <%= pkg.author %>\n' +
@@ -28,7 +28,7 @@ module.exports = function (grunt) {
             dist: {
                 tsconfig: './config/tsconfig.json',
                 src: ['ts/**/*.ts'],
-                dest: 'build/<%= pkg.name %>.js'
+                dest: 'build/<%= pkg.config.name %>.js'
             }
         },
         watch: {
@@ -62,8 +62,9 @@ module.exports = function (grunt) {
             },
             dist: {
                 files: {
-                    'build/<%= pkg.name %>.min.js': [
-                        'build/<%= pkg.name %>.js'
+                    'build/<%= pkg.config.name %>.min.js': [
+                        'vendor/Spine.js',
+                        'build/<%= pkg.config.name %>.js'
                     ]
                 }
             }
