@@ -55,7 +55,7 @@ module.exports = function (grunt) {
                     unused: true,
                     if_return: true,
                     join_vars: true,
-                    drop_console: true
+                    drop_console: false
                 },
                 mangle: true,
                 beautify: false
@@ -63,7 +63,6 @@ module.exports = function (grunt) {
             dist: {
                 files: {
                     'build/<%= pkg.config.name %>.min.js': [
-                        'vendor/Spine.js',
                         'build/<%= pkg.config.name %>.js'
                     ]
                 }

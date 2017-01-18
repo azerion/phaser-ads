@@ -89,7 +89,7 @@ module PhaserAds {
                 }
 
                 if (adType === CocoonAdType.insentive) {
-                    if (!this.interstitialShowable || null === this.insentive) {
+                    if (!this.insentiveShowable || null === this.insentive) {
                         //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
                         return;

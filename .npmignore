@@ -2,3 +2,5 @@ Gruntfile.js
 example
 ts
 .idea
+node_modules
+.tscache

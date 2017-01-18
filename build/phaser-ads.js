@@ -1,18 +1,9 @@
 /*!
- * phaser-ads - version 2.0.0 
+ * phaser-ads - version 2.0.1 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 20-12-2016
- * Released under MIT License 
- */
-
-/*!
- * phaser-ads - version 2.0.0 
- * A Phaser plugin for providing nice ads integration in your phaser.io game
- *
- * OrangeGames
- * Build at 20-12-2016
+ * Build at 18-01-2017
  * Released under MIT License 
  */
 
@@ -221,7 +212,7 @@ var PhaserAds;
                     this.interstitial.show();
                 }
                 if (adType === CocoonAdType.insentive) {
-                    if (!this.interstitialShowable || null === this.insentive) {
+                    if (!this.insentiveShowable || null === this.insentive) {
                         //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
                         return;
