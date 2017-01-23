@@ -286,11 +286,13 @@ module PhaserAds {
                 console.log('onContentResumeRequested', arguments);
 
                 if (typeof google === 'undefined') {
+                    this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
                     return;
                 }
 
                 this.adContent.style.display = 'none';
+                this.adManager.unMuteAfterAd();
                 this.adManager.onContentResumed.dispatch();
             }
 

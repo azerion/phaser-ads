@@ -48,14 +48,6 @@ module PhaserAds {
         public setAdProvider(provider: AdProvider.IProvider): void {
             this.provider = provider;
             this.provider.setManager(this);
-
-            //We add a listener to when the content should be resumed in order to unmute audio
-            this.onContentResumed.add(() => {
-                if (!this.wasMuted) {
-                    //Here we unmute audio, but only if it wasn't muted before requesting an add
-                    this.game.sound.mute = false;
-                }
-            });
         }
 
         /**
@@ -113,10 +105,7 @@ module PhaserAds {
                 throw new Error('Can not hide an ad without an provider, please attach an ad provider!');
             }
 
-            if (!this.wasMuted) {
-                //Here we unmute audio, but only if it wasn't muted before requesting an add
-                this.game.sound.mute = false;
-            }
+            this.unMuteAfterAd();
 
             this.provider.hideAd.apply(this.provider, args);
         }
@@ -128,6 +117,17 @@ module PhaserAds {
          */
         public adsEnabled(): boolean {
             return this.provider.adsEnabled;
+        }
+
+        /**
+         * Should be called after ad was(n't) shown, demutes the game so we can peacefully continue
+         */
+        public unMuteAfterAd(): void {
+            if (!this.wasMuted) {
+                //Here we unmute audio, but only if it wasn't muted before requesting an add
+                this.game.sound.mute = false;
+            }
+
         }
     }
 }
