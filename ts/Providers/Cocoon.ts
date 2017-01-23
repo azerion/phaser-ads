@@ -64,12 +64,14 @@ module PhaserAds {
 
             public showAd(adType: CocoonAdType): void {
                 if (!this.adsEnabled) {
+                    this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
                     return;
                 }
 
                 if (adType === CocoonAdType.banner) {
                     if (!this.bannerShowable || null === this.banner) {
+                        this.adManager.unMuteAfterAd();
                         //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
                         return;
@@ -80,6 +82,7 @@ module PhaserAds {
 
                 if (adType === CocoonAdType.interstitial) {
                     if (!this.interstitialShowable || null === this.interstitial) {
+                        this.adManager.unMuteAfterAd();
                         //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
                         return;
@@ -90,6 +93,7 @@ module PhaserAds {
 
                 if (adType === CocoonAdType.insentive) {
                     if (!this.insentiveShowable || null === this.insentive) {
+                        this.adManager.unMuteAfterAd();
                         //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
                         return;
@@ -154,6 +158,7 @@ module PhaserAds {
                     });
 
                     this.interstitial.on('dismiss', () => {
+                        this.adManager.unMuteAfterAd();
                         this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
                         this.interstitialShowable = false;
                         this.interstitial = null;
@@ -179,12 +184,14 @@ module PhaserAds {
                     });
 
                     this.insentive.on('dismiss', () => {
+                        this.adManager.unMuteAfterAd();
                         this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
                         this.insentiveShowable = false;
                         this.insentive = null;
                     });
 
                     this.insentive.on('reward', () => {
+                        this.adManager.unMuteAfterAd();
                         this.adManager.onAdRewardGranted.dispatch(CocoonAdType.insentive);
                         this.insentiveShowable = false;
                         this.insentive = null;

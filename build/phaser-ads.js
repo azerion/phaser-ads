@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.0.1 
+ * phaser-ads - version 2.0.2 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 18-01-2017
+ * Build at 23-01-2017
  * Released under MIT License 
  */
 
@@ -45,16 +45,8 @@ var PhaserAds;
          * @param provider
          */
         AdManager.prototype.setAdProvider = function (provider) {
-            var _this = this;
             this.provider = provider;
             this.provider.setManager(this);
-            //We add a listener to when the content should be resumed in order to unmute audio
-            this.onContentResumed.add(function () {
-                if (!_this.wasMuted) {
-                    //Here we unmute audio, but only if it wasn't muted before requesting an add
-                    _this.game.sound.mute = false;
-                }
-            });
         };
         /**
          * Here we request an ad, the arguments passed depend on the provider used!
@@ -120,10 +112,7 @@ var PhaserAds;
             if (null === this.provider) {
                 throw new Error('Can not hide an ad without an provider, please attach an ad provider!');
             }
-            if (!this.wasMuted) {
-                //Here we unmute audio, but only if it wasn't muted before requesting an add
-                this.game.sound.mute = false;
-            }
+            this.unMuteAfterAd();
             this.provider.hideAd.apply(this.provider, args);
         };
         /**
@@ -133,6 +122,15 @@ var PhaserAds;
          */
         AdManager.prototype.adsEnabled = function () {
             return this.provider.adsEnabled;
+        };
+        /**
+         * Should be called after ad was(n't) shown, demutes the game so we can peacefully continue
+         */
+        AdManager.prototype.unMuteAfterAd = function () {
+            if (!this.wasMuted) {
+                //Here we unmute audio, but only if it wasn't muted before requesting an add
+                this.game.sound.mute = false;
+            }
         };
         return AdManager;
     }(Phaser.Plugin));
@@ -192,11 +190,13 @@ var PhaserAds;
             };
             CocoonAds.prototype.showAd = function (adType) {
                 if (!this.adsEnabled) {
+                    this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
                     return;
                 }
                 if (adType === CocoonAdType.banner) {
                     if (!this.bannerShowable || null === this.banner) {
+                        this.adManager.unMuteAfterAd();
                         //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
                         return;
@@ -205,6 +205,7 @@ var PhaserAds;
                 }
                 if (adType === CocoonAdType.interstitial) {
                     if (!this.interstitialShowable || null === this.interstitial) {
+                        this.adManager.unMuteAfterAd();
                         //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
                         return;
@@ -213,6 +214,7 @@ var PhaserAds;
                 }
                 if (adType === CocoonAdType.insentive) {
                     if (!this.insentiveShowable || null === this.insentive) {
+                        this.adManager.unMuteAfterAd();
                         //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
                         return;
@@ -269,6 +271,7 @@ var PhaserAds;
                         _this.adManager.onContentPaused.dispatch(CocoonAdType.interstitial);
                     });
                     this.interstitial.on('dismiss', function () {
+                        _this.adManager.unMuteAfterAd();
                         _this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
                         _this.interstitialShowable = false;
                         _this.interstitial = null;
@@ -291,11 +294,13 @@ var PhaserAds;
                         _this.adManager.onContentPaused.dispatch(CocoonAdType.insentive);
                     });
                     this.insentive.on('dismiss', function () {
+                        _this.adManager.unMuteAfterAd();
                         _this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
                         _this.insentiveShowable = false;
                         _this.insentive = null;
                     });
                     this.insentive.on('reward', function () {
+                        _this.adManager.unMuteAfterAd();
                         _this.adManager.onAdRewardGranted.dispatch(CocoonAdType.insentive);
                         _this.insentiveShowable = false;
                         _this.insentive = null;
@@ -371,15 +376,18 @@ var PhaserAds;
             CordovaHeyzap.prototype.showAd = function (adType, bannerAdPositions) {
                 var _this = this;
                 if (!this.adsEnabled) {
+                    this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
                 }
                 switch (adType) {
                     case HeyzapAdTypes.Interstitial:
                         //Register event listeners
                         HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.HIDE, function () {
+                            _this.adManager.unMuteAfterAd();
                             _this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.HIDE);
                         });
                         HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.SHOW_FAILED, function () {
+                            _this.adManager.unMuteAfterAd();
                             _this.adManager.onContentResumed.dispatch(HeyzapAds.InterstitialAd.Events.SHOW_FAILED);
                         });
                         HeyzapAds.InterstitialAd.addEventListener(HeyzapAds.InterstitialAd.Events.CLICKED, function () {
@@ -389,15 +397,18 @@ var PhaserAds;
                             // Native call successful.
                             _this.adManager.onContentPaused.dispatch();
                         }, function (error) {
+                            _this.adManager.unMuteAfterAd();
                             //Failed to show insentive ad, continue operations
                             _this.adManager.onContentResumed.dispatch();
                         });
                         break;
                     case HeyzapAdTypes.Video:
                         HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.HIDE, function () {
+                            _this.adManager.unMuteAfterAd();
                             _this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.HIDE);
                         });
                         HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.SHOW_FAILED, function () {
+                            _this.adManager.unMuteAfterAd();
                             _this.adManager.onContentResumed.dispatch(HeyzapAds.VideoAd.Events.SHOW_FAILED);
                         });
                         HeyzapAds.VideoAd.addEventListener(HeyzapAds.VideoAd.Events.CLICKED, function () {
@@ -407,15 +418,18 @@ var PhaserAds;
                             // Native call successful.
                             _this.adManager.onContentPaused.dispatch();
                         }, function (error) {
+                            _this.adManager.unMuteAfterAd();
                             //Failed to show insentive ad, continue operations
                             _this.adManager.onContentResumed.dispatch();
                         });
                         break;
                     case HeyzapAdTypes.Rewarded:
                         HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.HIDE, function () {
+                            _this.adManager.unMuteAfterAd();
                             _this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.HIDE);
                         });
                         HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.SHOW_FAILED, function () {
+                            _this.adManager.unMuteAfterAd();
                             _this.adManager.onContentResumed.dispatch(HeyzapAds.IncentivizedAd.Events.SHOW_FAILED);
                         });
                         HeyzapAds.IncentivizedAd.addEventListener(HeyzapAds.IncentivizedAd.Events.CLICKED, function () {
@@ -425,6 +439,7 @@ var PhaserAds;
                             // Native call successful.
                             _this.adManager.onContentPaused.dispatch();
                         }, function (error) {
+                            _this.adManager.unMuteAfterAd();
                             //Failed to show insentive ad, continue operations
                             _this.adManager.onContentResumed.dispatch();
                         });
@@ -710,10 +725,12 @@ var PhaserAds;
             Ima3.prototype.onContentResumeRequested = function () {
                 console.log('onContentResumeRequested', arguments);
                 if (typeof google === 'undefined') {
+                    this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
                     return;
                 }
                 this.adContent.style.display = 'none';
+                this.adManager.unMuteAfterAd();
                 this.adManager.onContentResumed.dispatch();
             };
             Ima3.prototype.parseCustomParams = function (customParams) {

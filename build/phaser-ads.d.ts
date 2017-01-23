@@ -57,6 +57,10 @@ declare module PhaserAds {
          * @param args
          */
         adsEnabled(): boolean;
+        /**
+         * Should be called after ad was(n't) shown, demutes the game so we can peacefully continue
+         */
+        unMuteAfterAd(): void;
     }
 }
 declare module PhaserAds {
