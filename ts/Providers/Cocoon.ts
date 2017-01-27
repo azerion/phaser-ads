@@ -65,7 +65,9 @@ module PhaserAds {
             public showAd(adType: CocoonAdType): void {
                 if (!this.adsEnabled) {
                     this.adManager.unMuteAfterAd();
-                    this.adManager.onContentResumed.dispatch();
+                    if (!(adType === CocoonAdType.banner)) {
+                        this.adManager.onContentResumed.dispatch();
+                    }
                     return;
                 }
 
@@ -73,7 +75,7 @@ module PhaserAds {
                     if (!this.bannerShowable || null === this.banner) {
                         this.adManager.unMuteAfterAd();
                         //No banner ad available, skipping
-                        this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
+                        //this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
                         return;
                     }
 
