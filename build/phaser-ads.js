@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.0.3 
+ * phaser-ads - version 2.0.4 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 27-01-2017
+ * Build at 20-02-2017
  * Released under MIT License 
  */
 
@@ -649,6 +649,9 @@ var PhaserAds;
                     // start at this time; the call will be ignored for ad rules.
                     this.adsManager.start();
                     this.resizeListener = function () {
+                        if (_this.adsManager === null) {
+                            return;
+                        }
                         //Window was resized, so expect something similar
                         console.log('Resizing ad size');
                         _this.adsManager.resize(window.innerWidth, window.innerHeight, google.ima.ViewMode.NORMAL);
