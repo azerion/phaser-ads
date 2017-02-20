@@ -199,6 +199,10 @@ module PhaserAds {
                     this.adsManager.start();
 
                     this.resizeListener = () => {
+                        if (this.adsManager === null) {
+                            return;
+                        }
+
                         //Window was resized, so expect something similar
                         console.log('Resizing ad size');
                         this.adsManager.resize(window.innerWidth, window.innerHeight, google.ima.ViewMode.NORMAL);
