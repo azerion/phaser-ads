@@ -9,9 +9,10 @@
 
     <script type="text/javascript" src="//imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
 
-    <!-- Include Phaser Crisp Text JS -->
-    <script type="text/javascript" src="../node_modules/phaser/build/phaser.js"></script>
-    <script type="text/javascript" src="../build/phaser-ads.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/phaser/2.6.2/phaser.min.js"></script>
+
+    <script type="text/javascript" src="//cnd.fbrq.io/phaser-ads/phaser-ads.min.js"></script>
+    <!--<script type="text/javascript" src="./phaser-ads.js"></script>-->
 
     <style type="text/css">
         body {
@@ -24,7 +25,7 @@
     <script type="text/javascript">
         var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game-container', { init: init, create: create, preload: preload});
         Phaser.Device.whenReady(function () {
-            game.plugins.add(Fabrique.Plugins.AdManager);
+            game.plugins.add(PhaserAds.AdManager);
         });
 
         function init() {
@@ -46,7 +47,7 @@
             game.sound.play('boden');
 
             //Set the ad provider, we use google Ima3 (ima 3 sdk)
-            game.ads.setAdProvider(new Fabrique.AdProvider.Ima3(
+            game.ads.setAdProvider(new PhaserAds.AdProvider.Ima3(
                     game,
                     'https://pubads.g.doubleclick.net/' +
                     'gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&' +
@@ -56,27 +57,27 @@
             ));
 
             //Content paused event is fired when the content (game) should be paused, and the ad will be played
-            game.ads.onContentPaused.add(function () {
+            game.ads.onContentPaused.addOnce(function () {
                 console.error('Started playing ad.');
             });
 
             //This is fired when the ad is finished playing and the content (game) should be resumed
-            game.ads.onContentResumed.add(function () {
+            game.ads.onContentResumed.addOnce(function () {
                 console.error('Finished playing ad.');
             });
 
             //This is fired when the ad was clicked by the user
-            game.ads.onAdClicked.add(function () {
+            game.ads.onAdClicked.addOnce(function () {
                 console.error('Clicked the ad!');
             });
 
             //This gives us details about how far the users is viewing the add
-            game.ads.onAdProgression.add(function (progression) {
+            game.ads.onAdProgression.addOnce(function (progression) {
                 console.error(progression);
             });
 
             //This is fired when the ad was clicked by the user
-            game.ads.onAdsDisabled.add(function () {
+            game.ads.onAdsDisabled.addOnce(function () {
                 console.error('Ads are being blocked.');
             });
 
