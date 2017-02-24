@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.0.4 
+ * phaser-ads - version 2.0.5 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 20-02-2017
+ * Build at 24-02-2017
  * Released under MIT License 
  */
 
@@ -773,7 +773,9 @@ var PhaserAds;
                     test.parentNode.removeChild(test);
                     return enabled;
                 };
-                window.setTimeout(adsEnabled = isEnabled(), 100);
+                window.setTimeout(function () {
+                    adsEnabled = isEnabled();
+                }, 100);
                 return adsEnabled;
             };
             return Ima3;

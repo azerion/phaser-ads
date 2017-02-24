@@ -340,7 +340,9 @@ module PhaserAds {
                     return enabled;
                 };
 
-                window.setTimeout(adsEnabled = isEnabled(), 100);
+                window.setTimeout(() => {
+                    adsEnabled = isEnabled();
+                }, 100);
 
                 return adsEnabled;
             }
