@@ -28,6 +28,12 @@ module PhaserAds {
 
         public onAdRewardGranted: Phaser.Signal = new Phaser.Signal();
 
+        public onBannerShown: Phaser.Signal = new Phaser.Signal();
+
+        public onBannerHidden: Phaser.Signal = new Phaser.Signal();
+
+        public bannerActive: boolean = false;
+
         private provider: AdProvider.IProvider = null;
 
         private wasMuted: boolean = false;

@@ -19,6 +19,9 @@ declare module PhaserAds {
         onAdsDisabled: Phaser.Signal;
         onAdClicked: Phaser.Signal;
         onAdRewardGranted: Phaser.Signal;
+        onBannerShown: Phaser.Signal;
+        onBannerHidden: Phaser.Signal;
+        bannerActive: boolean;
         private provider;
         private wasMuted;
         constructor(game: IAdGame, pluginManager: Phaser.PluginManager);

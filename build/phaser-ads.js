@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.0.5 
+ * phaser-ads - version 2.0.6 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 24-02-2017
+ * Build at 11-04-2017
  * Released under MIT License 
  */
 
@@ -32,6 +32,9 @@ var PhaserAds;
             _this.onAdsDisabled = new Phaser.Signal();
             _this.onAdClicked = new Phaser.Signal();
             _this.onAdRewardGranted = new Phaser.Signal();
+            _this.onBannerShown = new Phaser.Signal();
+            _this.onBannerHidden = new Phaser.Signal();
+            _this.bannerActive = false;
             _this.provider = null;
             _this.wasMuted = false;
             Object.defineProperty(game, 'ads', {
@@ -248,9 +251,13 @@ var PhaserAds;
                     });
                     //Banner don't pause or resume content
                     this.banner.on('show', function () {
+                        _this.adManager.onBannerShown.dispatch(_this.banner.width, _this.banner.height);
+                        _this.adManager.bannerActive = true;
                         // this.adManager.onContentPaused.dispatch(CocoonAdType.banner);
                     });
                     this.banner.on('dismiss', function () {
+                        _this.adManager.bannerActive = false;
+                        _this.adManager.onBannerHidden.dispatch(_this.banner.width, _this.banner.height);
                         // this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
                         // this.bannerShowable = false;
                         // this.banner = null;
