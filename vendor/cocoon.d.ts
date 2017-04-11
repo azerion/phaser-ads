@@ -1,6 +1,8 @@
 declare module Cocoon {
     export module Ad {
         export interface IBanner {
+            width: number;
+            height: number;
             show(): void;
             hide(): void;
             load(): void;
