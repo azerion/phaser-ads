@@ -78,7 +78,8 @@ module PhaserAds {
                         //this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
                         return;
                     }
-
+                    this.adManager.onBannerShown.dispatch(this.banner.width, this.banner.height);
+                    this.adManager.bannerActive = true;
                     this.banner.show();
                 }
 
@@ -131,14 +132,14 @@ module PhaserAds {
 
                     //Banner don't pause or resume content
                     this.banner.on('show', () => {
-                        this.adManager.onBannerShown.dispatch(this.banner.width, this.banner.height);
-                        this.adManager.bannerActive = true;
+                        /*this.adManager.onBannerShown.dispatch(this.banner.width, this.banner.height);
+                        this.adManager.bannerActive = true;*/
                         // this.adManager.onContentPaused.dispatch(CocoonAdType.banner);
                     });
 
                     this.banner.on('dismiss', () => {
-                        this.adManager.bannerActive = false;
-                        this.adManager.onBannerHidden.dispatch(this.banner.width, this.banner.height);
+                        /*this.adManager.bannerActive = false;
+                        this.adManager.onBannerHidden.dispatch(this.banner.width, this.banner.height);*/
                         // this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
                         // this.bannerShowable = false;
                         // this.banner = null;
@@ -236,6 +237,10 @@ module PhaserAds {
                 }
 
                 if (adType === CocoonAdType.banner && null !== this.banner) {
+                    if (this.adManager.bannerActive) {
+                        this.adManager.bannerActive = false;
+                        this.adManager.onBannerHidden.dispatch(this.banner.width, this.banner.height);
+                    }
                     this.banner.hide();
 
                     // this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
@@ -247,6 +252,14 @@ module PhaserAds {
                     // this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
                 }
             }
+
+            /*public setLayout(bannerPosition: string): void {
+                this.banner.setLayout(bannerPosition);
+            }
+
+            public setPosition(x: number, y: number): void {
+                this.banner.setPosition(x, y);
+            }*/
         }
     }
 }
