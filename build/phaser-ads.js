@@ -1,3 +1,12 @@
+/*!
+ * phaser-ads - version 2.0.7 
+ * A Phaser plugin for providing nice ads integration in your phaser.io game
+ *
+ * OrangeGames
+ * Build at 13-04-2017
+ * Released under MIT License 
+ */
+
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
