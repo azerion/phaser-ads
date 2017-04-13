@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.0.6 
+ * phaser-ads - version 2.0.7 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 11-04-2017
+ * Build at 13-04-2017
  * Released under MIT License 
  */
 
@@ -206,6 +206,8 @@ var PhaserAds;
                         //this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
                         return;
                     }
+                    this.adManager.onBannerShown.dispatch(this.banner.width, this.banner.height);
+                    this.adManager.bannerActive = true;
                     this.banner.show();
                 }
                 if (adType === CocoonAdType.interstitial) {
@@ -251,13 +253,13 @@ var PhaserAds;
                     });
                     //Banner don't pause or resume content
                     this.banner.on('show', function () {
-                        _this.adManager.onBannerShown.dispatch(_this.banner.width, _this.banner.height);
-                        _this.adManager.bannerActive = true;
+                        /*this.adManager.onBannerShown.dispatch(this.banner.width, this.banner.height);
+                        this.adManager.bannerActive = true;*/
                         // this.adManager.onContentPaused.dispatch(CocoonAdType.banner);
                     });
                     this.banner.on('dismiss', function () {
-                        _this.adManager.bannerActive = false;
-                        _this.adManager.onBannerHidden.dispatch(_this.banner.width, _this.banner.height);
+                        /*this.adManager.bannerActive = false;
+                        this.adManager.onBannerHidden.dispatch(this.banner.width, this.banner.height);*/
                         // this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
                         // this.bannerShowable = false;
                         // this.banner = null;
@@ -340,6 +342,10 @@ var PhaserAds;
                     this.interstitial.hide();
                 }
                 if (adType === CocoonAdType.banner && null !== this.banner) {
+                    if (this.adManager.bannerActive) {
+                        this.adManager.bannerActive = false;
+                        this.adManager.onBannerHidden.dispatch(this.banner.width, this.banner.height);
+                    }
                     this.banner.hide();
                 }
                 if (adType === CocoonAdType.insentive && null !== this.insentive) {
