@@ -9,6 +9,8 @@ module PhaserAds {
             destroyAd(...args: any[]): void;
             hideAd(...args: any[]): void;
             showAd(...args: any[]): void;
+            /*setLayout(...args: any[]): void;
+            setPosition(...args: any[]): void;*/
         }
     }
 }

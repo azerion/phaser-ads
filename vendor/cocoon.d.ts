@@ -8,6 +8,7 @@ declare module Cocoon {
             load(): void;
             on(eventName: "load" | "fail" | "show" | "dismiss" | "click" | "reward", listener?: () => void): void;
             setLayout(layout: string): void;
+            // setPosition(x: number, y:number): void;
         }
         export interface IAdProvider {
             configure(config: any): void;
