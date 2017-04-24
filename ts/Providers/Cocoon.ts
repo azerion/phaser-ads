@@ -213,7 +213,13 @@ module PhaserAds {
                 }
 
                 if (adType === CocoonAdType.banner && null !== this.banner) {
-                    this.cocoonProvider.releaseBanner(this.banner);
+                    //Releasing banners will fail on cocoon due to:
+                    // https://github.com/ludei/atomic-plugins-ads/pull/12
+                    try {
+                        this.cocoonProvider.releaseBanner(this.banner);
+                    } catch (e) {
+                        //silently ignore
+                    }
                     this.banner = null;
                     this.bannerShowable = false;
                 }

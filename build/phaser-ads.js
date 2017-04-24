@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.0.8 
+ * phaser-ads - version 2.0.9 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 13-04-2017
+ * Build at 24-04-2017
  * Released under MIT License 
  */
 
@@ -324,7 +324,13 @@ var PhaserAds;
                     return;
                 }
                 if (adType === CocoonAdType.banner && null !== this.banner) {
-                    this.cocoonProvider.releaseBanner(this.banner);
+                    //Releasing banners will fail on cocoon due to:
+                    // https://github.com/ludei/atomic-plugins-ads/pull/12
+                    try {
+                        this.cocoonProvider.releaseBanner(this.banner);
+                    }
+                    catch (e) {
+                    }
                     this.banner = null;
                     this.bannerShowable = false;
                 }
