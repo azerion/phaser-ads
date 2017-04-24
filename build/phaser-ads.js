@@ -1,5 +1,5 @@
 /*!
- * phaser-ads - version 2.0.8 
+ * phaser-ads - version 2.0.9 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
