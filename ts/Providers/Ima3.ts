@@ -30,7 +30,7 @@ module PhaserAds {
             private resizeListener: () => void = null;
 
             constructor(game: Phaser.Game, adTagUrl: string) {
-                this.adsEnabled = this.areAdsEnabled();
+                this.areAdsEnabled();
 
                 if (typeof google === 'undefined') {
                     return;
@@ -320,16 +320,16 @@ module PhaserAds {
             }
 
             /**
-             * Checks id the ads are enabled
+             * Checks if the ads are enabled (e.g; adblock is enabled or not)
              * @returns {boolean}
              */
-            private areAdsEnabled(): boolean {
+            private areAdsEnabled(): void {
                 let test: HTMLElement = document.createElement('div');
                 test.innerHTML = '&nbsp;';
                 test.className = 'adsbox';
                 document.body.appendChild(test);
 
-                let adsEnabled: boolean;
+                // let adsEnabled: boolean;
                 let isEnabled: () => boolean = () => {
                     let enabled: boolean = true;
                     if (test.offsetHeight === 0) {
@@ -341,10 +341,8 @@ module PhaserAds {
                 };
 
                 window.setTimeout(() => {
-                    adsEnabled = isEnabled();
+                    this.adsEnabled = isEnabled();
                 }, 100);
-
-                return adsEnabled;
             }
         }
     }
