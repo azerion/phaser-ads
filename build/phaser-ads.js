@@ -1,17 +1,22 @@
 /*!
- * phaser-ads - version 2.0.9 
+ * phaser-ads - version 2.1.0 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 24-04-2017
+ * Build at 26-04-2017
  * Released under MIT License 
  */
 
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var PhaserAds;
 (function (PhaserAds) {
     var AdEvent;
@@ -330,6 +335,7 @@ var PhaserAds;
                         this.cocoonProvider.releaseBanner(this.banner);
                     }
                     catch (e) {
+                        //silently ignore
                     }
                     this.banner = null;
                     this.bannerShowable = false;
@@ -346,6 +352,7 @@ var PhaserAds;
                 }
                 if (adType === CocoonAdType.interstitial && null !== this.interstitial) {
                     this.interstitial.hide();
+                    // this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
                 }
                 if (adType === CocoonAdType.banner && null !== this.banner) {
                     if (this.adManager.bannerActive) {
@@ -353,9 +360,11 @@ var PhaserAds;
                         this.adManager.onBannerHidden.dispatch(this.banner.width, this.banner.height);
                     }
                     this.banner.hide();
+                    // this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
                 }
                 if (adType === CocoonAdType.insentive && null !== this.insentive) {
                     this.insentive.hide();
+                    // this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
                 }
             };
             return CocoonAds;
@@ -522,6 +531,109 @@ var PhaserAds;
 (function (PhaserAds) {
     var AdProvider;
     (function (AdProvider) {
+        var GameDistributionAdType;
+        (function (GameDistributionAdType) {
+            GameDistributionAdType[GameDistributionAdType["preroll"] = 0] = "preroll";
+            GameDistributionAdType[GameDistributionAdType["midroll"] = 1] = "midroll";
+        })(GameDistributionAdType = AdProvider.GameDistributionAdType || (AdProvider.GameDistributionAdType = {}));
+        var GameDistributionAds = (function () {
+            function GameDistributionAds(game, gameId, userId) {
+                var _this = this;
+                this.adsEnabled = true;
+                this.areAdsEnabled();
+                this.settings = {
+                    gameId: gameId,
+                    userId: userId,
+                    resumeGame: function () {
+                        //console.log('Resuming game');
+                        _this.adManager.unMuteAfterAd();
+                        _this.adManager.onContentResumed.dispatch();
+                    },
+                    pauseGame: function () {
+                        //console.log('Pausing game');
+                        _this.adManager.onContentPaused.dispatch();
+                    },
+                    onInit: function (data) {
+                        //console.log('Initialised vooxe', data);
+                    },
+                    onError: function (data) {
+                        // console.log('Got an Vooxe error', data);
+                        _this.adsEnabled = false;
+                    }
+                };
+                window['GameDistribution'] = 'gdApi';
+                window['gdApi'] = window['gdApi'] || function () {
+                    (window['gdApi'].q = window['gdApi'].q || []).push(arguments);
+                };
+                window['gdApi'].l = Date.now();
+                gdApi(this.settings);
+            }
+            GameDistributionAds.prototype.setManager = function (manager) {
+                this.adManager = manager;
+            };
+            GameDistributionAds.prototype.showAd = function (adType) {
+                if (adType === GameDistributionAdType.preroll) {
+                    //Include script. even when adblock is enabled, this script also allows us to track our users;
+                    (function (window, document, tagName, url) {
+                        var a = document.createElement(tagName);
+                        var m = document.getElementsByTagName(tagName)[0];
+                        a.async = true;
+                        a.src = url;
+                        m.parentNode.insertBefore(a, m);
+                    })(window, document, 'script', '//html5.api.gamedistribution.com/libs/gd/api.js');
+                }
+                else if (this.adsEnabled) {
+                    gdApi.showBanner();
+                }
+                if (!this.adsEnabled) {
+                    this.adManager.unMuteAfterAd();
+                    this.adManager.onContentResumed.dispatch();
+                }
+            };
+            //Does nothing, but needed for Provider interface
+            GameDistributionAds.prototype.preloadAd = function () {
+                return;
+            };
+            //Does nothing, but needed for Provider interface
+            GameDistributionAds.prototype.destroyAd = function () {
+                return;
+            };
+            //Does nothing, but needed for Provider interface
+            GameDistributionAds.prototype.hideAd = function () {
+                return;
+            };
+            /**
+             * Checks if the ads are enabled (e.g; adblock is enabled or not)
+             * @returns {boolean}
+             */
+            GameDistributionAds.prototype.areAdsEnabled = function () {
+                var _this = this;
+                var test = document.createElement('div');
+                test.innerHTML = '&nbsp;';
+                test.className = 'adsbox';
+                document.body.appendChild(test);
+                // let adsEnabled: boolean;
+                var isEnabled = function () {
+                    var enabled = true;
+                    if (test.offsetHeight === 0) {
+                        enabled = false;
+                    }
+                    test.parentNode.removeChild(test);
+                    return enabled;
+                };
+                window.setTimeout(function () {
+                    _this.adsEnabled = isEnabled();
+                }, 100);
+            };
+            return GameDistributionAds;
+        }());
+        AdProvider.GameDistributionAds = GameDistributionAds;
+    })(AdProvider = PhaserAds.AdProvider || (PhaserAds.AdProvider = {}));
+})(PhaserAds || (PhaserAds = {}));
+var PhaserAds;
+(function (PhaserAds) {
+    var AdProvider;
+    (function (AdProvider) {
         var Ima3 = (function () {
             function Ima3(game, adTagUrl) {
                 this.adsManager = null;
@@ -531,7 +643,7 @@ var PhaserAds;
                 this.adRequested = false;
                 this.adManager = null;
                 this.resizeListener = null;
-                this.adsEnabled = this.areAdsEnabled();
+                this.areAdsEnabled();
                 if (typeof google === 'undefined') {
                     return;
                 }
@@ -775,15 +887,16 @@ var PhaserAds;
                 return '';
             };
             /**
-             * Checks id the ads are enabled
+             * Checks if the ads are enabled (e.g; adblock is enabled or not)
              * @returns {boolean}
              */
             Ima3.prototype.areAdsEnabled = function () {
+                var _this = this;
                 var test = document.createElement('div');
                 test.innerHTML = '&nbsp;';
                 test.className = 'adsbox';
                 document.body.appendChild(test);
-                var adsEnabled;
+                // let adsEnabled: boolean;
                 var isEnabled = function () {
                     var enabled = true;
                     if (test.offsetHeight === 0) {
@@ -793,9 +906,8 @@ var PhaserAds;
                     return enabled;
                 };
                 window.setTimeout(function () {
-                    adsEnabled = isEnabled();
+                    _this.adsEnabled = isEnabled();
                 }, 100);
-                return adsEnabled;
             };
             return Ima3;
         }());

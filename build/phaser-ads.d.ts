@@ -120,6 +120,30 @@ declare module PhaserAds {
 }
 declare module PhaserAds {
     module AdProvider {
+        enum GameDistributionAdType {
+            preroll = 0,
+            midroll = 1,
+        }
+        class GameDistributionAds implements PhaserAds.AdProvider.IProvider {
+            adManager: AdManager;
+            adsEnabled: boolean;
+            private settings;
+            constructor(game: Phaser.Game, gameId: string, userId: string);
+            setManager(manager: PhaserAds.AdManager): void;
+            showAd(adType: GameDistributionAdType): void;
+            preloadAd(): void;
+            destroyAd(): void;
+            hideAd(): void;
+            /**
+             * Checks if the ads are enabled (e.g; adblock is enabled or not)
+             * @returns {boolean}
+             */
+            private areAdsEnabled();
+        }
+    }
+}
+declare module PhaserAds {
+    module AdProvider {
         interface ICustomParams {
             [name: string]: string | number | any[];
         }
@@ -169,7 +193,7 @@ declare module PhaserAds {
             private onContentResumeRequested();
             private parseCustomParams(customParams);
             /**
-             * Checks id the ads are enabled
+             * Checks if the ads are enabled (e.g; adblock is enabled or not)
              * @returns {boolean}
              */
             private areAdsEnabled();

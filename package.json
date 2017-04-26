@@ -1,7 +1,7 @@
 {
   "name": "@orange-games/phaser-ads",
   "author": "OrangeGames",
-  "version": "2.0.9",
+  "version": "2.1.0",
   "description": "A Phaser plugin for providing nice ads integration in your phaser.io game",
   "contributors": [
     {
@@ -39,6 +39,6 @@
     "grunt-tslint": "^3.3.0",
     "phaser": "2.6.2",
     "tslint": "^3.15.1",
-    "typescript": "2.1.x"
+    "typescript": "2.2.x"
   }
 }
