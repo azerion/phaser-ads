@@ -327,6 +327,8 @@ module PhaserAds {
                 let test: HTMLElement = document.createElement('div');
                 test.innerHTML = '&nbsp;';
                 test.className = 'adsbox';
+                test.style.position = 'absolute';
+                test.style.fontSize = '10px';
                 document.body.appendChild(test);
 
                 // let adsEnabled: boolean;
