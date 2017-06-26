@@ -1,7 +1,7 @@
 {
   "name": "@orange-games/phaser-ads",
   "author": "OrangeGames",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "A Phaser plugin for providing nice ads integration in your phaser.io game",
   "contributors": [
     {
@@ -35,7 +35,7 @@
     "grunt-contrib-connect": "1.0.x",
     "grunt-contrib-uglify": "2.0.x",
     "grunt-contrib-watch": "1.0.x",
-    "grunt-ts": "^6.0.0-beta.3",
+    "grunt-ts": "^6.0.0-beta.16",
     "grunt-tslint": "^3.3.0",
     "phaser": "2.6.2",
     "tslint": "^3.15.1",

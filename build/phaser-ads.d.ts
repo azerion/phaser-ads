@@ -130,7 +130,7 @@ declare module PhaserAds {
             private settings;
             constructor(game: Phaser.Game, gameId: string, userId: string);
             setManager(manager: PhaserAds.AdManager): void;
-            showAd(adType: GameDistributionAdType): void;
+            showAd(adType?: GameDistributionAdType): void;
             preloadAd(): void;
             destroyAd(): void;
             hideAd(): void;
