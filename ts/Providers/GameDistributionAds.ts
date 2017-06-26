@@ -20,19 +20,19 @@ module PhaserAds {
                     gameId: gameId,
                     userId: userId,
                     resumeGame: (): void => {
-                        console.log('Resuming game');
+                        // console.log('Resuming game');
                         this.adManager.unMuteAfterAd();
                         this.adManager.onContentResumed.dispatch();
                     },
                     pauseGame: (): void => {
-                        console.log('Pausing game');
+                        // console.log('Pausing game');
                         this.adManager.onContentPaused.dispatch();
                     },
                     onInit: (data: any): void => {
-                        console.log('Initialised vooxe', data);
+                        // console.log('Initialised vooxe', data);
                     },
                     onError: (data: any): void => {
-                        console.log('Got an Vooxe error', data);
+                        // console.log('Got an Vooxe error', data);
                         this.adsEnabled = false;
                     }
                 };

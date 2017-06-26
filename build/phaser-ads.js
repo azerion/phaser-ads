@@ -545,19 +545,19 @@ var PhaserAds;
                     gameId: gameId,
                     userId: userId,
                     resumeGame: function () {
-                        console.log('Resuming game');
+                        // console.log('Resuming game');
                         _this.adManager.unMuteAfterAd();
                         _this.adManager.onContentResumed.dispatch();
                     },
                     pauseGame: function () {
-                        console.log('Pausing game');
+                        // console.log('Pausing game');
                         _this.adManager.onContentPaused.dispatch();
                     },
                     onInit: function (data) {
-                        console.log('Initialised vooxe', data);
+                        // console.log('Initialised vooxe', data);
                     },
                     onError: function (data) {
-                        console.log('Got an Vooxe error', data);
+                        // console.log('Got an Vooxe error', data);
                         _this.adsEnabled = false;
                     }
                 };
