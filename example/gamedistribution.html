@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
+
+    <title>Phaser Advertisement example</title>
+
+    <script type="text/javascript" src="//imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/phaser/2.6.2/phaser.min.js"></script>
+
+    <!--<script type="text/javascript" src="//cnd.fbrq.io/phaser-ads/phaser-ads.min.js"></script>-->
+    <script type="text/javascript" src="../build/phaser-ads.js"></script>
+
+    <style type="text/css">
+        body {
+            margin: 0 auto;
+            padding: 0;
+        }
+    </style>
+
+    <!-- Game we want to track -->
+    <script type="text/javascript">
+        var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game-container', { init: init, create: create, preload: preload});
+        Phaser.Device.whenReady(function () {
+            game.plugins.add(PhaserAds.AdManager);
+        });
+
+        function init() {
+            game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
+            if (game.device.desktop) {
+                game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+                game.scale.pageAlignHorizontally = true;
+                game.scale.windowConstraints.bottom = 'visual'
+            }
+            game.scale.updateLayout();
+
+            //Set the ad provider, we use google Ima3 (ima 3 sdk)
+            game.ads.setAdProvider(new PhaserAds.AdProvider.GameDistributionAds(
+                game,
+                '2d77cfd4b1e5487d998465c29de195b3', //Your game id goes here
+                'ABD36C6C-E74B-4BA7-BE87-0AB01F98D30D-s1' //Your user id goes here
+            ));
+        }
+
+        function preload() {
+            game.load.audio('boden', 'bodenstaendig_2000_in_rock_4bit.ogg');
+        }
+
+        function create(){
+            //Let's play this sound file so we can mute it later
+            game.sound.play('boden', 0.2, true);
+
+            //Content paused event is fired when the content (game) should be paused, and the ad will be played
+            game.ads.onContentPaused.addOnce(function () {
+                console.error('Started playing ad.');
+            });
+
+            //This is fired when the ad is finished playing and the content (game) should be resumed
+            game.ads.onContentResumed.addOnce(function () {
+                console.error('Finished playing ad.');
+            });
+
+            //This is fired when the ad was clicked by the user
+            game.ads.onAdClicked.addOnce(function () {
+                console.error('Clicked the ad!');
+            });
+
+            //This gives us details about how far the users is viewing the add
+            game.ads.onAdProgression.addOnce(function (progression) {
+                console.error(progression);
+            });
+
+            //This is fired when the ad was clicked by the user
+            game.ads.onAdsDisabled.addOnce(function () {
+                console.error('Ads are being blocked.');
+            });
+
+            //called when the button is clicked
+            var showAd = function() {
+                //the actual game content, behind the ad
+                var text = game.add.text(game.width / 2, game.height / 2, 'If you see this, there is no Ad being displayed', {
+                    font: '30px Arial',
+                    fill: '#ffffff'
+                });
+                text.anchor.set(0.5);
+
+                var adsEnabled = game.ads.provider.adsEnabled;
+                if (adsEnabled) {
+                    if (game.device.desktop) {
+                        //This is how we request an ad for desktop
+                        game.ads.showAd();
+                    } else {
+                        //In mobile we need to activate it by user input
+                        game.ads.showAd();
+                    }
+                } else {
+                    //the actual game content, behind the ad
+                    var text = game.add.text(game.width / 2, game.height / 2 + 60, 'Ads are being blocked.', {
+                        font: '25px Arial',
+                        fill: '#cc0000'
+                    });
+                    text.anchor.set(0.5);
+                }
+            }
+
+            //create button to start ads
+            var graphics = game.make.graphics(0, 0);
+            graphics.beginFill(0xff6600)
+                    .drawRoundedRect(0, 0, 200, 60, 13)
+                    .endFill();
+            var texture = graphics.generateTexture();
+            var button = game.add.button(game.width / 2, game.height *.75, texture, showAd);
+            button.anchor.set(0.5, 0.5);
+            var label = game.add.text(0, 0, 'See ad', {
+                'font': 'bold 30px Arial',
+                'fill': '#000'
+            });
+            label.anchor.set(0.5);
+            button.addChild(label);
+        }
+    </script>
+</head>
+<body>
+<div id="content-wrapper">
+    <div id="game-container"></div>
+</div>
+</body>
+</html>

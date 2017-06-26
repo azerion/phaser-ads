@@ -20,19 +20,19 @@ module PhaserAds {
                     gameId: gameId,
                     userId: userId,
                     resumeGame: (): void => {
-                        //console.log('Resuming game');
+                        console.log('Resuming game');
                         this.adManager.unMuteAfterAd();
                         this.adManager.onContentResumed.dispatch();
                     },
                     pauseGame: (): void => {
-                        //console.log('Pausing game');
+                        console.log('Pausing game');
                         this.adManager.onContentPaused.dispatch();
                     },
                     onInit: (data: any): void => {
-                        //console.log('Initialised vooxe', data);
+                        console.log('Initialised vooxe', data);
                     },
                     onError: (data: any): void => {
-                        // console.log('Got an Vooxe error', data);
+                        console.log('Got an Vooxe error', data);
                         this.adsEnabled = false;
                     }
                 };
@@ -43,6 +43,15 @@ module PhaserAds {
                     };
                 (<any>window)['gdApi'].l = Date.now();
 
+                //Include script. even when adblock is enabled, this script also allows us to track our users;
+                (function (window: Window, document: Document, tagName: string, url: string): void {
+                    let a: HTMLScriptElement = <HTMLScriptElement>document.createElement(tagName);
+                    let m: HTMLScriptElement = <HTMLScriptElement>document.getElementsByTagName(tagName)[0];
+                    a.async = true;
+                    a.src = url;
+                    m.parentNode.insertBefore(a, m);
+                })(window, document, 'script', '//html5.api.gamedistribution.com/libs/gd/api.js');
+
                 gdApi(this.settings);
             }
 
@@ -50,23 +59,12 @@ module PhaserAds {
                 this.adManager = manager;
             }
 
-            public showAd(adType: GameDistributionAdType): void {
-                if (adType === GameDistributionAdType.preroll) {
-                    //Include script. even when adblock is enabled, this script also allows us to track our users;
-                    (function (window: Window, document: Document, tagName: string, url: string): void {
-                        let a: HTMLScriptElement = <HTMLScriptElement>document.createElement(tagName);
-                        let m: HTMLScriptElement = <HTMLScriptElement>document.getElementsByTagName(tagName)[0];
-                        a.async = true;
-                        a.src = url;
-                        m.parentNode.insertBefore(a, m);
-                    })(window, document, 'script', '//html5.api.gamedistribution.com/libs/gd/api.js');
-                } else if (this.adsEnabled) {
-                    gdApi.showBanner();
-                }
-
+            public showAd(adType?: GameDistributionAdType): void {
                 if (!this.adsEnabled) {
                     this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
+                } else {
+                    gdApi.showBanner();
                 }
             }
 
