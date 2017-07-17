@@ -64,6 +64,7 @@ declare module PhaserAds {
          * Should be called after ad was(n't) shown, demutes the game so we can peacefully continue
          */
         unMuteAfterAd(): void;
+        usesBanner(provider: AdProvider.IProvider): boolean;
     }
 }
 declare module PhaserAds {
