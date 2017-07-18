@@ -65,7 +65,7 @@ module PhaserAds {
                 throw new Error('Can not request an ad without an provider, please attach an ad provider!');
             }
             //Let's not do this for banner's
-            if (!this.usesBanner(this.provider) || (args[0] && args[0] !== AdProvider.CocoonAdType.banner)) {
+            if (args[0] !== AdProvider.CocoonAdType.banner) {
                 //first we check if the sound was already muted before we requested an add
                 this.wasMuted = this.game.sound.mute;
                 //Let's mute audio for the game, we can resume the audi playback once the add has played
@@ -134,22 +134,6 @@ module PhaserAds {
                 this.game.sound.mute = false;
             }
 
-        }
-
-        /* 
-         * Check if the provider uses banners
-         */
-        public usesBanner(provider: AdProvider.IProvider): boolean {
-
-            /* The providers that don't use banners */
-            if (
-                provider instanceof AdProvider.GameDistributionAds || 
-                provider instanceof AdProvider.Ima3
-            ) {
-                return false;
-            }
-
-            return true;
         }
 
        /* /!**
