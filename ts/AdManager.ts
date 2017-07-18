@@ -65,7 +65,7 @@ module PhaserAds {
                 throw new Error('Can not request an ad without an provider, please attach an ad provider!');
             }
             //Let's not do this for banner's
-            if (args[0] && args[0] !== AdProvider.CocoonAdType.banner) {
+            if (args[0] !== AdProvider.CocoonAdType.banner) {
                 //first we check if the sound was already muted before we requested an add
                 this.wasMuted = this.game.sound.mute;
                 //Let's mute audio for the game, we can resume the audi playback once the add has played

@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.2.0 
+ * phaser-ads - version 2.2.1 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 26-06-2017
+ * Build at 18-07-2017
  * Released under MIT License 
  */
 
@@ -69,7 +69,7 @@ var PhaserAds;
                 throw new Error('Can not request an ad without an provider, please attach an ad provider!');
             }
             //Let's not do this for banner's
-            if (args[0] && args[0] !== PhaserAds.AdProvider.CocoonAdType.banner) {
+            if (args[0] !== PhaserAds.AdProvider.CocoonAdType.banner) {
                 //first we check if the sound was already muted before we requested an add
                 this.wasMuted = this.game.sound.mute;
                 //Let's mute audio for the game, we can resume the audi playback once the add has played
