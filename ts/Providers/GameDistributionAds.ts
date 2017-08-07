@@ -64,6 +64,15 @@ module PhaserAds {
                     this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
                 } else {
+                    if (gdApi && typeof gdApi.showBanner === 'undefined') {
+                        //So gdApi is available, but showBanner is not there (weird but can happen)
+                        this.adsEnabled = false;
+
+                        this.adManager.unMuteAfterAd();
+                        this.adManager.onContentResumed.dispatch();
+
+                        return;
+                    }
                     gdApi.showBanner();
                 }
             }
