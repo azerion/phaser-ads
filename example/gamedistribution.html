@@ -7,10 +7,11 @@
 
     <title>Phaser Advertisement example</title>
 
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/phaser/2.6.2/phaser.min.js"></script>
+    <!--<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/phaser/2.6.2/phaser.min.js"></script>-->
 
-    <script type="text/javascript" src="//cnd.fbrq.io/phaser-ads/phaser-ads.min.js"></script>
-    <!--<script type="text/javascript" src="../build/phaser-ads.js"></script>-->
+    <!--<script type="text/javascript" src="//cnd.fbrq.io/phaser-ads/phaser-ads.min.js"></script>-->
+    <script type="text/javascript" src="../node_modules/phaser/build/phaser.min.js"></script>
+    <script type="text/javascript" src="../build/phaser-ads.js"></script>
 
     <style type="text/css">
         body {
@@ -21,6 +22,7 @@
 
     <!-- Game we want to track -->
     <script type="text/javascript">
+        var soundOfMusic;
         var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game-container', { init: init, create: create, preload: preload});
         Phaser.Device.whenReady(function () {
             game.plugins.add(PhaserAds.AdManager);
@@ -41,8 +43,9 @@
             game.ads.setAdProvider(new PhaserAds.AdProvider.GameDistributionAds(
                 game,
                 '2d77cfd4b1e5487d998465c29de195b3', //Your game id goes here
-                'ABD36C6C-E74B-4BA7-BE87-0AB01F98D30D-s1' //Your user id goes here
+                'ABD36C6C-E74B-4BA7-BE87-0AB01F98D30D-s1'//Your user id goes here
             ));
+
         }
 
         function preload() {
@@ -51,15 +54,18 @@
 
         function create(){
             //Let's play this sound file so we can mute it later
-            game.sound.play('boden', 0.2, true);
+            game.add.audio('boden');
+            game.sound.play('boden', 0.3, true);
 
             //Content paused event is fired when the content (game) should be paused, and the ad will be played
             game.ads.onContentPaused.addOnce(function () {
+                game.sound.mute = true;
                 console.error('Started playing ad.');
             });
 
             //This is fired when the ad is finished playing and the content (game) should be resumed
             game.ads.onContentResumed.addOnce(function () {
+                game.sound.mute = false;
                 console.error('Finished playing ad.');
             });
 
@@ -77,7 +83,7 @@
             game.ads.onAdsDisabled.addOnce(function () {
                 console.error('Ads are being blocked.');
             });
-            game.sound.mute = true;
+//            game.sound.mute = true;
 
             //called when the button is clicked
             var showAd = function() {

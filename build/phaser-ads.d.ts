@@ -127,7 +127,6 @@ declare module PhaserAds {
         class GameDistributionAds implements PhaserAds.AdProvider.IProvider {
             adManager: AdManager;
             adsEnabled: boolean;
-            private settings;
             constructor(game: Phaser.Game, gameId: string, userId: string);
             setManager(manager: PhaserAds.AdManager): void;
             showAd(adType?: GameDistributionAdType): void;

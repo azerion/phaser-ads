@@ -11,48 +11,55 @@ module PhaserAds {
 
             public adsEnabled: boolean = true;
 
-            private settings: IGameDistributionSettings;
-
             constructor(game: Phaser.Game, gameId: string, userId: string) {
                 this.areAdsEnabled();
 
-                this.settings = <IGameDistributionSettings>{
+                GD_OPTIONS = <IGameDistributionSettings>{
                     gameId: gameId,
                     userId: userId,
-                    resumeGame: (): void => {
-                        // console.log('Resuming game');
-                        this.adManager.unMuteAfterAd();
-                        this.adManager.onContentResumed.dispatch();
+                    advertisementSettings: {
+                        debug: false,
+                        prefix: 'gdApi-',
+                        autoplay: false,
+                        responsive: true,
+                        width: 640,
+                        height: 300,
+                        locale: 'en'
                     },
-                    pauseGame: (): void => {
-                        // console.log('Pausing game');
-                        this.adManager.onContentPaused.dispatch();
-                    },
-                    onInit: (data: any): void => {
-                        // console.log('Initialised vooxe', data);
-                    },
-                    onError: (data: any): void => {
-                        // console.log('Got an Vooxe error', data);
-                        this.adsEnabled = false;
+                    onEvent: (event: any): void => {
+                        console.log('event.name = ', event.name);
+                        switch (event.name) {
+                            case 'API_GAME_START':
+                                if (typeof gdApi !== 'undefined') {
+                                    gdApi.play();
+                                }
+                                this.adManager.unMuteAfterAd();
+                                this.adManager.onContentResumed.dispatch();
+                                break;
+                            case 'API_GAME_PAUSE':
+                                this.adManager.onContentPaused.dispatch();
+                                break;
+                            case 'API_READY':
+                                //add something here
+                                 break;
+                            case 'API_ERROR':
+                                break;
+                        }
                     }
                 };
 
-                (<any>window)['GameDistribution'] = 'gdApi';
-                (<any>window)['gdApi'] = (<any>window)['gdApi'] || function (): void {
-                        ((<any>window)['gdApi'].q = (<any>window)['gdApi'].q || []).push(arguments);
-                    };
-                (<any>window)['gdApi'].l = Date.now();
-
                 //Include script. even when adblock is enabled, this script also allows us to track our users;
-                (function (window: Window, document: Document, tagName: string, url: string): void {
-                    let a: HTMLScriptElement = <HTMLScriptElement>document.createElement(tagName);
-                    let m: HTMLScriptElement = <HTMLScriptElement>document.getElementsByTagName(tagName)[0];
-                    a.async = true;
-                    a.src = url;
-                    m.parentNode.insertBefore(a, m);
-                })(window, document, 'script', '//html5.api.gamedistribution.com/libs/gd/api.js');
-
-                gdApi(this.settings);
+                (function(d: Document, s: string, id: string): void {
+                    let js: HTMLScriptElement;
+                    let fjs: HTMLScriptElement = <HTMLScriptElement>d.getElementsByTagName(s)[0];
+                    if (d.getElementById(id)) {
+                        return;
+                    }
+                    js = <HTMLScriptElement>d.createElement(s);
+                    js.id = id;
+                    js.src = '//html5.api.gamedistribution.com/main.min.js';
+                    fjs.parentNode.insertBefore(js, fjs);
+                }(document, 'script', 'gamedistribution-jssdk'));
             }
 
             public setManager(manager: PhaserAds.AdManager): void {
@@ -60,6 +67,7 @@ module PhaserAds {
             }
 
             public showAd(adType?: GameDistributionAdType): void {
+                console.log('show ad');
                 if (!this.adsEnabled) {
                     this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
