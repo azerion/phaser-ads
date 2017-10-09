@@ -25,7 +25,7 @@ Next up you'd want to add it to your list of js sources you load into your game:
 <script src="path/to/phaser-ads.min.js"></script>
 ```
 
-You could also opt for using the (free) jsdelivr cdn:
+You could also opt for using the (free) jsdelivr cdn: [![jsDelivr Hits](https://data.jsdelivr.com/v1/package/npm/@orange-games/phaser-ads/badge)](https://www.jsdelivr.com/package/npm/@orange-games/phaser-ads)
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@orange-games/phaser-ads@latest/build/phaser-ads.min.js"></script>
 ```
