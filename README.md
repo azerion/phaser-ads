@@ -1,3 +1,5 @@
+[![npm version](https://badge.fury.io/js/%40orange-games%2Fphaser-ads.svg)](https://badge.fury.io/js/%40orange-games%2Fphaser-ads) [![jsDelivr Hits](https://data.jsdelivr.com/v1/package/npm/@orange-games/phaser-ads/badge)](https://www.jsdelivr.com/package/npm/@orange-games/phaser-ads)
+
 Phaser Ads
 ==========
 This Phaser plugin that allows you to leverage different ad providers whilst providing the same simple API.
@@ -25,7 +27,7 @@ Next up you'd want to add it to your list of js sources you load into your game:
 <script src="path/to/phaser-ads.min.js"></script>
 ```
 
-You could also opt for using the (free) jsdelivr cdn: [![jsDelivr Hits](https://data.jsdelivr.com/v1/package/npm/@orange-games/phaser-ads/badge)](https://www.jsdelivr.com/package/npm/@orange-games/phaser-ads)
+You could also opt for using the (free) jsdelivr cdn: 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@orange-games/phaser-ads@latest/build/phaser-ads.min.js"></script>
 ```
