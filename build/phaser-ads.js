@@ -1,3 +1,12 @@
+/*!
+ * phaser-ads - version 2.3.1-alpha1 
+ * A Phaser plugin for providing nice ads integration in your phaser.io game
+ *
+ * OrangeGames
+ * Build at 03-10-2017
+ * Released under MIT License 
+ */
+
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
