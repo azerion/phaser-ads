@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.3.1-alpha1 
+ * phaser-ads - version 2.3.1-alpha3 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 03-10-2017
+ * Build at 27-11-2017
  * Released under MIT License 
  */
 
@@ -556,20 +556,20 @@ var PhaserAds;
                     onEvent: function (event) {
                         console.log('event.name = ', event.name);
                         switch (event.name) {
-                            case 'API_GAME_START':
+                            case 'SDK_GAME_START':
                                 if (typeof gdApi !== 'undefined') {
                                     gdApi.play();
                                 }
                                 _this.adManager.unMuteAfterAd();
                                 _this.adManager.onContentResumed.dispatch();
                                 break;
-                            case 'API_GAME_PAUSE':
+                            case 'SDK_GAME_PAUSE':
                                 _this.adManager.onContentPaused.dispatch();
                                 break;
-                            case 'API_READY':
+                            case 'SDK_READY':
                                 //add something here
                                 break;
-                            case 'API_ERROR':
+                            case 'SDK_ERROR':
                                 break;
                         }
                     }
