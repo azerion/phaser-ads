@@ -17,32 +17,23 @@ module PhaserAds {
                 GD_OPTIONS = <IGameDistributionSettings>{
                     gameId: gameId,
                     userId: userId,
-                    advertisementSettings: {
-                        debug: false,
-                        prefix: 'gdApi-',
-                        autoplay: false,
-                        responsive: true,
-                        width: 640,
-                        height: 300,
-                        locale: 'en'
-                    },
                     onEvent: (event: any): void => {
                         console.log('event.name = ', event.name);
                         switch (event.name) {
-                            case 'API_GAME_START':
+                            case 'SDK_GAME_START':
                                 if (typeof gdApi !== 'undefined') {
                                     gdApi.play();
                                 }
                                 this.adManager.unMuteAfterAd();
                                 this.adManager.onContentResumed.dispatch();
                                 break;
-                            case 'API_GAME_PAUSE':
+                            case 'SDK_GAME_PAUSE':
                                 this.adManager.onContentPaused.dispatch();
                                 break;
-                            case 'API_READY':
+                            case 'SDK_READY':
                                 //add something here
                                  break;
-                            case 'API_ERROR':
+                            case 'SDK_ERROR':
                                 break;
                         }
                     }
