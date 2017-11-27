@@ -17,6 +17,15 @@ module PhaserAds {
                 GD_OPTIONS = <IGameDistributionSettings>{
                     gameId: gameId,
                     userId: userId,
+                    advertisementSettings: {
+                        debug: false,
+                        prefix: 'gdApi-',
+                        autoplay: false,
+                        responsive: true,
+                        width: 640,
+                        height: 300,
+                        locale: 'en'
+                    },
                     onEvent: (event: any): void => {
                         console.log('event.name = ', event.name);
                         switch (event.name) {
