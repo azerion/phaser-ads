@@ -18,16 +18,9 @@ module PhaserAds {
                     gameId: gameId,
                     userId: userId,
                     advertisementSettings: {
-                        debug: false,
-                        prefix: 'gdApi-',
-                        autoplay: false,
-                        responsive: true,
-                        width: 640,
-                        height: 300,
-                        locale: 'en'
+                        autoplay: false
                     },
                     onEvent: (event: any): void => {
-                        console.log('event.name = ', event.name);
                         switch (event.name) {
                             case 'SDK_GAME_START':
                                 if (typeof gdApi !== 'undefined') {
@@ -67,7 +60,6 @@ module PhaserAds {
             }
 
             public showAd(adType?: GameDistributionAdType): void {
-                console.log('show ad');
                 if (!this.adsEnabled) {
                     this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
