@@ -64,6 +64,7 @@ module PhaserAds {
             if (null === this.provider) {
                 throw new Error('Can not request an ad without an provider, please attach an ad provider!');
             }
+
             //Let's not do this for banner's
             if (args[0] !== AdProvider.CocoonAdType.banner) {
                 //first we check if the sound was already muted before we requested an add
@@ -135,29 +136,5 @@ module PhaserAds {
             }
 
         }
-
-       /* /!**
-         * Set the predefined position of the banner, e.g. TOP_CENTER, BOTTOM_CENTER, CUSTOM
-         *!/
-        public setLayout(...args: any[]): void {
-            if (null === this.provider) {
-                throw new Error('Can set layout position without an provider, please attach an ad provider!');
-            }
-
-            this.provider.setLayout.apply(this.provider, args);
-
-        }
-
-        /!**
-         * Set the x, y position of the banner, if you selected CUSTOM
-         *!/
-        public setPosition(...args: any[]): void {
-            if (null === this.provider) {
-                throw new Error('Can set layout x, y position without an provider, please attach an ad provider!');
-            }
-
-            this.provider.setPosition.apply(this.provider, args);
-
-        }*/
     }
 }

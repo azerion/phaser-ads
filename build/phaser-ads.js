@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.2.2 
+ * phaser-ads - version 2.2.3 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 07-08-2017
+ * Build at 29-11-2017
  * Released under MIT License 
  */
 
@@ -541,40 +541,44 @@ var PhaserAds;
                 var _this = this;
                 this.adsEnabled = true;
                 this.areAdsEnabled();
-                this.settings = {
+                GD_OPTIONS = {
                     gameId: gameId,
                     userId: userId,
-                    resumeGame: function () {
-                        // console.log('Resuming game');
-                        _this.adManager.unMuteAfterAd();
-                        _this.adManager.onContentResumed.dispatch();
+                    advertisementSettings: {
+                        autoplay: false
                     },
-                    pauseGame: function () {
-                        // console.log('Pausing game');
-                        _this.adManager.onContentPaused.dispatch();
-                    },
-                    onInit: function (data) {
-                        // console.log('Initialised vooxe', data);
-                    },
-                    onError: function (data) {
-                        // console.log('Got an Vooxe error', data);
-                        _this.adsEnabled = false;
+                    onEvent: function (event) {
+                        switch (event.name) {
+                            case 'SDK_GAME_START':
+                                if (typeof gdApi !== 'undefined') {
+                                    gdApi.play();
+                                }
+                                _this.adManager.unMuteAfterAd();
+                                _this.adManager.onContentResumed.dispatch();
+                                break;
+                            case 'SDK_GAME_PAUSE':
+                                _this.adManager.onContentPaused.dispatch();
+                                break;
+                            case 'SDK_READY':
+                                //add something here
+                                break;
+                            case 'SDK_ERROR':
+                                break;
+                        }
                     }
                 };
-                window['GameDistribution'] = 'gdApi';
-                window['gdApi'] = window['gdApi'] || function () {
-                    (window['gdApi'].q = window['gdApi'].q || []).push(arguments);
-                };
-                window['gdApi'].l = Date.now();
                 //Include script. even when adblock is enabled, this script also allows us to track our users;
-                (function (window, document, tagName, url) {
-                    var a = document.createElement(tagName);
-                    var m = document.getElementsByTagName(tagName)[0];
-                    a.async = true;
-                    a.src = url;
-                    m.parentNode.insertBefore(a, m);
-                })(window, document, 'script', '//html5.api.gamedistribution.com/libs/gd/api.js');
-                gdApi(this.settings);
+                (function (d, s, id) {
+                    var js;
+                    var fjs = d.getElementsByTagName(s)[0];
+                    if (d.getElementById(id)) {
+                        return;
+                    }
+                    js = d.createElement(s);
+                    js.id = id;
+                    js.src = '//html5.api.gamedistribution.com/main.min.js';
+                    fjs.parentNode.insertBefore(js, fjs);
+                }(document, 'script', 'gamedistribution-jssdk'));
             }
             GameDistributionAds.prototype.setManager = function (manager) {
                 this.adManager = manager;

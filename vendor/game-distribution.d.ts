@@ -1,10 +1,8 @@
 interface IGameDistributionSettings {
     gameId: string;
     userId: string;
-    resumeGame: () => void;
-    pauseGame: () => void;
-    onInit: (data: any) => void;
-    onError: (data: any) => void;
+    onEvent: (event: any) => void;
 }
 
 declare var gdApi: any;
+declare var GD_OPTIONS: IGameDistributionSettings;
