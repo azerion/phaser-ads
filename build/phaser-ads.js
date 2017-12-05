@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.2.3 
+ * phaser-ads - version 2.2.4 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 29-11-2017
+ * Build at 04-12-2017
  * Released under MIT License 
  */
 
@@ -589,8 +589,9 @@ var PhaserAds;
                     this.adManager.onContentResumed.dispatch();
                 }
                 else {
-                    if (gdApi && typeof gdApi.showBanner === 'undefined') {
-                        //So gdApi is available, but showBanner is not there (weird but can happen)
+                    if (typeof gdApi === 'undefined' || (gdApi && typeof gdApi.showBanner === 'undefined')) {
+                        //So gdApi isn't available OR
+                        //gdApi is available, but showBanner is not there (weird but can happen)
                         this.adsEnabled = false;
                         this.adManager.unMuteAfterAd();
                         this.adManager.onContentResumed.dispatch();
