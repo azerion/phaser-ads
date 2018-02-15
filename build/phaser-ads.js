@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.2.5-rc8 
+ * phaser-ads - version 2.2.5-rc9 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 14-02-2018
+ * Build at 15-02-2018
  * Released under MIT License 
  */
 
@@ -379,7 +379,6 @@ var PhaserAds;
         var CordovaGameDistribution = (function () {
             function CordovaGameDistribution(game, gameId, userId, debug) {
                 if (debug === void 0) { debug = false; }
-                var _this = this;
                 this.adsEnabled = false;
                 if (cordova.plugins === undefined ||
                     (cordova.plugins !== undefined && cordova.plugins.gdApi === undefined)) {
@@ -396,16 +395,9 @@ var PhaserAds;
                     gameId,
                     userId
                 ], function (data) {
-                    console.log('success!', data);
-                    _this.adsEnabled = true;
+                    console.log('API init success!', data);
                 }, function (error) {
-                    console.log('error!', error);
-                    if (error === 'Api is already initialized!') {
-                        _this.adsEnabled = true;
-                    }
-                    else {
-                        _this.adsEnabled = false;
-                    }
+                    console.log('API init error!', error);
                 });
             }
             CordovaGameDistribution.prototype.setAdListeners = function () {
@@ -417,12 +409,12 @@ var PhaserAds;
                         case 'BANNER_STARTED':
                             _this.adManager.onContentPaused.dispatch();
                             break;
+                        case 'API_IS_READY':
+                            //Send post init
+                            _this.adsEnabled = true;
+                            break;
                         case 'BANNER_CLOSED':
-                            _this.adManager.onContentResumed.dispatch();
-                            break;
                         case 'API_NOT_READY':
-                            _this.adManager.onContentResumed.dispatch();
-                            break;
                         case 'BANNER_FAILED':
                             _this.adManager.onContentResumed.dispatch();
                             break;

@@ -24,17 +24,10 @@ module PhaserAds {
                     gameId,
                     userId
                 ], (data: any) => {
-                    console.log('success!', data);
-                    this.adsEnabled = true;
+                    console.log('API init success!', data);
                 }, (error: any) => {
-                    console.log('error!', error);
-                    if (error === 'Api is already initialized!') {
-                        this.adsEnabled = true;
-                    } else {
-                        this.adsEnabled = false;
-                    }
-
-                });no
+                    console.log('API init error!', error);
+                });
             }
 
             private setAdListeners(): void {
@@ -45,12 +38,12 @@ module PhaserAds {
                         case 'BANNER_STARTED':
                             this.adManager.onContentPaused.dispatch();
                             break;
+                        case 'API_IS_READY':
+                            //Send post init
+                            this.adsEnabled = true;
+                            break;
                         case 'BANNER_CLOSED':
-                            this.adManager.onContentResumed.dispatch();
-                            break;
                         case 'API_NOT_READY':
-                            this.adManager.onContentResumed.dispatch();
-                            break;
                         case 'BANNER_FAILED':
                             this.adManager.onContentResumed.dispatch();
                             break;
