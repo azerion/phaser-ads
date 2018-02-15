@@ -1,5 +1,5 @@
 /*!
- * phaser-ads - version 2.2.5-rc10 
+ * phaser-ads - version 2.2.5 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
@@ -386,11 +386,9 @@ var PhaserAds;
                     return;
                 }
                 if (debug) {
-                    console.log('Enabling test ads');
                     cordova.plugins.gdApi.enableTestAds();
                 }
                 this.setAdListeners();
-                console.log('Initialising API');
                 cordova.plugins.gdApi.init([
                     gameId,
                     userId
@@ -402,7 +400,6 @@ var PhaserAds;
             }
             CordovaGameDistribution.prototype.setAdListeners = function () {
                 var _this = this;
-                console.log('Adding ad listeners');
                 cordova.plugins.gdApi.setAdListener(function (data) {
                     console.log('banner reply, data.event', data.event, data);
                     switch (data.event) {

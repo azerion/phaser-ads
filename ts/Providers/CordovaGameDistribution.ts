@@ -14,12 +14,10 @@ module PhaserAds {
                 }
 
                 if (debug) {
-                    console.log('Enabling test ads');
                     cordova.plugins.gdApi.enableTestAds();
                 }
 
                 this.setAdListeners();
-                console.log('Initialising API');
                 (<CordovaPluginGdApi>cordova.plugins.gdApi).init([
                     gameId,
                     userId
@@ -31,7 +29,6 @@ module PhaserAds {
             }
 
             private setAdListeners(): void {
-                console.log('Adding ad listeners');
                 (<CordovaPluginGdApi>cordova.plugins.gdApi).setAdListener((data: any) => {
                     console.log('banner reply, data.event', data.event, data);
                     switch (data.event) {
