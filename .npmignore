@@ -5,6 +5,5 @@ ts
 node_modules
 .tscache
 deploy
-vendor
 config
 .github

@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.2.4 
+ * phaser-ads - version 2.2.5-rc8 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 04-12-2017
+ * Build at 14-02-2018
  * Released under MIT License 
  */
 
@@ -370,6 +370,102 @@ var PhaserAds;
             return CocoonAds;
         }());
         AdProvider.CocoonAds = CocoonAds;
+    })(AdProvider = PhaserAds.AdProvider || (PhaserAds.AdProvider = {}));
+})(PhaserAds || (PhaserAds = {}));
+var PhaserAds;
+(function (PhaserAds) {
+    var AdProvider;
+    (function (AdProvider) {
+        var CordovaGameDistribution = (function () {
+            function CordovaGameDistribution(game, gameId, userId, debug) {
+                if (debug === void 0) { debug = false; }
+                var _this = this;
+                this.adsEnabled = false;
+                if (cordova.plugins === undefined ||
+                    (cordova.plugins !== undefined && cordova.plugins.gdApi === undefined)) {
+                    console.log('gdApi not available!');
+                    return;
+                }
+                if (debug) {
+                    console.log('Enabling test ads');
+                    cordova.plugins.gdApi.enableTestAds();
+                }
+                this.setAdListeners();
+                console.log('Initialising API');
+                cordova.plugins.gdApi.init([
+                    gameId,
+                    userId
+                ], function (data) {
+                    console.log('success!', data);
+                    _this.adsEnabled = true;
+                }, function (error) {
+                    console.log('error!', error);
+                    if (error === 'Api is already initialized!') {
+                        _this.adsEnabled = true;
+                    }
+                    else {
+                        _this.adsEnabled = false;
+                    }
+                });
+            }
+            CordovaGameDistribution.prototype.setAdListeners = function () {
+                var _this = this;
+                console.log('Adding ad listeners');
+                cordova.plugins.gdApi.setAdListener(function (data) {
+                    console.log('banner reply, data.event', data.event, data);
+                    switch (data.event) {
+                        case 'BANNER_STARTED':
+                            _this.adManager.onContentPaused.dispatch();
+                            break;
+                        case 'BANNER_CLOSED':
+                            _this.adManager.onContentResumed.dispatch();
+                            break;
+                        case 'API_NOT_READY':
+                            _this.adManager.onContentResumed.dispatch();
+                            break;
+                        case 'BANNER_FAILED':
+                            _this.adManager.onContentResumed.dispatch();
+                            break;
+                    }
+                }, function (error) {
+                    console.log('Set listener error:', error);
+                    _this.adsEnabled = false;
+                });
+            };
+            CordovaGameDistribution.prototype.setManager = function (manager) {
+                this.adManager = manager;
+            };
+            CordovaGameDistribution.prototype.showAd = function (adType) {
+                var _this = this;
+                if (this.adsEnabled) {
+                    console.log('show banner called');
+                    cordova.plugins.gdApi.showBanner(function (data) {
+                        console.log('Show banner worked', data);
+                    }, function (data) {
+                        console.log('Could not show banner:', data);
+                        _this.adManager.onContentResumed.dispatch();
+                    });
+                }
+                else {
+                    console.log('Ads not enabled, resuming');
+                    this.adManager.onContentResumed.dispatch();
+                }
+            };
+            //Does nothing, but needed for Provider interface
+            CordovaGameDistribution.prototype.preloadAd = function () {
+                return;
+            };
+            //Does nothing, but needed for Provider interface
+            CordovaGameDistribution.prototype.destroyAd = function () {
+                return;
+            };
+            //Does nothing, but needed for Provider interface
+            CordovaGameDistribution.prototype.hideAd = function () {
+                return;
+            };
+            return CordovaGameDistribution;
+        }());
+        AdProvider.CordovaGameDistribution = CordovaGameDistribution;
     })(AdProvider = PhaserAds.AdProvider || (PhaserAds.AdProvider = {}));
 })(PhaserAds || (PhaserAds = {}));
 var PhaserAds;

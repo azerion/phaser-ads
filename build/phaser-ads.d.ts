@@ -100,6 +100,21 @@ declare module PhaserAds {
 }
 declare module PhaserAds {
     module AdProvider {
+        class CordovaGameDistribution implements PhaserAds.AdProvider.IProvider {
+            adManager: AdManager;
+            adsEnabled: boolean;
+            constructor(game: Phaser.Game, gameId: string, userId: string, debug?: boolean);
+            private setAdListeners();
+            setManager(manager: PhaserAds.AdManager): void;
+            showAd(adType?: GameDistributionAdType): void;
+            preloadAd(): void;
+            destroyAd(): void;
+            hideAd(): void;
+        }
+    }
+}
+declare module PhaserAds {
+    module AdProvider {
         enum HeyzapAdTypes {
             Interstitial = 0,
             Video = 1,
