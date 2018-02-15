@@ -42,6 +42,8 @@ module PhaserAds {
                             //Send post init
                             this.adsEnabled = true;
                             break;
+                        case 'API_ALREADY_INITIALIZED':
+                            break;
                         case 'BANNER_CLOSED':
                         case 'API_NOT_READY':
                         case 'BANNER_FAILED':

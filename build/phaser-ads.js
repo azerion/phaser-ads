@@ -1,5 +1,5 @@
 /*!
- * phaser-ads - version 2.2.5-rc9 
+ * phaser-ads - version 2.2.5-rc10 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
@@ -412,6 +412,8 @@ var PhaserAds;
                         case 'API_IS_READY':
                             //Send post init
                             _this.adsEnabled = true;
+                            break;
+                        case 'API_ALREADY_INITIALIZED':
                             break;
                         case 'BANNER_CLOSED':
                         case 'API_NOT_READY':
