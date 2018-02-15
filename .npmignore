@@ -4,3 +4,6 @@ ts
 .idea
 node_modules
 .tscache
+deploy
+config
+.github
