@@ -1,7 +1,7 @@
 {
   "name": "@orange-games/phaser-ads",
   "author": "OrangeGames",
-  "version": "2.2.5",
+  "version": "3.0.0-beta.2",
   "description": "A Phaser plugin for providing nice ads integration in your phaser.io game",
   "contributors": [
     {
@@ -13,32 +13,43 @@
     "type": "git",
     "url": "git@github.com:orange-games/phaser-ads.git"
   },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/orange-games/phaser-ads/raw/master/LICENSE"
-    }
-  ],
-  "bugs": [
-    {
-      "url": "https://github.com/orange-games/phaser-ads/issues"
-    }
-  ],
+  "license": "MIT",
+  "bugs": "https://github.com/orange-games/phaser-ads/issues",
+  "scripts": {
+    "dev": "webpack-dev-server --mode development --config ./config/webpack.dev.config.js",
+    "dist": "webpack --mode production --config ./config/webpack.dist.config.js --progress --colors"
+  },
   "config": {
     "name": "phaser-ads"
   },
+  "main": "./build/phaser-ads.min.js",
+  "types": "./build/ts/index.d.ts",
   "devDependencies": {
-    "@types/es6-promise": "0.0.32",
-    "grunt": "1.0.x",
-    "grunt-banner": "^0.6.0",
-    "grunt-contrib-clean": "1.0.x",
-    "grunt-contrib-connect": "1.0.x",
-    "grunt-contrib-uglify": "2.0.x",
-    "grunt-contrib-watch": "1.0.x",
-    "grunt-ts": "^6.0.0-beta.16",
-    "grunt-tslint": "^3.3.0",
-    "phaser": "2.6.2",
-    "tslint": "^3.15.1",
-    "typescript": "2.2.x"
+    "@types/es6-promise": "^3.3.0",
+    "@types/webfontloader": "^1.6.29",
+    "browser-sync": "^2.24.4",
+    "browser-sync-webpack-plugin": "^1.2.0",
+    "cache-loader": "^1.2.2",
+    "clean-webpack-plugin": "^0.1.19",
+    "copy-webpack-plugin": "^4.5.1",
+    "declaration-bundler-webpack-plugin": "^1.0.3",
+    "expose-loader": "^0.7.5",
+    "file-loader": "^1.1.11",
+    "fork-ts-checker-notifier-webpack-plugin": "^0.2.0",
+    "fork-ts-checker-webpack-plugin": "^0.2.10",
+    "happypack": "^4.0.1",
+    "html-webpack-plugin": "^2.30.1",
+    "raw-loader": "^0.5.1",
+    "ts-loader": "^4.3.0",
+    "tslint": "^5.10.0",
+    "tslint-loader": "^3.6.0",
+    "typescript": "^2.9.1",
+    "webpack": "^4.11.x",
+    "webpack-cli": "^3.0.2",
+    "webpack-dev-server": "^3.1.4"
+  },
+  "dependencies": {
+    "phaser": "^3.9.0",
+    "es6-promise-polyfill": "^1.2.0"
   }
 }
