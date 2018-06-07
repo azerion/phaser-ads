@@ -28,7 +28,7 @@ export default class PhaserAds extends Phaser.Events.EventEmitter {
     protected pluginManager: Phaser.Plugins.PluginManager;
     protected scene: Phaser.Scene;
     protected systems: Phaser.Scenes.Systems;
-    constructor(game: Phaser.Game);
+    constructor(pluginManager: Phaser.Plugins.PluginManager);
     init(): void;
     start(): void;
     stop(): void;

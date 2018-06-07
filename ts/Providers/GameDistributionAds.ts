@@ -9,7 +9,7 @@ export default class GameDistributionAds implements IProvider {
     constructor(game: Phaser.Game, gameId: string, userId: string) {
         this.areAdsEnabled();
 
-        GD_OPTIONS = <IGameDistributionSettings>{
+        (<any>window).GD_OPTIONS = <IGameDistributionSettings>{
             gameId: gameId,
             userId: userId,
             advertisementSettings: {

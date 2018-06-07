@@ -1,7 +1,7 @@
 {
   "name": "@orange-games/phaser-ads",
   "author": "OrangeGames",
-  "version": "3.0.0-beta.2",
+  "version": "3.0.0-beta.10",
   "description": "A Phaser plugin for providing nice ads integration in your phaser.io game",
   "contributors": [
     {

@@ -47,17 +47,32 @@ export default class PhaserAds extends Phaser.Events.EventEmitter {
 
     protected systems: Phaser.Scenes.Systems;
 
-    constructor(game: Phaser.Game) {
+    constructor(pluginManager: Phaser.Plugins.PluginManager) {
         super();
-        this.game = game;
-        this.pluginManager = this.game.plugins;
+        this.game = pluginManager.game;
+        this.pluginManager = pluginManager;
+        // console.log(arguments)
     }
 
-    public init(): void {};
-    public start(): void {};
-    public stop(): void {};
-    public boot(): void {};
-    public destroy(): void {};
+    public init(): void {
+        // console.log('init', arguments, this);
+    };
+    public start(): void {
+        // console.log('start', arguments, this);
+
+    };
+    public stop(): void {
+        // console.log('stop', arguments, this);
+
+    };
+    public boot(): void {
+        // console.log('boot', arguments, this);
+
+    };
+    public destroy(): void {
+        // console.log('destroy', arguments, this);
+
+    };
 
     /**
      * Here we set an adprovider, any can be given as long as it implements the IProvider interface
