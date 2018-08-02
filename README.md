@@ -54,7 +54,7 @@ So when you have your gameId you can start by registering the provider to the pl
 // Let's create a new provider, first argument should be the game, second should be the ad tag URL
 var provider = new PhaserAds.AdProvider.GameDistributionAds(
    game,                                        // Your Phaser game instance
-   '2d77cfd4b1e5487d998465c29de195b3'          // Your gameId
+   '2d77cfd4b1e5487d998465c29de195b3'           // Your gameId
 );
 game.ads.setAdProvider(provider);
 ```
