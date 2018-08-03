@@ -15,6 +15,13 @@ module PhaserAds {
         complete
     }
 
+    export enum AdType {
+        interstitial,
+        rewarded,
+        banner,
+        video
+    }
+
     export class AdManager extends Phaser.Plugin {
         public onContentPaused: Phaser.Signal = new Phaser.Signal();
 
@@ -66,7 +73,7 @@ module PhaserAds {
             }
 
             //Let's not do this for banner's
-            if (args[0] !== AdProvider.CocoonAdType.banner) {
+            if (args[0] !== AdType.banner) {
                 //first we check if the sound was already muted before we requested an add
                 this.wasMuted = this.game.sound.mute;
                 //Let's mute audio for the game, we can resume the audi playback once the add has played

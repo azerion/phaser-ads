@@ -57,7 +57,7 @@ module PhaserAds {
                 this.adManager = manager;
             }
 
-            public showAd(adType?: GameDistributionAdType): void {
+            public showAd(adType?: AdType): void {
                 if (this.adsEnabled) {
                     console.log('show banner called');
                     (<CordovaPluginGdApi>cordova.plugins.gdApi).showBanner((data: any) => {

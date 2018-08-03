@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.2.5 
+ * phaser-ads - version 2.2.6-rc.1 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 15-02-2018
+ * Build at 03-08-2018
  * Released under MIT License 
  */
 
@@ -27,6 +27,13 @@ var PhaserAds;
         AdEvent[AdEvent["thirdQuartile"] = 3] = "thirdQuartile";
         AdEvent[AdEvent["complete"] = 4] = "complete";
     })(AdEvent = PhaserAds.AdEvent || (PhaserAds.AdEvent = {}));
+    var AdType;
+    (function (AdType) {
+        AdType[AdType["interstitial"] = 0] = "interstitial";
+        AdType[AdType["rewarded"] = 1] = "rewarded";
+        AdType[AdType["banner"] = 2] = "banner";
+        AdType[AdType["video"] = 3] = "video";
+    })(AdType = PhaserAds.AdType || (PhaserAds.AdType = {}));
     var AdManager = (function (_super) {
         __extends(AdManager, _super);
         function AdManager(game, pluginManager) {
@@ -69,7 +76,7 @@ var PhaserAds;
                 throw new Error('Can not request an ad without an provider, please attach an ad provider!');
             }
             //Let's not do this for banner's
-            if (args[0] !== PhaserAds.AdProvider.CocoonAdType.banner) {
+            if (args[0] !== AdType.banner) {
                 //first we check if the sound was already muted before we requested an add
                 this.wasMuted = this.game.sound.mute;
                 //Let's mute audio for the game, we can resume the audi playback once the add has played
@@ -155,12 +162,6 @@ var PhaserAds;
             CocoonProvider[CocoonProvider["Chartboost"] = 2] = "Chartboost";
             CocoonProvider[CocoonProvider["Heyzap"] = 3] = "Heyzap";
         })(CocoonProvider = AdProvider.CocoonProvider || (AdProvider.CocoonProvider = {}));
-        var CocoonAdType;
-        (function (CocoonAdType) {
-            CocoonAdType[CocoonAdType["banner"] = 0] = "banner";
-            CocoonAdType[CocoonAdType["interstitial"] = 1] = "interstitial";
-            CocoonAdType[CocoonAdType["insentive"] = 2] = "insentive";
-        })(CocoonAdType = AdProvider.CocoonAdType || (AdProvider.CocoonAdType = {}));
         var CocoonAds = (function () {
             function CocoonAds(game, provider, config) {
                 this.adsEnabled = false;
@@ -168,8 +169,8 @@ var PhaserAds;
                 this.bannerShowable = false;
                 this.interstitial = null;
                 this.interstitialShowable = false;
-                this.insentive = null;
-                this.insentiveShowable = false;
+                this.rewarded = null;
+                this.rewardedShowable = false;
                 if ((game.device.cordova || game.device.crosswalk) && (Cocoon && Cocoon.Ad)) {
                     this.adsEnabled = true;
                 }
@@ -199,12 +200,12 @@ var PhaserAds;
             CocoonAds.prototype.showAd = function (adType) {
                 if (!this.adsEnabled) {
                     this.adManager.unMuteAfterAd();
-                    if (!(adType === CocoonAdType.banner)) {
+                    if (!(adType === PhaserAds.AdType.banner)) {
                         this.adManager.onContentResumed.dispatch();
                     }
                     return;
                 }
-                if (adType === CocoonAdType.banner) {
+                if (adType === PhaserAds.AdType.banner) {
                     if (!this.bannerShowable || null === this.banner) {
                         this.adManager.unMuteAfterAd();
                         //No banner ad available, skipping
@@ -215,23 +216,23 @@ var PhaserAds;
                     this.adManager.bannerActive = true;
                     this.banner.show();
                 }
-                if (adType === CocoonAdType.interstitial) {
+                if (adType === PhaserAds.AdType.interstitial) {
                     if (!this.interstitialShowable || null === this.interstitial) {
                         this.adManager.unMuteAfterAd();
                         //No banner ad available, skipping
-                        this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
+                        this.adManager.onContentResumed.dispatch(PhaserAds.AdType.interstitial);
                         return;
                     }
                     this.interstitial.show();
                 }
-                if (adType === CocoonAdType.insentive) {
-                    if (!this.insentiveShowable || null === this.insentive) {
+                if (adType === PhaserAds.AdType.rewarded) {
+                    if (!this.rewardedShowable || null === this.rewarded) {
                         this.adManager.unMuteAfterAd();
                         //No banner ad available, skipping
-                        this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
+                        this.adManager.onContentResumed.dispatch(PhaserAds.AdType.rewarded);
                         return;
                     }
-                    this.insentive.show();
+                    this.rewarded.show();
                 }
             };
             CocoonAds.prototype.preloadAd = function (adType, adId, bannerPosition) {
@@ -241,7 +242,7 @@ var PhaserAds;
                 }
                 //Some cleanup before preloading a new ad
                 this.destroyAd(adType);
-                if (adType === CocoonAdType.banner) {
+                if (adType === PhaserAds.AdType.banner) {
                     this.banner = this.cocoonProvider.createBanner(adId);
                     if (bannerPosition) {
                         this.banner.setLayout(bannerPosition);
@@ -254,24 +255,24 @@ var PhaserAds;
                         _this.banner = null;
                     });
                     this.banner.on('click', function () {
-                        _this.adManager.onAdClicked.dispatch(CocoonAdType.banner);
+                        _this.adManager.onAdClicked.dispatch(PhaserAds.AdType.banner);
                     });
                     //Banner don't pause or resume content
                     this.banner.on('show', function () {
                         /*this.adManager.onBannerShown.dispatch(this.banner.width, this.banner.height);
                         this.adManager.bannerActive = true;*/
-                        // this.adManager.onContentPaused.dispatch(CocoonAdType.banner);
+                        // this.adManager.onContentPaused.dispatch(AdType.banner);
                     });
                     this.banner.on('dismiss', function () {
                         /*this.adManager.bannerActive = false;
                         this.adManager.onBannerHidden.dispatch(this.banner.width, this.banner.height);*/
-                        // this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
+                        // this.adManager.onContentResumed.dispatch(AdType.banner);
                         // this.bannerShowable = false;
                         // this.banner = null;
                     });
                     this.banner.load();
                 }
-                if (adType === CocoonAdType.interstitial) {
+                if (adType === PhaserAds.AdType.interstitial) {
                     this.interstitial = this.cocoonProvider.createInterstitial(adId);
                     this.interstitial.on('load', function () {
                         _this.interstitialShowable = true;
@@ -281,54 +282,54 @@ var PhaserAds;
                         _this.interstitial = null;
                     });
                     this.interstitial.on('click', function () {
-                        _this.adManager.onAdClicked.dispatch(CocoonAdType.interstitial);
+                        _this.adManager.onAdClicked.dispatch(PhaserAds.AdType.interstitial);
                     });
                     this.interstitial.on('show', function () {
-                        _this.adManager.onContentPaused.dispatch(CocoonAdType.interstitial);
+                        _this.adManager.onContentPaused.dispatch(PhaserAds.AdType.interstitial);
                     });
                     this.interstitial.on('dismiss', function () {
                         _this.adManager.unMuteAfterAd();
-                        _this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
+                        _this.adManager.onContentResumed.dispatch(PhaserAds.AdType.interstitial);
                         _this.interstitialShowable = false;
                         _this.interstitial = null;
                     });
                     this.interstitial.load();
                 }
-                if (adType === CocoonAdType.insentive) {
-                    this.insentive = this.cocoonProvider.createRewardedVideo(adId);
-                    this.insentive.on('load', function () {
-                        _this.insentiveShowable = true;
+                if (adType === PhaserAds.AdType.rewarded) {
+                    this.rewarded = this.cocoonProvider.createRewardedVideo(adId);
+                    this.rewarded.on('load', function () {
+                        _this.rewardedShowable = true;
                     });
-                    this.insentive.on('fail', function () {
-                        _this.insentiveShowable = false;
-                        _this.insentive = null;
+                    this.rewarded.on('fail', function () {
+                        _this.rewardedShowable = false;
+                        _this.rewarded = null;
                     });
-                    this.insentive.on('click', function () {
-                        _this.adManager.onAdClicked.dispatch(CocoonAdType.insentive);
+                    this.rewarded.on('click', function () {
+                        _this.adManager.onAdClicked.dispatch(PhaserAds.AdType.rewarded);
                     });
-                    this.insentive.on('show', function () {
-                        _this.adManager.onContentPaused.dispatch(CocoonAdType.insentive);
+                    this.rewarded.on('show', function () {
+                        _this.adManager.onContentPaused.dispatch(PhaserAds.AdType.rewarded);
                     });
-                    this.insentive.on('dismiss', function () {
+                    this.rewarded.on('dismiss', function () {
                         _this.adManager.unMuteAfterAd();
-                        _this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
-                        _this.insentiveShowable = false;
-                        _this.insentive = null;
+                        _this.adManager.onContentResumed.dispatch(PhaserAds.AdType.rewarded);
+                        _this.rewardedShowable = false;
+                        _this.rewarded = null;
                     });
-                    this.insentive.on('reward', function () {
+                    this.rewarded.on('reward', function () {
                         _this.adManager.unMuteAfterAd();
-                        _this.adManager.onAdRewardGranted.dispatch(CocoonAdType.insentive);
-                        _this.insentiveShowable = false;
-                        _this.insentive = null;
+                        _this.adManager.onAdRewardGranted.dispatch(PhaserAds.AdType.rewarded);
+                        _this.rewardedShowable = false;
+                        _this.rewarded = null;
                     });
-                    this.insentive.load();
+                    this.rewarded.load();
                 }
             };
             CocoonAds.prototype.destroyAd = function (adType) {
                 if (!this.adsEnabled) {
                     return;
                 }
-                if (adType === CocoonAdType.banner && null !== this.banner) {
+                if (adType === PhaserAds.AdType.banner && null !== this.banner) {
                     //Releasing banners will fail on cocoon due to:
                     // https://github.com/ludei/atomic-plugins-ads/pull/12
                     try {
@@ -340,7 +341,7 @@ var PhaserAds;
                     this.banner = null;
                     this.bannerShowable = false;
                 }
-                if (adType === CocoonAdType.interstitial && null !== this.interstitial) {
+                if (adType === PhaserAds.AdType.interstitial && null !== this.interstitial) {
                     this.cocoonProvider.releaseInterstitial(this.interstitial);
                     this.interstitial = null;
                     this.interstitialShowable = false;
@@ -350,21 +351,21 @@ var PhaserAds;
                 if (!this.adsEnabled) {
                     return;
                 }
-                if (adType === CocoonAdType.interstitial && null !== this.interstitial) {
+                if (adType === PhaserAds.AdType.interstitial && null !== this.interstitial) {
                     this.interstitial.hide();
-                    // this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
+                    // this.adManager.onContentResumed.dispatch(AdType.interstitial);
                 }
-                if (adType === CocoonAdType.banner && null !== this.banner) {
+                if (adType === PhaserAds.AdType.banner && null !== this.banner) {
                     if (this.adManager.bannerActive) {
                         this.adManager.bannerActive = false;
                         this.adManager.onBannerHidden.dispatch(this.banner.width, this.banner.height);
                     }
                     this.banner.hide();
-                    // this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
+                    // this.adManager.onContentResumed.dispatch(AdType.banner);
                 }
-                if (adType === CocoonAdType.insentive && null !== this.insentive) {
-                    this.insentive.hide();
-                    // this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
+                if (adType === PhaserAds.AdType.rewarded && null !== this.rewarded) {
+                    this.rewarded.hide();
+                    // this.adManager.onContentResumed.dispatch(AdType.rewarded);
                 }
             };
             return CocoonAds;
@@ -618,13 +619,9 @@ var PhaserAds;
 (function (PhaserAds) {
     var AdProvider;
     (function (AdProvider) {
-        var GameDistributionAdType;
-        (function (GameDistributionAdType) {
-            GameDistributionAdType[GameDistributionAdType["preroll"] = 0] = "preroll";
-            GameDistributionAdType[GameDistributionAdType["midroll"] = 1] = "midroll";
-        })(GameDistributionAdType = AdProvider.GameDistributionAdType || (AdProvider.GameDistributionAdType = {}));
         var GameDistributionAds = (function () {
             function GameDistributionAds(game, gameId, userId) {
+                if (userId === void 0) { userId = ''; }
                 var _this = this;
                 this.adsEnabled = true;
                 this.areAdsEnabled();
@@ -670,7 +667,7 @@ var PhaserAds;
             GameDistributionAds.prototype.setManager = function (manager) {
                 this.adManager = manager;
             };
-            GameDistributionAds.prototype.showAd = function (adType) {
+            GameDistributionAds.prototype.showAd = function () {
                 if (!this.adsEnabled) {
                     this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();

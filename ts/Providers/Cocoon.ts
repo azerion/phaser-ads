@@ -7,12 +7,6 @@ module PhaserAds {
             Heyzap
         }
 
-        export enum CocoonAdType {
-            banner,
-            interstitial,
-            insentive
-        }
-
         export class CocoonAds implements IProvider {
             public adManager: AdManager;
 
@@ -28,9 +22,9 @@ module PhaserAds {
 
             private interstitialShowable: boolean = false;
 
-            private insentive: Cocoon.Ad.IBanner = null;
+            private rewarded: Cocoon.Ad.IBanner = null;
 
-            private insentiveShowable: boolean = false;
+            private rewardedShowable: boolean = false;
 
             constructor(game: Phaser.Game, provider: CocoonProvider, config?: any) {
                 if ((game.device.cordova || game.device.crosswalk) && (Cocoon && Cocoon.Ad)) {
@@ -62,16 +56,16 @@ module PhaserAds {
                 this.adManager = manager;
             }
 
-            public showAd(adType: CocoonAdType): void {
+            public showAd(adType: AdType): void {
                 if (!this.adsEnabled) {
                     this.adManager.unMuteAfterAd();
-                    if (!(adType === CocoonAdType.banner)) {
+                    if (!(adType === AdType.banner)) {
                         this.adManager.onContentResumed.dispatch();
                     }
                     return;
                 }
 
-                if (adType === CocoonAdType.banner) {
+                if (adType === AdType.banner) {
                     if (!this.bannerShowable || null === this.banner) {
                         this.adManager.unMuteAfterAd();
                         //No banner ad available, skipping
@@ -83,30 +77,30 @@ module PhaserAds {
                     this.banner.show();
                 }
 
-                if (adType === CocoonAdType.interstitial) {
+                if (adType === AdType.interstitial) {
                     if (!this.interstitialShowable || null === this.interstitial) {
                         this.adManager.unMuteAfterAd();
                         //No banner ad available, skipping
-                        this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
+                        this.adManager.onContentResumed.dispatch(AdType.interstitial);
                         return;
                     }
 
                     this.interstitial.show();
                 }
 
-                if (adType === CocoonAdType.insentive) {
-                    if (!this.insentiveShowable || null === this.insentive) {
+                if (adType === AdType.rewarded) {
+                    if (!this.rewardedShowable || null === this.rewarded) {
                         this.adManager.unMuteAfterAd();
                         //No banner ad available, skipping
-                        this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
+                        this.adManager.onContentResumed.dispatch(AdType.rewarded);
                         return;
                     }
 
-                    this.insentive.show();
+                    this.rewarded.show();
                 }
             }
 
-            public preloadAd(adType: CocoonAdType, adId?: string, bannerPosition?: string): void {
+            public preloadAd(adType: AdType, adId?: string, bannerPosition?: string): void {
                 if (!this.adsEnabled) {
                     return;
                 }
@@ -114,7 +108,7 @@ module PhaserAds {
                 //Some cleanup before preloading a new ad
                 this.destroyAd(adType);
 
-                if (adType === CocoonAdType.banner) {
+                if (adType === AdType.banner) {
                     this.banner = this.cocoonProvider.createBanner(adId);
                     if (bannerPosition) {
                         this.banner.setLayout(bannerPosition);
@@ -127,27 +121,27 @@ module PhaserAds {
                         this.banner = null;
                     });
                     this.banner.on('click', () => {
-                        this.adManager.onAdClicked.dispatch(CocoonAdType.banner);
+                        this.adManager.onAdClicked.dispatch(AdType.banner);
                     });
 
                     //Banner don't pause or resume content
                     this.banner.on('show', () => {
                         /*this.adManager.onBannerShown.dispatch(this.banner.width, this.banner.height);
                         this.adManager.bannerActive = true;*/
-                        // this.adManager.onContentPaused.dispatch(CocoonAdType.banner);
+                        // this.adManager.onContentPaused.dispatch(AdType.banner);
                     });
 
                     this.banner.on('dismiss', () => {
                         /*this.adManager.bannerActive = false;
                         this.adManager.onBannerHidden.dispatch(this.banner.width, this.banner.height);*/
-                        // this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
+                        // this.adManager.onContentResumed.dispatch(AdType.banner);
                         // this.bannerShowable = false;
                         // this.banner = null;
                     });
                     this.banner.load();
                 }
 
-                if (adType === CocoonAdType.interstitial) {
+                if (adType === AdType.interstitial) {
                     this.interstitial = this.cocoonProvider.createInterstitial(adId);
                     this.interstitial.on('load', () => {
                         this.interstitialShowable = true;
@@ -157,62 +151,62 @@ module PhaserAds {
                         this.interstitial = null;
                     });
                     this.interstitial.on('click', () => {
-                        this.adManager.onAdClicked.dispatch(CocoonAdType.interstitial);
+                        this.adManager.onAdClicked.dispatch(AdType.interstitial);
                     });
 
                     this.interstitial.on('show', () => {
-                        this.adManager.onContentPaused.dispatch(CocoonAdType.interstitial);
+                        this.adManager.onContentPaused.dispatch(AdType.interstitial);
                     });
 
                     this.interstitial.on('dismiss', () => {
                         this.adManager.unMuteAfterAd();
-                        this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
+                        this.adManager.onContentResumed.dispatch(AdType.interstitial);
                         this.interstitialShowable = false;
                         this.interstitial = null;
                     });
                     this.interstitial.load();
                 }
 
-                if (adType === CocoonAdType.insentive) {
-                    this.insentive = this.cocoonProvider.createRewardedVideo(adId);
-                    this.insentive.on('load', () => {
-                        this.insentiveShowable = true;
+                if (adType === AdType.rewarded) {
+                    this.rewarded = this.cocoonProvider.createRewardedVideo(adId);
+                    this.rewarded.on('load', () => {
+                        this.rewardedShowable = true;
                     });
-                    this.insentive.on('fail', () => {
-                        this.insentiveShowable = false;
-                        this.insentive = null;
+                    this.rewarded.on('fail', () => {
+                        this.rewardedShowable = false;
+                        this.rewarded = null;
                     });
-                    this.insentive.on('click', () => {
-                        this.adManager.onAdClicked.dispatch(CocoonAdType.insentive);
-                    });
-
-                    this.insentive.on('show', () => {
-                        this.adManager.onContentPaused.dispatch(CocoonAdType.insentive);
+                    this.rewarded.on('click', () => {
+                        this.adManager.onAdClicked.dispatch(AdType.rewarded);
                     });
 
-                    this.insentive.on('dismiss', () => {
+                    this.rewarded.on('show', () => {
+                        this.adManager.onContentPaused.dispatch(AdType.rewarded);
+                    });
+
+                    this.rewarded.on('dismiss', () => {
                         this.adManager.unMuteAfterAd();
-                        this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
-                        this.insentiveShowable = false;
-                        this.insentive = null;
+                        this.adManager.onContentResumed.dispatch(AdType.rewarded);
+                        this.rewardedShowable = false;
+                        this.rewarded = null;
                     });
 
-                    this.insentive.on('reward', () => {
+                    this.rewarded.on('reward', () => {
                         this.adManager.unMuteAfterAd();
-                        this.adManager.onAdRewardGranted.dispatch(CocoonAdType.insentive);
-                        this.insentiveShowable = false;
-                        this.insentive = null;
+                        this.adManager.onAdRewardGranted.dispatch(AdType.rewarded);
+                        this.rewardedShowable = false;
+                        this.rewarded = null;
                     });
-                    this.insentive.load();
+                    this.rewarded.load();
                 }
             }
 
-            public destroyAd(adType: CocoonAdType): void {
+            public destroyAd(adType: AdType): void {
                 if (!this.adsEnabled) {
                     return;
                 }
 
-                if (adType === CocoonAdType.banner && null !== this.banner) {
+                if (adType === AdType.banner && null !== this.banner) {
                     //Releasing banners will fail on cocoon due to:
                     // https://github.com/ludei/atomic-plugins-ads/pull/12
                     try {
@@ -224,38 +218,38 @@ module PhaserAds {
                     this.bannerShowable = false;
                 }
 
-                if (adType === CocoonAdType.interstitial && null !== this.interstitial) {
+                if (adType === AdType.interstitial && null !== this.interstitial) {
                     this.cocoonProvider.releaseInterstitial(this.interstitial);
                     this.interstitial = null;
                     this.interstitialShowable = false;
                 }
             }
 
-            public hideAd(adType: CocoonAdType): void {
+            public hideAd(adType: AdType): void {
                 if (!this.adsEnabled) {
                     return;
                 }
 
-                if (adType === CocoonAdType.interstitial && null !== this.interstitial) {
+                if (adType === AdType.interstitial && null !== this.interstitial) {
                     this.interstitial.hide();
 
-                    // this.adManager.onContentResumed.dispatch(CocoonAdType.interstitial);
+                    // this.adManager.onContentResumed.dispatch(AdType.interstitial);
                 }
 
-                if (adType === CocoonAdType.banner && null !== this.banner) {
+                if (adType === AdType.banner && null !== this.banner) {
                     if (this.adManager.bannerActive) {
                         this.adManager.bannerActive = false;
                         this.adManager.onBannerHidden.dispatch(this.banner.width, this.banner.height);
                     }
                     this.banner.hide();
 
-                    // this.adManager.onContentResumed.dispatch(CocoonAdType.banner);
+                    // this.adManager.onContentResumed.dispatch(AdType.banner);
                 }
 
-                if (adType === CocoonAdType.insentive && null !== this.insentive) {
-                    this.insentive.hide();
+                if (adType === AdType.rewarded && null !== this.rewarded) {
+                    this.rewarded.hide();
 
-                    // this.adManager.onContentResumed.dispatch(CocoonAdType.insentive);
+                    // this.adManager.onContentResumed.dispatch(AdType.rewarded);
                 }
             }
 

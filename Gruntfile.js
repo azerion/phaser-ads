@@ -26,7 +26,7 @@ module.exports = function (grunt) {
         //Typescript settings per build
         ts: {
             dist: {
-                tsconfig: './config/tsconfig.json',
+                tsconfig: './tsconfig.json',
                 src: ['ts/**/*.ts'],
                 dest: 'build/<%= pkg.config.name %>.js'
             }
@@ -74,7 +74,7 @@ module.exports = function (grunt) {
         tslint: {
             options: {
                 // can be a configuration object or a filepath to tslint.json
-                configuration: "./config/tslint.json"
+                configuration: "./tslint.json"
             },
             dist: {
                 src: [
