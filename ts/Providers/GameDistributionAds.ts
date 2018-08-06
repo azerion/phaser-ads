@@ -1,17 +1,12 @@
 
 module PhaserAds {
     export module AdProvider {
-        export enum GameDistributionAdType {
-            preroll,
-            midroll
-        }
-
         export class GameDistributionAds implements PhaserAds.AdProvider.IProvider {
             public adManager: AdManager;
 
             public adsEnabled: boolean = true;
 
-            constructor(game: Phaser.Game, gameId: string, userId: string) {
+            constructor(game: Phaser.Game, gameId: string, userId: string = '') {
                 this.areAdsEnabled();
 
                 GD_OPTIONS = <IGameDistributionSettings>{
@@ -59,7 +54,7 @@ module PhaserAds {
                 this.adManager = manager;
             }
 
-            public showAd(adType?: GameDistributionAdType): void {
+            public showAd(): void {
                 if (!this.adsEnabled) {
                     this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
