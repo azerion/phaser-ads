@@ -1,6 +1,11 @@
 
 module PhaserAds {
     export module AdProvider {
+        export enum GameDistributionAdType {
+            preroll,
+            midroll
+        }
+
         export class GameDistributionAds implements PhaserAds.AdProvider.IProvider {
             public adManager: AdManager;
 

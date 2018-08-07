@@ -136,6 +136,10 @@ declare module PhaserAds {
 }
 declare module PhaserAds {
     module AdProvider {
+        enum GameDistributionAdType {
+            preroll = 0,
+            midroll = 1,
+        }
         class GameDistributionAds implements PhaserAds.AdProvider.IProvider {
             adManager: AdManager;
             adsEnabled: boolean;
