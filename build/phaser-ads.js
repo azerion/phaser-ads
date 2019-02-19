@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.2.7 
+ * phaser-ads - version 2.2.8-alpha.1 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 07-08-2018
+ * Build at 19-02-2019
  * Released under MIT License 
  */
 
@@ -44,6 +44,7 @@ var PhaserAds;
             _this.onAdsDisabled = new Phaser.Signal();
             _this.onAdClicked = new Phaser.Signal();
             _this.onAdRewardGranted = new Phaser.Signal();
+            _this.onAdLoaded = new Phaser.Signal();
             _this.onBannerShown = new Phaser.Signal();
             _this.onBannerHidden = new Phaser.Signal();
             _this.bannerActive = false;
@@ -83,6 +84,9 @@ var PhaserAds;
                 this.game.sound.mute = true;
             }
             this.provider.showAd.apply(this.provider, args);
+        };
+        AdManager.prototype.isRewardedAvailable = function () {
+            return this.provider.hasRewarded;
         };
         /**
          * Some providers might require you to preload an ad before showing it, that can be done here
@@ -170,7 +174,7 @@ var PhaserAds;
                 this.interstitial = null;
                 this.interstitialShowable = false;
                 this.rewarded = null;
-                this.rewardedShowable = false;
+                this.hasRewarded = false;
                 if ((game.device.cordova || game.device.crosswalk) && (Cocoon && Cocoon.Ad)) {
                     this.adsEnabled = true;
                 }
@@ -226,7 +230,7 @@ var PhaserAds;
                     this.interstitial.show();
                 }
                 if (adType === PhaserAds.AdType.rewarded) {
-                    if (!this.rewardedShowable || null === this.rewarded) {
+                    if (!this.hasRewarded || null === this.rewarded) {
                         this.adManager.unMuteAfterAd();
                         //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(PhaserAds.AdType.rewarded);
@@ -298,10 +302,10 @@ var PhaserAds;
                 if (adType === PhaserAds.AdType.rewarded) {
                     this.rewarded = this.cocoonProvider.createRewardedVideo(adId);
                     this.rewarded.on('load', function () {
-                        _this.rewardedShowable = true;
+                        _this.hasRewarded = true;
                     });
                     this.rewarded.on('fail', function () {
-                        _this.rewardedShowable = false;
+                        _this.hasRewarded = false;
                         _this.rewarded = null;
                     });
                     this.rewarded.on('click', function () {
@@ -313,13 +317,13 @@ var PhaserAds;
                     this.rewarded.on('dismiss', function () {
                         _this.adManager.unMuteAfterAd();
                         _this.adManager.onContentResumed.dispatch(PhaserAds.AdType.rewarded);
-                        _this.rewardedShowable = false;
+                        _this.hasRewarded = false;
                         _this.rewarded = null;
                     });
                     this.rewarded.on('reward', function () {
                         _this.adManager.unMuteAfterAd();
                         _this.adManager.onAdRewardGranted.dispatch(PhaserAds.AdType.rewarded);
-                        _this.rewardedShowable = false;
+                        _this.hasRewarded = false;
                         _this.rewarded = null;
                     });
                     this.rewarded.load();
@@ -381,6 +385,7 @@ var PhaserAds;
             function CordovaGameDistribution(game, gameId, userId, debug) {
                 if (debug === void 0) { debug = false; }
                 this.adsEnabled = false;
+                this.hasRewarded = false;
                 if (cordova.plugins === undefined ||
                     (cordova.plugins !== undefined && cordova.plugins.gdApi === undefined)) {
                     console.log('gdApi not available!');
@@ -475,6 +480,7 @@ var PhaserAds;
             function CordovaHeyzap(game, publisherId) {
                 var _this = this;
                 this.adsEnabled = false;
+                this.hasRewarded = false;
                 if (game.device.cordova || game.device.crosswalk) {
                     this.adsEnabled = true;
                 }
@@ -621,39 +627,19 @@ var PhaserAds;
     (function (AdProvider) {
         var GameDistributionAdType;
         (function (GameDistributionAdType) {
-            GameDistributionAdType[GameDistributionAdType["preroll"] = 0] = "preroll";
-            GameDistributionAdType[GameDistributionAdType["midroll"] = 1] = "midroll";
+            GameDistributionAdType["interstitial"] = "interstitial";
+            GameDistributionAdType["rewarded"] = "rewarded";
         })(GameDistributionAdType = AdProvider.GameDistributionAdType || (AdProvider.GameDistributionAdType = {}));
         var GameDistributionAds = (function () {
             function GameDistributionAds(game, gameId, userId) {
                 if (userId === void 0) { userId = ''; }
-                var _this = this;
                 this.adsEnabled = true;
+                this.hasRewarded = false;
                 this.areAdsEnabled();
                 GD_OPTIONS = {
                     gameId: gameId,
-                    userId: userId,
                     advertisementSettings: {
                         autoplay: false
-                    },
-                    onEvent: function (event) {
-                        switch (event.name) {
-                            case 'SDK_GAME_START':
-                                if (typeof gdApi !== 'undefined') {
-                                    gdApi.play();
-                                }
-                                _this.adManager.unMuteAfterAd();
-                                _this.adManager.onContentResumed.dispatch();
-                                break;
-                            case 'SDK_GAME_PAUSE':
-                                _this.adManager.onContentPaused.dispatch();
-                                break;
-                            case 'SDK_READY':
-                                //add something here
-                                break;
-                            case 'SDK_ERROR':
-                                break;
-                        }
                     }
                 };
                 //Include script. even when adblock is enabled, this script also allows us to track our users;
@@ -665,20 +651,21 @@ var PhaserAds;
                     }
                     js = d.createElement(s);
                     js.id = id;
-                    js.src = '//html5.api.gamedistribution.com/main.min.js';
+                    js.src = '//html5.api.gamedistribution.com//test/main.min.js';
                     fjs.parentNode.insertBefore(js, fjs);
                 }(document, 'script', 'gamedistribution-jssdk'));
             }
             GameDistributionAds.prototype.setManager = function (manager) {
                 this.adManager = manager;
             };
-            GameDistributionAds.prototype.showAd = function () {
+            GameDistributionAds.prototype.showAd = function (adType) {
+                var _this = this;
                 if (!this.adsEnabled) {
                     this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
                 }
                 else {
-                    if (typeof gdApi === 'undefined' || (gdApi && typeof gdApi.showBanner === 'undefined')) {
+                    if (typeof gdsdk === 'undefined' || (gdsdk && typeof gdsdk.showAd === 'undefined')) {
                         //So gdApi isn't available OR
                         //gdApi is available, but showBanner is not there (weird but can happen)
                         this.adsEnabled = false;
@@ -686,12 +673,35 @@ var PhaserAds;
                         this.adManager.onContentResumed.dispatch();
                         return;
                     }
-                    gdApi.showBanner();
+                    if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === false) {
+                        this.adManager.unMuteAfterAd();
+                        this.adManager.onContentResumed.dispatch();
+                        return;
+                    }
+                    this.adManager.onContentPaused.dispatch();
+                    gdsdk.showAd((adType === PhaserAds.AdType.rewarded) ? GameDistributionAdType.rewarded : GameDistributionAdType.interstitial).then(function () {
+                        _this.adManager.unMuteAfterAd();
+                        _this.adManager.onContentResumed.dispatch();
+                        if (adType === PhaserAds.AdType.rewarded && _this.hasRewarded === true) {
+                            _this.adManager.onAdRewardGranted.dispatch();
+                            _this.hasRewarded = false;
+                        }
+                    }).catch(function () {
+                        _this.adManager.unMuteAfterAd();
+                        _this.adManager.onContentResumed.dispatch();
+                        if (adType === PhaserAds.AdType.rewarded && _this.hasRewarded === true) {
+                            _this.hasRewarded = false;
+                        }
+                    });
                 }
             };
             //Does nothing, but needed for Provider interface
-            GameDistributionAds.prototype.preloadAd = function () {
-                return;
+            GameDistributionAds.prototype.preloadAd = function (adType) {
+                var _this = this;
+                gdsdk.preloadAd(GameDistributionAdType.rewarded).then(function () {
+                    _this.hasRewarded = true;
+                    _this.adManager.onAdLoaded.dispatch(adType);
+                });
             };
             //Does nothing, but needed for Provider interface
             GameDistributionAds.prototype.destroyAd = function () {
@@ -742,6 +752,7 @@ var PhaserAds;
                 this.adsEnabled = true;
                 this.adTagUrl = '';
                 this.adRequested = false;
+                this.hasRewarded = false;
                 this.adManager = null;
                 this.resizeListener = null;
                 this.areAdsEnabled();

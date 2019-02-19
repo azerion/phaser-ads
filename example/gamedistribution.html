@@ -53,63 +53,68 @@
         }
 
         function create(){
+            var text = game.add.text(game.width / 2, game.height / 2, 'If you see this, there is no Ad being displayed', {
+                font: '30px Arial',
+                fill: '#ffffff'
+            });
+            text.anchor.set(0.5);
+            text.visible = false;
+
             //Let's play this sound file so we can mute it later
             game.add.audio('boden');
             game.sound.play('boden', 0.3, true);
 
             //Content paused event is fired when the content (game) should be paused, and the ad will be played
-            game.ads.onContentPaused.addOnce(function () {
+            game.ads.onContentPaused.add(function () {
                 game.sound.mute = true;
                 console.error('Started playing ad.');
             });
 
             //This is fired when the ad is finished playing and the content (game) should be resumed
-            game.ads.onContentResumed.addOnce(function () {
+            game.ads.onContentResumed.add(function () {
                 game.sound.mute = false;
+                text.visible = false;
                 console.error('Finished playing ad.');
             });
 
             //This is fired when the ad was clicked by the user
-            game.ads.onAdClicked.addOnce(function () {
+            game.ads.onAdClicked.add(function () {
                 console.error('Clicked the ad!');
             });
 
+            game.ads.onAdRewardGranted.add(function () {
+                console.error('Received ad reward!.');
+            });
+
             //This gives us details about how far the users is viewing the add
-            game.ads.onAdProgression.addOnce(function (progression) {
+            game.ads.onAdProgression.add(function (progression) {
                 console.error(progression);
             });
 
             //This is fired when the ad was clicked by the user
-            game.ads.onAdsDisabled.addOnce(function () {
+            game.ads.onAdsDisabled.add(function () {
                 console.error('Ads are being blocked.');
+            });
+
+            game.ads.onAdLoaded.add(function () {
+                console.error('Rewarded ad loaded.');
             });
 //            game.sound.mute = true;
 
             //called when the button is clicked
-            var showAd = function() {
-                //the actual game content, behind the ad
-                var text = game.add.text(game.width / 2, game.height / 2, 'If you see this, there is no Ad being displayed', {
-                    font: '30px Arial',
-                    fill: '#ffffff'
-                });
-                text.anchor.set(0.5);
+            var showAd = function(adType) {
+                text.visible = true;
 
                 var adsEnabled = game.ads.provider.adsEnabled;
                 if (adsEnabled) {
-                    if (game.device.desktop) {
-                        //This is how we request an ad for desktop
-                        game.ads.showAd();
-                    } else {
-                        //In mobile we need to activate it by user input
-                        game.ads.showAd();
-                    }
+                    game.ads.showAd(adType);
                 } else {
                     //the actual game content, behind the ad
-                    var text = game.add.text(game.width / 2, game.height / 2 + 60, 'Ads are being blocked.', {
+                    var block = game.add.text(game.width / 2, game.height / 2 + 60, 'Ads are being blocked.', {
                         font: '25px Arial',
                         fill: '#cc0000'
                     });
-                    text.anchor.set(0.5);
+                    block.anchor.set(0.5);
                 }
             }
 
@@ -119,9 +124,33 @@
                     .drawRoundedRect(0, 0, 200, 60, 13)
                     .endFill();
             var texture = graphics.generateTexture();
-            var button = game.add.button(game.width / 2, game.height *.75, texture, showAd);
+            var button = game.add.button(game.width / 2, game.height *.75, texture, function () {
+                showAd(PhaserAds.AdType.interstitial);
+            });
             button.anchor.set(0.5, 0.5);
             var label = game.add.text(0, 0, 'See ad', {
+                'font': 'bold 30px Arial',
+                'fill': '#000'
+            });
+            label.anchor.set(0.5);
+            button.addChild(label);
+
+            var button = game.add.button(game.width / 2, game.height *.5, texture, function () {
+                showAd(PhaserAds.AdType.rewarded);
+            });
+            button.anchor.set(0.5, 0.5);
+            var label = game.add.text(0, 0, 'See rewarded', {
+                'font': 'bold 30px Arial',
+                'fill': '#000'
+            });
+            label.anchor.set(0.5);
+            button.addChild(label);
+
+            var button = game.add.button(game.width / 2, game.height *.25, texture, function () {
+                game.ads.preloadAd(PhaserAds.AdType.rewarded);
+            });
+            button.anchor.set(0.5, 0.5);
+            var label = game.add.text(0, 0, 'Preload rewarded', {
                 'font': 'bold 30px Arial',
                 'fill': '#000'
             });

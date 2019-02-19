@@ -3,6 +3,7 @@ module PhaserAds {
         export interface IProvider {
             adManager: AdManager;
             adsEnabled: boolean;
+            hasRewarded: boolean;
 
             setManager(manager: AdManager): void;
             preloadAd(...args: any[]): void;

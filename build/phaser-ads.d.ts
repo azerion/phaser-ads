@@ -25,6 +25,7 @@ declare module PhaserAds {
         onAdsDisabled: Phaser.Signal;
         onAdClicked: Phaser.Signal;
         onAdRewardGranted: Phaser.Signal;
+        onAdLoaded: Phaser.Signal;
         onBannerShown: Phaser.Signal;
         onBannerHidden: Phaser.Signal;
         bannerActive: boolean;
@@ -42,6 +43,7 @@ declare module PhaserAds {
          * @param args
          */
         showAd(...args: any[]): void;
+        isRewardedAvailable(): boolean;
         /**
          * Some providers might require you to preload an ad before showing it, that can be done here
          *
@@ -89,7 +91,7 @@ declare module PhaserAds {
             private interstitial;
             private interstitialShowable;
             private rewarded;
-            private rewardedShowable;
+            hasRewarded: boolean;
             constructor(game: Phaser.Game, provider: CocoonProvider, config?: any);
             setManager(manager: AdManager): void;
             showAd(adType: AdType): void;
@@ -104,6 +106,7 @@ declare module PhaserAds {
         class CordovaGameDistribution implements PhaserAds.AdProvider.IProvider {
             adManager: AdManager;
             adsEnabled: boolean;
+            hasRewarded: boolean;
             constructor(game: Phaser.Game, gameId: string, userId: string, debug?: boolean);
             private setAdListeners();
             setManager(manager: PhaserAds.AdManager): void;
@@ -125,6 +128,7 @@ declare module PhaserAds {
         class CordovaHeyzap implements IProvider {
             adManager: AdManager;
             adsEnabled: boolean;
+            hasRewarded: boolean;
             constructor(game: Phaser.Game, publisherId: string);
             setManager(manager: AdManager): void;
             showAd(adType: HeyzapAdTypes, bannerAdPositions?: string): void;
@@ -137,16 +141,17 @@ declare module PhaserAds {
 declare module PhaserAds {
     module AdProvider {
         enum GameDistributionAdType {
-            preroll = 0,
-            midroll = 1,
+            interstitial = "interstitial",
+            rewarded = "rewarded",
         }
         class GameDistributionAds implements PhaserAds.AdProvider.IProvider {
             adManager: AdManager;
             adsEnabled: boolean;
+            hasRewarded: boolean;
             constructor(game: Phaser.Game, gameId: string, userId?: string);
             setManager(manager: PhaserAds.AdManager): void;
-            showAd(): void;
-            preloadAd(): void;
+            showAd(adType: AdType): void;
+            preloadAd(adType: PhaserAds.AdType): void;
             destroyAd(): void;
             hideAd(): void;
             /**
@@ -173,6 +178,7 @@ declare module PhaserAds {
             private adTagUrl;
             private game;
             private adRequested;
+            hasRewarded: boolean;
             adManager: AdManager;
             private resizeListener;
             constructor(game: Phaser.Game, adTagUrl: string);
@@ -220,6 +226,7 @@ declare module PhaserAds {
         interface IProvider {
             adManager: AdManager;
             adsEnabled: boolean;
+            hasRewarded: boolean;
             setManager(manager: AdManager): void;
             preloadAd(...args: any[]): void;
             destroyAd(...args: any[]): void;

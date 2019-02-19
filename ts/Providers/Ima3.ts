@@ -25,6 +25,8 @@ module PhaserAds {
 
             private adRequested: boolean = false;
 
+            public hasRewarded: boolean = false;
+
             public adManager: AdManager = null;
 
             private resizeListener: () => void = null;

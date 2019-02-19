@@ -35,6 +35,8 @@ module PhaserAds {
 
         public onAdRewardGranted: Phaser.Signal = new Phaser.Signal();
 
+        public onAdLoaded: Phaser.Signal = new Phaser.Signal();
+
         public onBannerShown: Phaser.Signal = new Phaser.Signal();
 
         public onBannerHidden: Phaser.Signal = new Phaser.Signal();
@@ -81,6 +83,10 @@ module PhaserAds {
             }
 
             this.provider.showAd.apply(this.provider, args);
+        }
+
+        public isRewardedAvailable(): boolean {
+            return this.provider.hasRewarded;
         }
 
         /**

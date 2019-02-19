@@ -2,8 +2,8 @@
 module PhaserAds {
     export module AdProvider {
         export enum GameDistributionAdType {
-            preroll,
-            midroll
+            interstitial = 'interstitial',
+            rewarded = 'rewarded'
         }
 
         export class GameDistributionAds implements PhaserAds.AdProvider.IProvider {
@@ -11,33 +11,15 @@ module PhaserAds {
 
             public adsEnabled: boolean = true;
 
+            public hasRewarded: boolean = false;
+
             constructor(game: Phaser.Game, gameId: string, userId: string = '') {
                 this.areAdsEnabled();
 
                 GD_OPTIONS = <IGameDistributionSettings>{
                     gameId: gameId,
-                    userId: userId,
                     advertisementSettings: {
                         autoplay: false
-                    },
-                    onEvent: (event: any): void => {
-                        switch (event.name) {
-                            case 'SDK_GAME_START':
-                                if (typeof gdApi !== 'undefined') {
-                                    gdApi.play();
-                                }
-                                this.adManager.unMuteAfterAd();
-                                this.adManager.onContentResumed.dispatch();
-                                break;
-                            case 'SDK_GAME_PAUSE':
-                                this.adManager.onContentPaused.dispatch();
-                                break;
-                            case 'SDK_READY':
-                                //add something here
-                                 break;
-                            case 'SDK_ERROR':
-                                break;
-                        }
                     }
                 };
 
@@ -50,7 +32,7 @@ module PhaserAds {
                     }
                     js = <HTMLScriptElement>d.createElement(s);
                     js.id = id;
-                    js.src = '//html5.api.gamedistribution.com/main.min.js';
+                    js.src = '//html5.api.gamedistribution.com//test/main.min.js';
                     fjs.parentNode.insertBefore(js, fjs);
                 }(document, 'script', 'gamedistribution-jssdk'));
             }
@@ -59,12 +41,12 @@ module PhaserAds {
                 this.adManager = manager;
             }
 
-            public showAd(): void {
+            public showAd(adType: AdType): void {
                 if (!this.adsEnabled) {
                     this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
                 } else {
-                    if (typeof gdApi === 'undefined' ||  (gdApi && typeof gdApi.showBanner === 'undefined')) {
+                    if (typeof gdsdk === 'undefined' ||  (gdsdk && typeof gdsdk.showAd === 'undefined')) {
                         //So gdApi isn't available OR
                         //gdApi is available, but showBanner is not there (weird but can happen)
                         this.adsEnabled = false;
@@ -74,13 +56,38 @@ module PhaserAds {
 
                         return;
                     }
-                    gdApi.showBanner();
+
+                    if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === false) {
+                        this.adManager.unMuteAfterAd();
+                        this.adManager.onContentResumed.dispatch();
+
+                        return;
+                    }
+
+                    this.adManager.onContentPaused.dispatch();
+                    gdsdk.showAd((adType === PhaserAds.AdType.rewarded) ? GameDistributionAdType.rewarded : GameDistributionAdType.interstitial).then(() => {
+                        this.adManager.unMuteAfterAd();
+                        this.adManager.onContentResumed.dispatch();
+                        if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === true) {
+                            this.adManager.onAdRewardGranted.dispatch();
+                            this.hasRewarded = false;
+                        }
+                    }).catch(() => {
+                        this.adManager.unMuteAfterAd();
+                        this.adManager.onContentResumed.dispatch();
+                        if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === true) {
+                            this.hasRewarded = false;
+                        }
+                    });
                 }
             }
 
             //Does nothing, but needed for Provider interface
-            public preloadAd(): void {
-                return;
+            public preloadAd(adType: PhaserAds.AdType): void {
+                gdsdk.preloadAd(GameDistributionAdType.rewarded).then(() => {
+                    this.hasRewarded = true;
+                    this.adManager.onAdLoaded.dispatch(adType);
+                });
             }
 
             //Does nothing, but needed for Provider interface

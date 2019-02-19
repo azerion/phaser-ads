@@ -5,6 +5,8 @@ module PhaserAds {
 
             public adsEnabled: boolean = false;
 
+            public hasRewarded: boolean = false;
+
             constructor(game: Phaser.Game, gameId: string, userId: string, debug: boolean = false) {
                 if (cordova.plugins === undefined ||
                     (cordova.plugins !== undefined && cordova.plugins.gdApi === undefined)
