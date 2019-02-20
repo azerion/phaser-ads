@@ -10,13 +10,13 @@ declare module PhaserAds {
         firstQuartile = 1,
         midPoint = 2,
         thirdQuartile = 3,
-        complete = 4,
+        complete = 4
     }
     enum AdType {
         interstitial = 0,
         rewarded = 1,
         banner = 2,
-        video = 3,
+        video = 3
     }
     class AdManager extends Phaser.Plugin {
         onContentPaused: Phaser.Signal;
@@ -80,7 +80,7 @@ declare module PhaserAds {
             AdMob = 0,
             MoPub = 1,
             Chartboost = 2,
-            Heyzap = 3,
+            Heyzap = 3
         }
         class CocoonAds implements IProvider {
             adManager: AdManager;
@@ -108,7 +108,7 @@ declare module PhaserAds {
             adsEnabled: boolean;
             hasRewarded: boolean;
             constructor(game: Phaser.Game, gameId: string, userId: string, debug?: boolean);
-            private setAdListeners();
+            private setAdListeners;
             setManager(manager: PhaserAds.AdManager): void;
             showAd(adType?: AdType): void;
             preloadAd(): void;
@@ -123,7 +123,7 @@ declare module PhaserAds {
             Interstitial = 0,
             Video = 1,
             Rewarded = 2,
-            Banner = 3,
+            Banner = 3
         }
         class CordovaHeyzap implements IProvider {
             adManager: AdManager;
@@ -142,7 +142,7 @@ declare module PhaserAds {
     module AdProvider {
         enum GameDistributionAdType {
             interstitial = "interstitial",
-            rewarded = "rewarded",
+            rewarded = "rewarded"
         }
         class GameDistributionAds implements PhaserAds.AdProvider.IProvider {
             adManager: AdManager;
@@ -158,7 +158,7 @@ declare module PhaserAds {
              * Checks if the ads are enabled (e.g; adblock is enabled or not)
              * @returns {boolean}
              */
-            private areAdsEnabled();
+            private areAdsEnabled;
         }
     }
 }
@@ -197,27 +197,27 @@ declare module PhaserAds {
              *
              * @param adsManagerLoadedEvent
              */
-            private onAdManagerLoader(adsManagerLoadedEvent);
+            private onAdManagerLoader;
             /**
              * Generic ad events are handled here
              * @param adEvent
              */
-            private onAdEvent(adEvent);
-            private onAdError(error);
+            private onAdEvent;
+            private onAdError;
             /**
              * When the ad starts playing, and the game should be paused
              */
-            private onContentPauseRequested();
+            private onContentPauseRequested;
             /**
              * When the ad is finished and the game should be resumed
              */
-            private onContentResumeRequested();
-            private parseCustomParams(customParams);
+            private onContentResumeRequested;
+            private parseCustomParams;
             /**
              * Checks if the ads are enabled (e.g; adblock is enabled or not)
              * @returns {boolean}
              */
-            private areAdsEnabled();
+            private areAdsEnabled;
         }
     }
 }

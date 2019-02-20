@@ -66,18 +66,20 @@ module PhaserAds {
 
                     this.adManager.onContentPaused.dispatch();
                     gdsdk.showAd((adType === PhaserAds.AdType.rewarded) ? GameDistributionAdType.rewarded : GameDistributionAdType.interstitial).then(() => {
-                        this.adManager.unMuteAfterAd();
-                        this.adManager.onContentResumed.dispatch();
                         if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === true) {
                             this.adManager.onAdRewardGranted.dispatch();
                             this.hasRewarded = false;
                         }
-                    }).catch(() => {
+
                         this.adManager.unMuteAfterAd();
                         this.adManager.onContentResumed.dispatch();
+                    }).catch(() => {
                         if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === true) {
                             this.hasRewarded = false;
                         }
+
+                        this.adManager.unMuteAfterAd();
+                        this.adManager.onContentResumed.dispatch();
                     });
                 }
             }

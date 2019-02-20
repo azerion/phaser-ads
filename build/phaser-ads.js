@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.2.8-alpha.1 
+ * phaser-ads - version 2.3.0-alpha.1 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * OrangeGames
- * Build at 19-02-2019
+ * Build at 20-02-2019
  * Released under MIT License 
  */
 
@@ -34,7 +34,7 @@ var PhaserAds;
         AdType[AdType["banner"] = 2] = "banner";
         AdType[AdType["video"] = 3] = "video";
     })(AdType = PhaserAds.AdType || (PhaserAds.AdType = {}));
-    var AdManager = (function (_super) {
+    var AdManager = /** @class */ (function (_super) {
         __extends(AdManager, _super);
         function AdManager(game, pluginManager) {
             var _this = _super.call(this, game, pluginManager) || this;
@@ -166,7 +166,7 @@ var PhaserAds;
             CocoonProvider[CocoonProvider["Chartboost"] = 2] = "Chartboost";
             CocoonProvider[CocoonProvider["Heyzap"] = 3] = "Heyzap";
         })(CocoonProvider = AdProvider.CocoonProvider || (AdProvider.CocoonProvider = {}));
-        var CocoonAds = (function () {
+        var CocoonAds = /** @class */ (function () {
             function CocoonAds(game, provider, config) {
                 this.adsEnabled = false;
                 this.banner = null;
@@ -381,7 +381,7 @@ var PhaserAds;
 (function (PhaserAds) {
     var AdProvider;
     (function (AdProvider) {
-        var CordovaGameDistribution = (function () {
+        var CordovaGameDistribution = /** @class */ (function () {
             function CordovaGameDistribution(game, gameId, userId, debug) {
                 if (debug === void 0) { debug = false; }
                 this.adsEnabled = false;
@@ -476,7 +476,7 @@ var PhaserAds;
             HeyzapAdTypes[HeyzapAdTypes["Rewarded"] = 2] = "Rewarded";
             HeyzapAdTypes[HeyzapAdTypes["Banner"] = 3] = "Banner";
         })(HeyzapAdTypes = AdProvider.HeyzapAdTypes || (AdProvider.HeyzapAdTypes = {}));
-        var CordovaHeyzap = (function () {
+        var CordovaHeyzap = /** @class */ (function () {
             function CordovaHeyzap(game, publisherId) {
                 var _this = this;
                 this.adsEnabled = false;
@@ -630,7 +630,7 @@ var PhaserAds;
             GameDistributionAdType["interstitial"] = "interstitial";
             GameDistributionAdType["rewarded"] = "rewarded";
         })(GameDistributionAdType = AdProvider.GameDistributionAdType || (AdProvider.GameDistributionAdType = {}));
-        var GameDistributionAds = (function () {
+        var GameDistributionAds = /** @class */ (function () {
             function GameDistributionAds(game, gameId, userId) {
                 if (userId === void 0) { userId = ''; }
                 this.adsEnabled = true;
@@ -680,18 +680,18 @@ var PhaserAds;
                     }
                     this.adManager.onContentPaused.dispatch();
                     gdsdk.showAd((adType === PhaserAds.AdType.rewarded) ? GameDistributionAdType.rewarded : GameDistributionAdType.interstitial).then(function () {
-                        _this.adManager.unMuteAfterAd();
-                        _this.adManager.onContentResumed.dispatch();
                         if (adType === PhaserAds.AdType.rewarded && _this.hasRewarded === true) {
                             _this.adManager.onAdRewardGranted.dispatch();
                             _this.hasRewarded = false;
                         }
-                    }).catch(function () {
                         _this.adManager.unMuteAfterAd();
                         _this.adManager.onContentResumed.dispatch();
+                    }).catch(function () {
                         if (adType === PhaserAds.AdType.rewarded && _this.hasRewarded === true) {
                             _this.hasRewarded = false;
                         }
+                        _this.adManager.unMuteAfterAd();
+                        _this.adManager.onContentResumed.dispatch();
                     });
                 }
             };
@@ -745,7 +745,7 @@ var PhaserAds;
 (function (PhaserAds) {
     var AdProvider;
     (function (AdProvider) {
-        var Ima3 = (function () {
+        var Ima3 = /** @class */ (function () {
             function Ima3(game, adTagUrl) {
                 this.adsManager = null;
                 this.googleEnabled = false;
