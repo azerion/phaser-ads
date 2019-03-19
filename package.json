@@ -1,27 +1,27 @@
 {
-  "name": "@orange-games/phaser-ads",
-  "author": "OrangeGames",
+  "name": "@azerion/phaser-ads",
+  "author": "Azerion",
   "version": "2.2.7",
   "description": "A Phaser plugin for providing nice ads integration in your phaser.io game",
   "contributors": [
     {
       "name": "Ale Bles",
-      "email": "a.bles@orangegames.com"
+      "email": "a.bles@azerion.com"
     }
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:orange-games/phaser-ads.git"
+    "url": "git@github.com:azerion/phaser-ads.git"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/orange-games/phaser-ads/raw/master/LICENSE"
+      "url": "https://github.com/azerion/phaser-ads/raw/master/LICENSE"
     }
   ],
   "bugs": [
     {
-      "url": "https://github.com/orange-games/phaser-ads/issues"
+      "url": "https://github.com/azerion/phaser-ads/issues"
     }
   ],
   "config": {

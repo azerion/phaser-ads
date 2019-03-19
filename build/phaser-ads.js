@@ -2,8 +2,8 @@
  * phaser-ads - version 2.2.7 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
- * OrangeGames
- * Build at 07-08-2018
+ * Azerion
+ * Build at 15-03-2019
  * Released under MIT License 
  */
 
@@ -619,11 +619,6 @@ var PhaserAds;
 (function (PhaserAds) {
     var AdProvider;
     (function (AdProvider) {
-        var GameDistributionAdType;
-        (function (GameDistributionAdType) {
-            GameDistributionAdType[GameDistributionAdType["preroll"] = 0] = "preroll";
-            GameDistributionAdType[GameDistributionAdType["midroll"] = 1] = "midroll";
-        })(GameDistributionAdType = AdProvider.GameDistributionAdType || (AdProvider.GameDistributionAdType = {}));
         var GameDistributionAds = (function () {
             function GameDistributionAds(game, gameId, userId) {
                 if (userId === void 0) { userId = ''; }
