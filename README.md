@@ -1,4 +1,4 @@
-[![npm version](https://badge.fury.io/js/%40orange-games%2Fphaser-ads.svg)](https://badge.fury.io/js/%40orange-games%2Fphaser-ads) [![jsDelivr Hits](https://data.jsdelivr.com/v1/package/npm/@orange-games/phaser-ads/badge)](https://www.jsdelivr.com/package/npm/@orange-games/phaser-ads)
+[![npm version](https://badge.fury.io/js/%40azerion%2Fphaser-ads.svg)](https://badge.fury.io/js/%40azerion%2Fphaser-ads) [![jsDelivr Hits](https://data.jsdelivr.com/v1/package/npm/@azerion/phaser-ads/badge)](https://www.jsdelivr.com/package/npm/@azerion/phaser-ads)
 
 Phaser Ads
 ==========
@@ -17,9 +17,9 @@ Key features:
 
 Getting Started
 ---------------
-First you want to get a fresh copy of the plugin. You can get it from [this repo](https://github.com/orange-games/phaser-ads/releases) or from [npm](https://www.npmjs.com/package/@orange-games/phaser-ads).
+First you want to get a fresh copy of the plugin. You can get it from [this repo](https://github.com/azerion/phaser-ads/releases) or from [npm](https://www.npmjs.com/package/@azerion/phaser-ads).
 ```
-npm install @orange-games/phaser-ads
+npm install @azerion/phaser-ads
 ```
 
 Next up you'd want to add it to your list of js sources you load into your game:
@@ -29,7 +29,7 @@ Next up you'd want to add it to your list of js sources you load into your game:
 
 You could also opt for using the (free) jsdelivr cdn: 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@orange-games/phaser-ads@latest/build/phaser-ads.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azerion/phaser-ads@latest/build/phaser-ads.min.js"></script>
 ```
 
 After adding the script to the page you can activate it by enabling the plugin:
@@ -104,7 +104,7 @@ That beeing sad, this plugin is on github, and you're welcome to shoot in a PR t
 
 Disclaimer
 ----------
-We at OrangeGames just love playing and creating awesome games. We aren't affiliated with Phaser.io. We just needed some awesome ads in our awesome HTML5 games. Feel free to use it for enhancing your own awesome games!
+We at Azerion just love playing and creating awesome games. We aren't affiliated with Phaser.io. We just needed some awesome ads in our awesome HTML5 games. Feel free to use it for enhancing your own awesome games!
 
 Phaser Ads is distributed under the MIT license. All 3rd party libraries and components are distributed under their
 respective license terms.
