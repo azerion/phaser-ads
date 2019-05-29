@@ -1,3 +1,6 @@
+###**_IMPORTANT NOTE_**
+**This repository is to be considered _DEPRECATED_ and all efforts are going towards developing the next version of the Ad Wrapper in [azerion/h5-ad-wrapper](https://github.com/azerion/h5-ad-wrapper).**
+
 [![npm version](https://badge.fury.io/js/%40azerion%2Fphaser-ads.svg)](https://badge.fury.io/js/%40azerion%2Fphaser-ads) [![jsDelivr Hits](https://data.jsdelivr.com/v1/package/npm/@azerion/phaser-ads/badge)](https://www.jsdelivr.com/package/npm/@azerion/phaser-ads)
 
 Phaser Ads
