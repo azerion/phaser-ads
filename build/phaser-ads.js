@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.3.0-alpha.1 
+ * phaser-ads - version 2.3.0 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * Azerion
- * Build at 14-03-2019
+ * Build at 11-09-2019
  * Released under MIT License 
  */
 
@@ -651,7 +651,7 @@ var PhaserAds;
                     }
                     js = d.createElement(s);
                     js.id = id;
-                    js.src = '//html5.api.gamedistribution.com//test/main.min.js';
+                    js.src = '//html5.api.gamedistribution.com/main.min.js';
                     fjs.parentNode.insertBefore(js, fjs);
                 }(document, 'script', 'gamedistribution-jssdk'));
             }
@@ -698,6 +698,9 @@ var PhaserAds;
             //Does nothing, but needed for Provider interface
             GameDistributionAds.prototype.preloadAd = function (adType) {
                 var _this = this;
+                if (this.hasRewarded) {
+                    return;
+                }
                 gdsdk.preloadAd(GameDistributionAdType.rewarded).then(function () {
                     _this.hasRewarded = true;
                     _this.adManager.onAdLoaded.dispatch(adType);

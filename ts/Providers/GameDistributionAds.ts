@@ -32,7 +32,7 @@ module PhaserAds {
                     }
                     js = <HTMLScriptElement>d.createElement(s);
                     js.id = id;
-                    js.src = '//html5.api.gamedistribution.com//test/main.min.js';
+                    js.src = '//html5.api.gamedistribution.com/main.min.js';
                     fjs.parentNode.insertBefore(js, fjs);
                 }(document, 'script', 'gamedistribution-jssdk'));
             }
@@ -86,6 +86,10 @@ module PhaserAds {
 
             //Does nothing, but needed for Provider interface
             public preloadAd(adType: PhaserAds.AdType): void {
+                if (this.hasRewarded) {
+                    return;
+                }
+
                 gdsdk.preloadAd(GameDistributionAdType.rewarded).then(() => {
                     this.hasRewarded = true;
                     this.adManager.onAdLoaded.dispatch(adType);
