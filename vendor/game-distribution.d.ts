@@ -1,8 +1,8 @@
 interface IGameDistributionSettings {
     gameId: string;
-    userId: string;
-    onEvent: (event: any) => void;
+    userId?: string;
+    onEvent?: (event: any) => void;
 }
 
-declare var gdApi: any;
+declare var gdsdk: any;
 declare var GD_OPTIONS: IGameDistributionSettings;

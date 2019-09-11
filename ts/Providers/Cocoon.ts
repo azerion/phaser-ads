@@ -24,7 +24,7 @@ module PhaserAds {
 
             private rewarded: Cocoon.Ad.IBanner = null;
 
-            private rewardedShowable: boolean = false;
+            public hasRewarded: boolean = false;
 
             constructor(game: Phaser.Game, provider: CocoonProvider, config?: any) {
                 if ((game.device.cordova || game.device.crosswalk) && (Cocoon && Cocoon.Ad)) {
@@ -89,7 +89,7 @@ module PhaserAds {
                 }
 
                 if (adType === AdType.rewarded) {
-                    if (!this.rewardedShowable || null === this.rewarded) {
+                    if (!this.hasRewarded || null === this.rewarded) {
                         this.adManager.unMuteAfterAd();
                         //No banner ad available, skipping
                         this.adManager.onContentResumed.dispatch(AdType.rewarded);
@@ -170,10 +170,10 @@ module PhaserAds {
                 if (adType === AdType.rewarded) {
                     this.rewarded = this.cocoonProvider.createRewardedVideo(adId);
                     this.rewarded.on('load', () => {
-                        this.rewardedShowable = true;
+                        this.hasRewarded = true;
                     });
                     this.rewarded.on('fail', () => {
-                        this.rewardedShowable = false;
+                        this.hasRewarded = false;
                         this.rewarded = null;
                     });
                     this.rewarded.on('click', () => {
@@ -187,14 +187,14 @@ module PhaserAds {
                     this.rewarded.on('dismiss', () => {
                         this.adManager.unMuteAfterAd();
                         this.adManager.onContentResumed.dispatch(AdType.rewarded);
-                        this.rewardedShowable = false;
+                        this.hasRewarded = false;
                         this.rewarded = null;
                     });
 
                     this.rewarded.on('reward', () => {
                         this.adManager.unMuteAfterAd();
                         this.adManager.onAdRewardGranted.dispatch(AdType.rewarded);
-                        this.rewardedShowable = false;
+                        this.hasRewarded = false;
                         this.rewarded = null;
                     });
                     this.rewarded.load();

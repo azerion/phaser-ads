@@ -20,7 +20,7 @@ Key features:
 
 Getting Started
 ---------------
-First you want to get a fresh copy of the plugin. You can get it from [this repo](https://github.com/azerion/phaser-ads/releases) or from [npm](https://npmjs.com/package/@azerion/phaser-ads).
+First you want to get a fresh copy of the plugin. You can get it from [this repo](https://github.com/azerion/phaser-ads/releases) or from [npm](https://www.npmjs.com/package/@azerion/phaser-ads).
 ```
 npm install @azerion/phaser-ads
 ```

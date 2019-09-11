@@ -12,6 +12,8 @@ module PhaserAds {
 
             public adsEnabled: boolean = false;
 
+            public hasRewarded: boolean = false;
+
             constructor(game: Phaser.Game, publisherId: string) {
                 if (game.device.cordova || game.device.crosswalk) {
                     this.adsEnabled = true;

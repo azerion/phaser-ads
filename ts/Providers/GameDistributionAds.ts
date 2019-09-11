@@ -1,38 +1,25 @@
 
 module PhaserAds {
     export module AdProvider {
+        export enum GameDistributionAdType {
+            interstitial = 'interstitial',
+            rewarded = 'rewarded'
+        }
+
         export class GameDistributionAds implements PhaserAds.AdProvider.IProvider {
             public adManager: AdManager;
 
             public adsEnabled: boolean = true;
+
+            public hasRewarded: boolean = false;
 
             constructor(game: Phaser.Game, gameId: string, userId: string = '') {
                 this.areAdsEnabled();
 
                 GD_OPTIONS = <IGameDistributionSettings>{
                     gameId: gameId,
-                    userId: userId,
                     advertisementSettings: {
                         autoplay: false
-                    },
-                    onEvent: (event: any): void => {
-                        switch (event.name) {
-                            case 'SDK_GAME_START':
-                                if (typeof gdApi !== 'undefined') {
-                                    gdApi.play();
-                                }
-                                this.adManager.unMuteAfterAd();
-                                this.adManager.onContentResumed.dispatch();
-                                break;
-                            case 'SDK_GAME_PAUSE':
-                                this.adManager.onContentPaused.dispatch();
-                                break;
-                            case 'SDK_READY':
-                                //add something here
-                                 break;
-                            case 'SDK_ERROR':
-                                break;
-                        }
                     }
                 };
 
@@ -54,12 +41,12 @@ module PhaserAds {
                 this.adManager = manager;
             }
 
-            public showAd(): void {
+            public showAd(adType: AdType): void {
                 if (!this.adsEnabled) {
                     this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
                 } else {
-                    if (typeof gdApi === 'undefined' ||  (gdApi && typeof gdApi.showBanner === 'undefined')) {
+                    if (typeof gdsdk === 'undefined' ||  (gdsdk && typeof gdsdk.showAd === 'undefined')) {
                         //So gdApi isn't available OR
                         //gdApi is available, but showBanner is not there (weird but can happen)
                         this.adsEnabled = false;
@@ -69,13 +56,44 @@ module PhaserAds {
 
                         return;
                     }
-                    gdApi.showBanner();
+
+                    if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === false) {
+                        this.adManager.unMuteAfterAd();
+                        this.adManager.onContentResumed.dispatch();
+
+                        return;
+                    }
+
+                    this.adManager.onContentPaused.dispatch();
+                    gdsdk.showAd((adType === PhaserAds.AdType.rewarded) ? GameDistributionAdType.rewarded : GameDistributionAdType.interstitial).then(() => {
+                        if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === true) {
+                            this.adManager.onAdRewardGranted.dispatch();
+                            this.hasRewarded = false;
+                        }
+
+                        this.adManager.unMuteAfterAd();
+                        this.adManager.onContentResumed.dispatch();
+                    }).catch(() => {
+                        if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === true) {
+                            this.hasRewarded = false;
+                        }
+
+                        this.adManager.unMuteAfterAd();
+                        this.adManager.onContentResumed.dispatch();
+                    });
                 }
             }
 
             //Does nothing, but needed for Provider interface
-            public preloadAd(): void {
-                return;
+            public preloadAd(adType: PhaserAds.AdType): void {
+                if (this.hasRewarded) {
+                    return;
+                }
+
+                gdsdk.preloadAd(GameDistributionAdType.rewarded).then(() => {
+                    this.hasRewarded = true;
+                    this.adManager.onAdLoaded.dispatch(adType);
+                });
             }
 
             //Does nothing, but needed for Provider interface
