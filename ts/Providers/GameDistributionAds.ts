@@ -20,6 +20,16 @@ module PhaserAds {
                     gameId: gameId,
                     advertisementSettings: {
                         autoplay: false
+                    },
+                    onEvent: (event: any): void => {
+                        switch (event.name as string) {
+                            case 'SDK_GAME_PAUSE':
+                                // pause game logic / mute audio
+                                this.adManager.onContentPaused.dispatch();
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 };
 
@@ -64,7 +74,6 @@ module PhaserAds {
                         return;
                     }
 
-                    this.adManager.onContentPaused.dispatch();
                     gdsdk.showAd((adType === PhaserAds.AdType.rewarded) ? GameDistributionAdType.rewarded : GameDistributionAdType.interstitial).then(() => {
                         if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === true) {
                             this.adManager.onAdRewardGranted.dispatch();
