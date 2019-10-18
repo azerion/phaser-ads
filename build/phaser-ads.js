@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.3.0 
+ * phaser-ads - version 2.3.1 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * Azerion
- * Build at 11-09-2019
+ * Build at 18-10-2019
  * Released under MIT License 
  */
 
@@ -633,6 +633,7 @@ var PhaserAds;
         var GameDistributionAds = /** @class */ (function () {
             function GameDistributionAds(game, gameId, userId) {
                 if (userId === void 0) { userId = ''; }
+                var _this = this;
                 this.adsEnabled = true;
                 this.hasRewarded = false;
                 this.areAdsEnabled();
@@ -640,6 +641,16 @@ var PhaserAds;
                     gameId: gameId,
                     advertisementSettings: {
                         autoplay: false
+                    },
+                    onEvent: function (event) {
+                        switch (event.name) {
+                            case 'SDK_GAME_PAUSE':
+                                // pause game logic / mute audio
+                                _this.adManager.onContentPaused.dispatch();
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 };
                 //Include script. even when adblock is enabled, this script also allows us to track our users;
@@ -678,7 +689,6 @@ var PhaserAds;
                         this.adManager.onContentResumed.dispatch();
                         return;
                     }
-                    this.adManager.onContentPaused.dispatch();
                     gdsdk.showAd((adType === PhaserAds.AdType.rewarded) ? GameDistributionAdType.rewarded : GameDistributionAdType.interstitial).then(function () {
                         if (adType === PhaserAds.AdType.rewarded && _this.hasRewarded === true) {
                             _this.adManager.onAdRewardGranted.dispatch();
