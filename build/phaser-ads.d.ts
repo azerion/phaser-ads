@@ -154,11 +154,32 @@ declare module PhaserAds {
             Skyscraper = 4,
             WideSkyscraper = 5
         }
+        enum GameDistributionAlignment {
+            TopLeft = 0,
+            TopCenter = 1,
+            TopRight = 2,
+            CenterLeft = 3,
+            Center = 4,
+            CenterRight = 5,
+            BottomLeft = 6,
+            BottomCenter = 7,
+            BottomRight = 8
+        }
         class GameDistributionBanner {
             element: HTMLElement;
+            private resizeListener;
+            private parent;
+            private alignment;
+            private width;
+            private height;
+            private offsetX;
+            private offsetY;
             constructor();
             loadBanner(): void;
             destroy(): void;
+            alignIn(element: HTMLElement, position: GameDistributionAlignment): void;
+            setOffset(x?: number, y?: number): void;
+            private resize;
             setSize(size: GameDistributionBannerSize): void;
             position(x: number, y: number): void;
         }
