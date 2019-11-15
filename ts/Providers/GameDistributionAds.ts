@@ -3,7 +3,8 @@ module PhaserAds {
     export module AdProvider {
         export enum GameDistributionAdType {
             interstitial = 'interstitial',
-            rewarded = 'rewarded'
+            rewarded = 'rewarded',
+            display = 'display'
         }
 
         export class GameDistributionAds implements PhaserAds.AdProvider.IProvider {
@@ -51,46 +52,51 @@ module PhaserAds {
                 this.adManager = manager;
             }
 
-            public showAd(adType: AdType): void {
+            public showAd(adType: AdType, containerId?: string): void {
                 if (!this.adsEnabled) {
                     this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
-                } else {
-                    if (typeof gdsdk === 'undefined' ||  (gdsdk && typeof gdsdk.showAd === 'undefined')) {
-                        //So gdApi isn't available OR
-                        //gdApi is available, but showBanner is not there (weird but can happen)
-                        this.adsEnabled = false;
-
-                        this.adManager.unMuteAfterAd();
-                        this.adManager.onContentResumed.dispatch();
-
-                        return;
-                    }
-
-                    if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === false) {
-                        this.adManager.unMuteAfterAd();
-                        this.adManager.onContentResumed.dispatch();
-
-                        return;
-                    }
-
-                    gdsdk.showAd((adType === PhaserAds.AdType.rewarded) ? GameDistributionAdType.rewarded : GameDistributionAdType.interstitial).then(() => {
-                        if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === true) {
-                            this.adManager.onAdRewardGranted.dispatch();
-                            this.hasRewarded = false;
-                        }
-
-                        this.adManager.unMuteAfterAd();
-                        this.adManager.onContentResumed.dispatch();
-                    }).catch(() => {
-                        if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === true) {
-                            this.hasRewarded = false;
-                        }
-
-                        this.adManager.unMuteAfterAd();
-                        this.adManager.onContentResumed.dispatch();
-                    });
+                    return;
                 }
+
+                if (typeof gdsdk === 'undefined' ||  (gdsdk && typeof gdsdk.showAd === 'undefined')) {
+                    //So gdApi isn't available OR
+                    //gdApi is available, but showBanner is not there (weird but can happen)
+                    this.adsEnabled = false;
+                    this.adManager.unMuteAfterAd();
+                    this.adManager.onContentResumed.dispatch();
+                    return;
+                }
+
+                if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === false) {
+                    this.adManager.unMuteAfterAd();
+                    this.adManager.onContentResumed.dispatch();
+                    return;
+                }
+
+                if (adType === PhaserAds.AdType.banner) {
+                    gdsdk.showAd(GameDistributionAdType.display, {
+                        containerId
+                    });
+                    return;
+                }
+
+                gdsdk.showAd((adType === PhaserAds.AdType.rewarded) ? GameDistributionAdType.rewarded : GameDistributionAdType.interstitial).then(() => {
+                    if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === true) {
+                        this.adManager.onAdRewardGranted.dispatch();
+                        this.hasRewarded = false;
+                    }
+
+                    this.adManager.unMuteAfterAd();
+                    this.adManager.onContentResumed.dispatch();
+                }).catch(() => {
+                    if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === true) {
+                        this.hasRewarded = false;
+                    }
+
+                    this.adManager.unMuteAfterAd();
+                    this.adManager.onContentResumed.dispatch();
+                });
             }
 
             //Does nothing, but needed for Provider interface
