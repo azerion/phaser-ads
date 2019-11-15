@@ -158,8 +158,7 @@ declare module PhaserAds {
             element: HTMLElement;
             constructor();
             loadBanner(): void;
-            show(): void;
-            hide(): void;
+            destroy(): void;
             setSize(size: GameDistributionBannerSize): void;
             position(x: number, y: number): void;
         }

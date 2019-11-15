@@ -651,7 +651,6 @@ var PhaserAds;
             function GameDistributionBanner() {
                 this.element = document.createElement('div');
                 this.element.style.position = 'absolute';
-                this.element.style.visibility = 'visible';
                 this.element.style.top = "0px";
                 this.element.style.left = "0px";
                 this.element.id = "banner-" + Date.now() + (Math.random() * 10000000 | 0);
@@ -663,11 +662,8 @@ var PhaserAds;
                     containerId: this.element.id
                 });
             };
-            GameDistributionBanner.prototype.show = function () {
-                this.element.style.visibility = 'visible';
-            };
-            GameDistributionBanner.prototype.hide = function () {
-                this.element.style.visibility = 'hidden';
+            GameDistributionBanner.prototype.destroy = function () {
+                document.body.removeChild(this.element);
             };
             GameDistributionBanner.prototype.setSize = function (size) {
                 var width, height;

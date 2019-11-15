@@ -23,7 +23,6 @@ module PhaserAds {
             constructor() {
                 this.element = document.createElement('div');
                 this.element.style.position = 'absolute';
-                this.element.style.visibility = 'visible';
                 this.element.style.top = `0px`;
                 this.element.style.left = `0px`;
                 this.element.id = `banner-${Date.now()}${Math.random() * 10000000 | 0}`;
@@ -36,12 +35,8 @@ module PhaserAds {
                 });
             }
 
-            public show(): void {
-                this.element.style.visibility = 'visible';
-            }
-
-            public hide(): void {
-                this.element.style.visibility = 'hidden';
+            public destroy(): void {
+                document.body.removeChild(this.element);
             }
 
             public setSize(size: GameDistributionBannerSize): void {
