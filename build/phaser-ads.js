@@ -1,5 +1,5 @@
 /*!
- * phaser-ads - version 2.4.0 
+ * phaser-ads - version 2.4.1 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * Azerion
@@ -647,8 +647,22 @@ var PhaserAds;
             GameDistributionBannerSize[GameDistributionBannerSize["Skyscraper"] = 4] = "Skyscraper";
             GameDistributionBannerSize[GameDistributionBannerSize["WideSkyscraper"] = 5] = "WideSkyscraper"; // 160x600
         })(GameDistributionBannerSize = AdProvider.GameDistributionBannerSize || (AdProvider.GameDistributionBannerSize = {}));
+        var GameDistributionAlignment;
+        (function (GameDistributionAlignment) {
+            GameDistributionAlignment[GameDistributionAlignment["TopLeft"] = 0] = "TopLeft";
+            GameDistributionAlignment[GameDistributionAlignment["TopCenter"] = 1] = "TopCenter";
+            GameDistributionAlignment[GameDistributionAlignment["TopRight"] = 2] = "TopRight";
+            GameDistributionAlignment[GameDistributionAlignment["CenterLeft"] = 3] = "CenterLeft";
+            GameDistributionAlignment[GameDistributionAlignment["Center"] = 4] = "Center";
+            GameDistributionAlignment[GameDistributionAlignment["CenterRight"] = 5] = "CenterRight";
+            GameDistributionAlignment[GameDistributionAlignment["BottomLeft"] = 6] = "BottomLeft";
+            GameDistributionAlignment[GameDistributionAlignment["BottomCenter"] = 7] = "BottomCenter";
+            GameDistributionAlignment[GameDistributionAlignment["BottomRight"] = 8] = "BottomRight";
+        })(GameDistributionAlignment = AdProvider.GameDistributionAlignment || (AdProvider.GameDistributionAlignment = {}));
         var GameDistributionBanner = /** @class */ (function () {
             function GameDistributionBanner() {
+                this.offsetX = 0;
+                this.offsetY = 0;
                 this.element = document.createElement('div');
                 this.element.style.position = 'absolute';
                 this.element.style.top = "0px";
@@ -664,6 +678,41 @@ var PhaserAds;
             };
             GameDistributionBanner.prototype.destroy = function () {
                 document.body.removeChild(this.element);
+                this.element = null;
+                this.parent = null;
+                this.alignment = null;
+                if (this.resizeListener) {
+                    window.removeEventListener('resize', this.resizeListener);
+                }
+            };
+            GameDistributionBanner.prototype.alignIn = function (element, position) {
+                var _this = this;
+                this.parent = element;
+                this.alignment = position;
+                this.resizeListener = function () { return _this.resize(); };
+                window.addEventListener('resize', this.resizeListener);
+                this.resize();
+            };
+            GameDistributionBanner.prototype.setOffset = function (x, y) {
+                if (x === void 0) { x = 0; }
+                if (y === void 0) { y = 0; }
+                this.offsetX = x;
+                this.offsetY = y;
+                this.resize();
+            };
+            GameDistributionBanner.prototype.resize = function () {
+                var parentBoundingRect = this.parent.getBoundingClientRect();
+                switch (this.alignment) {
+                    case GameDistributionAlignment.TopCenter:
+                        this.position(parentBoundingRect.left + parentBoundingRect.width / 2 - this.width / 2, parentBoundingRect.top);
+                        break;
+                    case GameDistributionAlignment.TopRight:
+                        this.position(parentBoundingRect.left + parentBoundingRect.width - this.width, parentBoundingRect.top);
+                        break;
+                    case GameDistributionAlignment.BottomCenter:
+                        this.position(parentBoundingRect.left + parentBoundingRect.width / 2 - this.width / 2, parentBoundingRect.top + parentBoundingRect.height - this.height);
+                        break;
+                }
             };
             GameDistributionBanner.prototype.setSize = function (size) {
                 var width, height;
@@ -694,12 +743,14 @@ var PhaserAds;
                         height = 600;
                         break;
                 }
+                this.width = width;
+                this.height = height;
                 this.element.style.width = width + "px";
                 this.element.style.height = height + "px";
             };
             GameDistributionBanner.prototype.position = function (x, y) {
-                this.element.style.left = x + "px";
-                this.element.style.top = y + "px";
+                this.element.style.left = x + this.offsetX + "px";
+                this.element.style.top = y + this.offsetY + "px";
             };
             return GameDistributionBanner;
         }());
