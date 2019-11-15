@@ -142,7 +142,8 @@ declare module PhaserAds {
     module AdProvider {
         enum GameDistributionAdType {
             interstitial = "interstitial",
-            rewarded = "rewarded"
+            rewarded = "rewarded",
+            display = "display"
         }
         class GameDistributionAds implements PhaserAds.AdProvider.IProvider {
             adManager: AdManager;
@@ -150,7 +151,7 @@ declare module PhaserAds {
             hasRewarded: boolean;
             constructor(game: Phaser.Game, gameId: string, userId?: string);
             setManager(manager: PhaserAds.AdManager): void;
-            showAd(adType: AdType): void;
+            showAd(adType: AdType, containerId?: string): void;
             preloadAd(adType: PhaserAds.AdType): void;
             destroyAd(): void;
             hideAd(): void;

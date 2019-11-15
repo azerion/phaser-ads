@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.3.1 
+ * phaser-ads - version 2.4.0 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * Azerion
- * Build at 18-10-2019
+ * Build at 15-11-2019
  * Released under MIT License 
  */
 
@@ -629,6 +629,7 @@ var PhaserAds;
         (function (GameDistributionAdType) {
             GameDistributionAdType["interstitial"] = "interstitial";
             GameDistributionAdType["rewarded"] = "rewarded";
+            GameDistributionAdType["display"] = "display";
         })(GameDistributionAdType = AdProvider.GameDistributionAdType || (AdProvider.GameDistributionAdType = {}));
         var GameDistributionAds = /** @class */ (function () {
             function GameDistributionAds(game, gameId, userId) {
@@ -669,41 +670,46 @@ var PhaserAds;
             GameDistributionAds.prototype.setManager = function (manager) {
                 this.adManager = manager;
             };
-            GameDistributionAds.prototype.showAd = function (adType) {
+            GameDistributionAds.prototype.showAd = function (adType, containerId) {
                 var _this = this;
                 if (!this.adsEnabled) {
                     this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
+                    return;
                 }
-                else {
-                    if (typeof gdsdk === 'undefined' || (gdsdk && typeof gdsdk.showAd === 'undefined')) {
-                        //So gdApi isn't available OR
-                        //gdApi is available, but showBanner is not there (weird but can happen)
-                        this.adsEnabled = false;
-                        this.adManager.unMuteAfterAd();
-                        this.adManager.onContentResumed.dispatch();
-                        return;
-                    }
-                    if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === false) {
-                        this.adManager.unMuteAfterAd();
-                        this.adManager.onContentResumed.dispatch();
-                        return;
-                    }
-                    gdsdk.showAd((adType === PhaserAds.AdType.rewarded) ? GameDistributionAdType.rewarded : GameDistributionAdType.interstitial).then(function () {
-                        if (adType === PhaserAds.AdType.rewarded && _this.hasRewarded === true) {
-                            _this.adManager.onAdRewardGranted.dispatch();
-                            _this.hasRewarded = false;
-                        }
-                        _this.adManager.unMuteAfterAd();
-                        _this.adManager.onContentResumed.dispatch();
-                    }).catch(function () {
-                        if (adType === PhaserAds.AdType.rewarded && _this.hasRewarded === true) {
-                            _this.hasRewarded = false;
-                        }
-                        _this.adManager.unMuteAfterAd();
-                        _this.adManager.onContentResumed.dispatch();
+                if (typeof gdsdk === 'undefined' || (gdsdk && typeof gdsdk.showAd === 'undefined')) {
+                    //So gdApi isn't available OR
+                    //gdApi is available, but showBanner is not there (weird but can happen)
+                    this.adsEnabled = false;
+                    this.adManager.unMuteAfterAd();
+                    this.adManager.onContentResumed.dispatch();
+                    return;
+                }
+                if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === false) {
+                    this.adManager.unMuteAfterAd();
+                    this.adManager.onContentResumed.dispatch();
+                    return;
+                }
+                if (adType === PhaserAds.AdType.banner) {
+                    gdsdk.showAd(GameDistributionAdType.display, {
+                        containerId: containerId
                     });
+                    return;
                 }
+                gdsdk.showAd((adType === PhaserAds.AdType.rewarded) ? GameDistributionAdType.rewarded : GameDistributionAdType.interstitial).then(function () {
+                    if (adType === PhaserAds.AdType.rewarded && _this.hasRewarded === true) {
+                        _this.adManager.onAdRewardGranted.dispatch();
+                        _this.hasRewarded = false;
+                    }
+                    _this.adManager.unMuteAfterAd();
+                    _this.adManager.onContentResumed.dispatch();
+                }).catch(function () {
+                    if (adType === PhaserAds.AdType.rewarded && _this.hasRewarded === true) {
+                        _this.hasRewarded = false;
+                    }
+                    _this.adManager.unMuteAfterAd();
+                    _this.adManager.onContentResumed.dispatch();
+                });
             };
             //Does nothing, but needed for Provider interface
             GameDistributionAds.prototype.preloadAd = function (adType) {
