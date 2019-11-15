@@ -43,6 +43,7 @@ declare module PhaserAds {
          * @param args
          */
         showAd(...args: any[]): void;
+        loadBanner(...args: any[]): any;
         isRewardedAvailable(): boolean;
         /**
          * Some providers might require you to preload an ad before showing it, that can be done here
@@ -142,7 +143,24 @@ declare module PhaserAds {
     module AdProvider {
         enum GameDistributionAdType {
             interstitial = "interstitial",
-            rewarded = "rewarded"
+            rewarded = "rewarded",
+            display = "display"
+        }
+        enum GameDistributionBannerSize {
+            LargeRectangle = 0,
+            MediumRectangle = 1,
+            Billboard = 2,
+            Leaderboard = 3,
+            Skyscraper = 4,
+            WideSkyscraper = 5
+        }
+        class GameDistributionBanner {
+            element: HTMLElement;
+            constructor();
+            loadBanner(): void;
+            destroy(): void;
+            setSize(size: GameDistributionBannerSize): void;
+            position(x: number, y: number): void;
         }
         class GameDistributionAds implements PhaserAds.AdProvider.IProvider {
             adManager: AdManager;
@@ -150,7 +168,8 @@ declare module PhaserAds {
             hasRewarded: boolean;
             constructor(game: Phaser.Game, gameId: string, userId?: string);
             setManager(manager: PhaserAds.AdManager): void;
-            showAd(adType: AdType): void;
+            showAd(adType: AdType, containerId?: string): void;
+            loadBanner(size: GameDistributionBannerSize): GameDistributionBanner;
             preloadAd(adType: PhaserAds.AdType): void;
             destroyAd(): void;
             hideAd(): void;
@@ -232,6 +251,7 @@ declare module PhaserAds {
             destroyAd(...args: any[]): void;
             hideAd(...args: any[]): void;
             showAd(...args: any[]): void;
+            loadBanner?(...args: any[]): void;
         }
     }
 }

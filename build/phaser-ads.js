@@ -1,9 +1,9 @@
 /*!
- * phaser-ads - version 2.3.1 
+ * phaser-ads - version 2.4.0 
  * A Phaser plugin for providing nice ads integration in your phaser.io game
  *
  * Azerion
- * Build at 18-10-2019
+ * Build at 15-11-2019
  * Released under MIT License 
  */
 
@@ -84,6 +84,13 @@ var PhaserAds;
                 this.game.sound.mute = true;
             }
             this.provider.showAd.apply(this.provider, args);
+        };
+        AdManager.prototype.loadBanner = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            return this.provider.loadBanner.apply(this.provider, args);
         };
         AdManager.prototype.isRewardedAvailable = function () {
             return this.provider.hasRewarded;
@@ -629,7 +636,74 @@ var PhaserAds;
         (function (GameDistributionAdType) {
             GameDistributionAdType["interstitial"] = "interstitial";
             GameDistributionAdType["rewarded"] = "rewarded";
+            GameDistributionAdType["display"] = "display";
         })(GameDistributionAdType = AdProvider.GameDistributionAdType || (AdProvider.GameDistributionAdType = {}));
+        var GameDistributionBannerSize;
+        (function (GameDistributionBannerSize) {
+            GameDistributionBannerSize[GameDistributionBannerSize["LargeRectangle"] = 0] = "LargeRectangle";
+            GameDistributionBannerSize[GameDistributionBannerSize["MediumRectangle"] = 1] = "MediumRectangle";
+            GameDistributionBannerSize[GameDistributionBannerSize["Billboard"] = 2] = "Billboard";
+            GameDistributionBannerSize[GameDistributionBannerSize["Leaderboard"] = 3] = "Leaderboard";
+            GameDistributionBannerSize[GameDistributionBannerSize["Skyscraper"] = 4] = "Skyscraper";
+            GameDistributionBannerSize[GameDistributionBannerSize["WideSkyscraper"] = 5] = "WideSkyscraper"; // 160x600
+        })(GameDistributionBannerSize = AdProvider.GameDistributionBannerSize || (AdProvider.GameDistributionBannerSize = {}));
+        var GameDistributionBanner = /** @class */ (function () {
+            function GameDistributionBanner() {
+                this.element = document.createElement('div');
+                this.element.style.position = 'absolute';
+                this.element.style.top = "0px";
+                this.element.style.left = "0px";
+                this.element.id = "banner-" + Date.now() + (Math.random() * 10000000 | 0);
+                document.body.appendChild(this.element);
+            }
+            ;
+            GameDistributionBanner.prototype.loadBanner = function () {
+                return gdsdk.showAd(GameDistributionAdType.display, {
+                    containerId: this.element.id
+                });
+            };
+            GameDistributionBanner.prototype.destroy = function () {
+                document.body.removeChild(this.element);
+            };
+            GameDistributionBanner.prototype.setSize = function (size) {
+                var width, height;
+                switch (size) {
+                    default:
+                    case GameDistributionBannerSize.LargeRectangle:
+                        width = 336;
+                        height = 280;
+                        break;
+                    case GameDistributionBannerSize.MediumRectangle:
+                        width = 300;
+                        height = 250;
+                        break;
+                    case GameDistributionBannerSize.Billboard:
+                        width = 970;
+                        height = 250;
+                        break;
+                    case GameDistributionBannerSize.Leaderboard:
+                        width = 728;
+                        height = 90;
+                        break;
+                    case GameDistributionBannerSize.Skyscraper:
+                        width = 120;
+                        height = 600;
+                        break;
+                    case GameDistributionBannerSize.WideSkyscraper:
+                        width = 160;
+                        height = 600;
+                        break;
+                }
+                this.element.style.width = width + "px";
+                this.element.style.height = height + "px";
+            };
+            GameDistributionBanner.prototype.position = function (x, y) {
+                this.element.style.left = x + "px";
+                this.element.style.top = y + "px";
+            };
+            return GameDistributionBanner;
+        }());
+        AdProvider.GameDistributionBanner = GameDistributionBanner;
         var GameDistributionAds = /** @class */ (function () {
             function GameDistributionAds(game, gameId, userId) {
                 if (userId === void 0) { userId = ''; }
@@ -669,41 +743,46 @@ var PhaserAds;
             GameDistributionAds.prototype.setManager = function (manager) {
                 this.adManager = manager;
             };
-            GameDistributionAds.prototype.showAd = function (adType) {
+            GameDistributionAds.prototype.showAd = function (adType, containerId) {
                 var _this = this;
                 if (!this.adsEnabled) {
                     this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
+                    return;
                 }
-                else {
-                    if (typeof gdsdk === 'undefined' || (gdsdk && typeof gdsdk.showAd === 'undefined')) {
-                        //So gdApi isn't available OR
-                        //gdApi is available, but showBanner is not there (weird but can happen)
-                        this.adsEnabled = false;
-                        this.adManager.unMuteAfterAd();
-                        this.adManager.onContentResumed.dispatch();
-                        return;
-                    }
-                    if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === false) {
-                        this.adManager.unMuteAfterAd();
-                        this.adManager.onContentResumed.dispatch();
-                        return;
-                    }
-                    gdsdk.showAd((adType === PhaserAds.AdType.rewarded) ? GameDistributionAdType.rewarded : GameDistributionAdType.interstitial).then(function () {
-                        if (adType === PhaserAds.AdType.rewarded && _this.hasRewarded === true) {
-                            _this.adManager.onAdRewardGranted.dispatch();
-                            _this.hasRewarded = false;
-                        }
-                        _this.adManager.unMuteAfterAd();
-                        _this.adManager.onContentResumed.dispatch();
-                    }).catch(function () {
-                        if (adType === PhaserAds.AdType.rewarded && _this.hasRewarded === true) {
-                            _this.hasRewarded = false;
-                        }
-                        _this.adManager.unMuteAfterAd();
-                        _this.adManager.onContentResumed.dispatch();
-                    });
+                if (typeof gdsdk === 'undefined' || (gdsdk && typeof gdsdk.showAd === 'undefined')) {
+                    //So gdApi isn't available OR
+                    //gdApi is available, but showBanner is not there (weird but can happen)
+                    this.adsEnabled = false;
+                    this.adManager.unMuteAfterAd();
+                    this.adManager.onContentResumed.dispatch();
+                    return;
                 }
+                if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === false) {
+                    this.adManager.unMuteAfterAd();
+                    this.adManager.onContentResumed.dispatch();
+                    return;
+                }
+                gdsdk.showAd((adType === PhaserAds.AdType.rewarded) ? GameDistributionAdType.rewarded : GameDistributionAdType.interstitial).then(function () {
+                    if (adType === PhaserAds.AdType.rewarded && _this.hasRewarded === true) {
+                        _this.adManager.onAdRewardGranted.dispatch();
+                        _this.hasRewarded = false;
+                    }
+                    _this.adManager.unMuteAfterAd();
+                    _this.adManager.onContentResumed.dispatch();
+                }).catch(function () {
+                    if (adType === PhaserAds.AdType.rewarded && _this.hasRewarded === true) {
+                        _this.hasRewarded = false;
+                    }
+                    _this.adManager.unMuteAfterAd();
+                    _this.adManager.onContentResumed.dispatch();
+                });
+            };
+            GameDistributionAds.prototype.loadBanner = function (size) {
+                var banner = new GameDistributionBanner();
+                banner.setSize(size);
+                banner.loadBanner();
+                return banner;
             };
             //Does nothing, but needed for Provider interface
             GameDistributionAds.prototype.preloadAd = function (adType) {
