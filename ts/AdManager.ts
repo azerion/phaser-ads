@@ -85,6 +85,10 @@ module PhaserAds {
             this.provider.showAd.apply(this.provider, args);
         }
 
+        public loadBanner(...args: any[]): any {
+            return this.provider.loadBanner.apply(this.provider, args);
+        }
+
         public isRewardedAvailable(): boolean {
             return this.provider.hasRewarded;
         }

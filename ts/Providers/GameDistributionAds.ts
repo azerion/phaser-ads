@@ -7,6 +7,82 @@ module PhaserAds {
             display = 'display'
         }
 
+        export enum GameDistributionBannerSize {
+            LargeRectangle,     // 336x280
+            MediumRectangle,    // 300x250
+            Billboard,          // 970x250
+            Leaderboard,        // 728x90
+            Skyscraper,         // 120x600
+            WideSkyscraper      // 160x600
+        }
+
+        export class GameDistributionBanner {
+
+            public element: HTMLElement;
+
+            constructor() {
+                this.element = document.createElement('div');
+                this.element.style.position = 'absolute';
+                this.element.style.visibility = 'visible';
+                this.element.style.top = `0px`;
+                this.element.style.left = `0px`;
+                this.element.id = `banner-${Date.now()}${Math.random() * 10000000 | 0}`;
+                document.body.appendChild(this.element);
+            };
+
+            public loadBanner(): void {
+                return gdsdk.showAd(GameDistributionAdType.display, {
+                    containerId: this.element.id
+                });
+            }
+
+            public show(): void {
+                this.element.style.visibility = 'visible';
+            }
+
+            public hide(): void {
+                this.element.style.visibility = 'hidden';
+            }
+
+            public setSize(size: GameDistributionBannerSize): void {
+                let width: number, height: number;
+                switch (size) {
+                    default:
+                    case GameDistributionBannerSize.LargeRectangle:
+                        width = 336;
+                        height = 280;
+                        break;
+                    case GameDistributionBannerSize.MediumRectangle:
+                        width = 300;
+                        height = 250;
+                        break;
+                    case GameDistributionBannerSize.Billboard:
+                        width = 970;
+                        height = 250;
+                        break;
+                    case GameDistributionBannerSize.Leaderboard:
+                        width = 728;
+                        height = 90;
+                        break;
+                    case GameDistributionBannerSize.Skyscraper:
+                        width = 120;
+                        height = 600;
+                        break;
+                    case GameDistributionBannerSize.WideSkyscraper:
+                        width = 160;
+                        height = 600;
+                        break;
+                }
+                this.element.style.width = `${width}px`;
+                this.element.style.height = `${height}px`;
+            }
+
+            public position(x: number, y: number): void {
+                this.element.style.left = `${x}px`;
+                this.element.style.top = `${y}px`;
+            }
+        }
+
         export class GameDistributionAds implements PhaserAds.AdProvider.IProvider {
             public adManager: AdManager;
 
@@ -74,13 +150,6 @@ module PhaserAds {
                     return;
                 }
 
-                if (adType === PhaserAds.AdType.banner) {
-                    gdsdk.showAd(GameDistributionAdType.display, {
-                        containerId
-                    });
-                    return;
-                }
-
                 gdsdk.showAd((adType === PhaserAds.AdType.rewarded) ? GameDistributionAdType.rewarded : GameDistributionAdType.interstitial).then(() => {
                     if (adType === PhaserAds.AdType.rewarded && this.hasRewarded === true) {
                         this.adManager.onAdRewardGranted.dispatch();
@@ -97,6 +166,13 @@ module PhaserAds {
                     this.adManager.unMuteAfterAd();
                     this.adManager.onContentResumed.dispatch();
                 });
+            }
+
+            public loadBanner(size: GameDistributionBannerSize): GameDistributionBanner {
+                const banner: GameDistributionBanner = new GameDistributionBanner();
+                banner.setSize(size);
+                banner.loadBanner();
+                return banner;
             }
 
             //Does nothing, but needed for Provider interface
