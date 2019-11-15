@@ -703,14 +703,32 @@ var PhaserAds;
             GameDistributionBanner.prototype.resize = function () {
                 var parentBoundingRect = this.parent.getBoundingClientRect();
                 switch (this.alignment) {
+                    case GameDistributionAlignment.TopLeft:
+                        this.position(parentBoundingRect.left, parentBoundingRect.top);
+                        break;
                     case GameDistributionAlignment.TopCenter:
                         this.position(parentBoundingRect.left + parentBoundingRect.width / 2 - this.width / 2, parentBoundingRect.top);
                         break;
                     case GameDistributionAlignment.TopRight:
                         this.position(parentBoundingRect.left + parentBoundingRect.width - this.width, parentBoundingRect.top);
                         break;
+                    case GameDistributionAlignment.CenterLeft:
+                        this.position(parentBoundingRect.left, parentBoundingRect.top + parentBoundingRect.height / 2 - this.height / 2);
+                        break;
+                    case GameDistributionAlignment.Center:
+                        this.position(parentBoundingRect.left + parentBoundingRect.width / 2 - this.width / 2, parentBoundingRect.top + parentBoundingRect.height / 2 - this.height / 2);
+                        break;
+                    case GameDistributionAlignment.CenterRight:
+                        this.position(parentBoundingRect.left + parentBoundingRect.width - this.width, parentBoundingRect.top + parentBoundingRect.height / 2 - this.height / 2);
+                        break;
+                    case GameDistributionAlignment.BottomLeft:
+                        this.position(parentBoundingRect.left, parentBoundingRect.top + parentBoundingRect.height - this.height);
+                        break;
                     case GameDistributionAlignment.BottomCenter:
                         this.position(parentBoundingRect.left + parentBoundingRect.width / 2 - this.width / 2, parentBoundingRect.top + parentBoundingRect.height - this.height);
+                        break;
+                    case GameDistributionAlignment.BottomRight:
+                        this.position(parentBoundingRect.left + parentBoundingRect.width - this.width, parentBoundingRect.top + parentBoundingRect.height - this.height);
                         break;
                 }
             };
